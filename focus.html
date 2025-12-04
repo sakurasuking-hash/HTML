@@ -3,186 +3,335 @@
 <head>
   <meta charset="UTF-8" />
   <title>重点关注品种 - 后台界面交互</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
+    /* ====== 基础样式，偏 Material Design 风格 ====== */
+    :root {
+      color-scheme: light;
+      --color-bg: #f5f5f5;
+      --color-surface: #ffffff;
+      --color-primary: #1a73e8;
+      --color-primary-dark: #1557b0;
+      --color-error: #d93025;
+      --color-border: #dadce0;
+      --color-text: #202124;
+      --color-text-secondary: #5f6368;
+      --radius-md: 12px;
+      --shadow-sm: 0 1px 2px rgba(60,64,67,.3);
+      --shadow-md: 0 1px 3px rgba(60,64,67,.3), 0 4px 8px rgba(60,64,67,.15);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
     body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
       margin: 0;
-      padding: 0;
-      background-color: #f5f5f7;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+        Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei",
+        sans-serif;
+      background-color: var(--color-bg);
+      color: var(--color-text);
     }
+
     header {
-      background-color: #1f2933;
-      color: #fff;
-      padding: 12px 20px;
-      font-size: 16px;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background-color: var(--color-surface);
+      border-bottom: 1px solid var(--color-border);
+      padding: 12px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
     }
+
+    header h1 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    header span {
+      font-size: 12px;
+      color: var(--color-text-secondary);
+    }
+
     .container {
       display: flex;
-      padding: 16px;
-      gap: 16px;
+      padding: 20px 24px 32px;
+      gap: 20px;
+      max-width: 1280px;
+      margin: 0 auto;
     }
+
     .sidebar {
-      width: 240px;
-      background-color: #ffffff;
-      border-radius: 8px;
-      padding: 12px 16px;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+      width: 260px;
+      flex-shrink: 0;
+      background-color: var(--color-surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 18px;
       font-size: 13px;
+    }
+
+    .sidebar h2 {
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 600;
+    }
+
+    .sidebar p {
+      margin: 4px 0;
       line-height: 1.6;
     }
-    .sidebar h2 {
-      font-size: 15px;
-      margin-top: 0;
-      margin-bottom: 8px;
-    }
+
     .sidebar ul {
-      padding-left: 16px;
-      margin: 4px 0;
+      margin: 6px 0 0;
+      padding-left: 18px;
     }
+
     .sidebar li {
       margin: 2px 0;
     }
+
+    .muted {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
     .main {
       flex: 1;
       display: flex;
       flex-direction: column;
       gap: 16px;
     }
+
     .card {
-      background-color: #ffffff;
-      border-radius: 8px;
-      padding: 16px 18px;
-      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+      background-color: var(--color-surface);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      padding: 16px 18px 18px;
     }
+
     .card h2 {
-      margin: 0 0 12px 0;
-      font-size: 16px;
+      margin: 0 0 10px;
+      font-size: 15px;
+      font-weight: 600;
     }
+
     .card h3 {
-      margin: 12px 0 8px 0;
+      margin: 12px 0 6px;
       font-size: 14px;
+      font-weight: 500;
     }
-    .card p, .card li {
+
+    .card p,
+    .card li {
       font-size: 13px;
       line-height: 1.7;
     }
-    .tag {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
+
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
       font-size: 11px;
-      margin-left: 4px;
-      background-color: #eef2ff;
-      color: #4338ca;
+      border: 1px solid #e0e0e0;
+      color: var(--color-text-secondary);
+      margin-left: 6px;
+      background-color: #f8f9fa;
     }
-    .toolbar, .filters, .batch-actions, .page-actions {
+
+    /* ====== 表单/按钮/表格 ====== */
+    .filters,
+    .batch-actions,
+    .page-actions {
       display: flex;
       align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
       flex-wrap: wrap;
+      gap: 8px 12px;
+      margin-bottom: 10px;
     }
+
     .filters label {
       font-size: 12px;
+      color: var(--color-text-secondary);
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
     }
-    select, input[type="text"], input[type="datetime-local"] {
+
+    select,
+    input[type="text"],
+    input[type="datetime-local"],
+    input[type="file"] {
       font-size: 12px;
-      padding: 4px 6px;
-      border-radius: 4px;
-      border: 1px solid #d1d5db;
-      min-width: 120px;
+      padding: 4px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+      min-width: 130px;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
     }
+
+    select:focus,
+    input[type="text"]:focus,
+    input[type="datetime-local"]:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px rgba(26,115,232,.1);
+    }
+
     button {
       font-size: 12px;
-      padding: 4px 10px;
-      border-radius: 4px;
-      border: 1px solid #d1d5db;
-      background-color: #fff;
+      padding: 6px 12px;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background-color: var(--color-surface);
+      color: var(--color-text);
       cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background-color .12s ease, box-shadow .12s ease, border-color .12s ease, transform .05s ease;
     }
+
     button.primary {
-      background-color: #2563eb;
-      border-color: #2563eb;
+      background-color: var(--color-primary);
+      border-color: var(--color-primary);
       color: #fff;
     }
+
     button.danger {
-      background-color: #dc2626;
-      border-color: #dc2626;
+      background-color: var(--color-error);
+      border-color: var(--color-error);
       color: #fff;
     }
-    button[disabled] {
-      opacity: 0.5;
-      cursor: default;
+
+    button:hover:not(:disabled) {
+      box-shadow: var(--shadow-sm);
+      background-color: #f8f9fa;
+      transform: translateY(-0.5px);
     }
+
+    button.primary:hover:not(:disabled) {
+      background-color: var(--color-primary-dark);
+    }
+
+    button.danger:hover:not(:disabled) {
+      background-color: #b3251e;
+    }
+
+    button:disabled {
+      opacity: .5;
+      cursor: default;
+      box-shadow: none;
+      transform: none;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
       font-size: 12px;
-      margin-top: 4px;
     }
-    th, td {
-      border: 1px solid #e5e7eb;
-      padding: 6px 8px;
+
+    th,
+    td {
+      padding: 8px 10px;
+      border-bottom: 1px solid #e0e0e0;
       text-align: left;
       vertical-align: top;
     }
+
     th {
-      background-color: #f3f4f6;
-      cursor: default;
-    }
-    th.sortable {
-      cursor: pointer;
+      background-color: #f8f9fa;
+      font-weight: 500;
+      color: var(--color-text-secondary);
+      font-size: 11px;
       white-space: nowrap;
     }
-    th.sortable span {
-      font-size: 11px;
-      color: #6b7280;
-      margin-left: 4px;
+
+    th.sortable {
+      cursor: pointer;
     }
+
+    th.sortable span {
+      margin-left: 4px;
+      font-size: 11px;
+      color: #9aa0a6;
+    }
+
+    tbody tr:hover {
+      background-color: #f5f7fb;
+    }
+
     .status-pill {
-      display: inline-block;
-      padding: 2px 6px;
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
       border-radius: 999px;
       font-size: 11px;
+      font-weight: 500;
     }
+
     .status-draft {
-      background-color: #fef3c7;
-      color: #92400e;
+      background-color: #fef7e0;
+      color: #b06a00;
     }
+
     .status-published {
-      background-color: #dcfce7;
-      color: #166534;
+      background-color: #e6f4ea;
+      color: #137333;
     }
+
     .status-offline {
-      background-color: #e5e7eb;
-      color: #374151;
+      background-color: #eceff1;
+      color: #37474f;
     }
+
+    /* ====== 新建/编辑表单 ====== */
     .form-grid {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
       gap: 12px 16px;
-      margin-bottom: 8px;
+      margin-bottom: 10px;
     }
+
     .form-item label {
       display: block;
       font-size: 12px;
+      color: var(--color-text-secondary);
       margin-bottom: 2px;
     }
+
     textarea {
       width: 100%;
-      min-height: 60px;
+      min-height: 70px;
       font-size: 12px;
-      padding: 4px 6px;
-      border-radius: 4px;
-      border: 1px solid #d1d5db;
+      padding: 6px 8px;
+      border-radius: 8px;
+      border: 1px solid var(--color-border);
       resize: vertical;
+      outline: none;
+      transition: border-color .15s ease, box-shadow .15s ease;
     }
+
+    textarea:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 1px rgba(26,115,232,.1);
+    }
+
     .symbol-block {
-      border: 1px dashed #e5e7eb;
-      border-radius: 6px;
+      border-radius: 10px;
+      border: 1px solid #e0e0e0;
       padding: 10px 12px;
-      margin-bottom: 8px;
+      margin-top: 6px;
+      background-color: #fafbff;
     }
+
     .symbol-block-header {
       display: flex;
       justify-content: space-between;
@@ -190,114 +339,94 @@
       margin-bottom: 4px;
       font-size: 12px;
     }
-    .muted {
-      color: #6b7280;
-      font-size: 12px;
+
+    .symbol-block-header strong {
+      font-weight: 600;
     }
+
+    /* ====== 弹窗 ====== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
-      background: rgba(15, 23, 42, 0.35);
+      background: rgba(32,33,36,.45);
       display: none;
       align-items: center;
       justify-content: center;
       z-index: 999;
     }
+
     .modal {
-      background-color: #ffffff;
-      border-radius: 8px;
-      padding: 16px 18px;
+      background-color: var(--color-surface);
+      border-radius: 16px;
+      padding: 18px 20px 16px;
       width: 380px;
       max-width: 90vw;
-      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+      box-shadow: var(--shadow-md);
       font-size: 13px;
     }
+
     .modal h3 {
-      margin: 0 0 8px 0;
-      font-size: 14px;
+      margin: 0 0 8px;
+      font-size: 15px;
+      font-weight: 600;
     }
+
+    .modal p {
+      margin: 0;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
     .modal-footer {
-      margin-top: 12px;
-      text-align: right;
+      margin-top: 14px;
       display: flex;
       justify-content: flex-end;
       gap: 8px;
     }
-    .preview-phone {
-      width: 320px;
-      max-width: 80vw;
-      background-color: #111827;
-      border-radius: 16px;
-      padding: 10px;
-      color: #f9fafb;
-      font-size: 12px;
-    }
-    .preview-phone-header {
+
+    .preview-placeholder {
+      border-radius: 12px;
+      border: 1px dashed var(--color-border);
+      padding: 24px 16px;
       text-align: center;
-      font-size: 11px;
-      margin-bottom: 4px;
-      color: #9ca3af;
+      color: var(--color-text-secondary);
+      font-size: 12px;
+      margin-top: 8px;
     }
-    .preview-card {
-      background-color: #111827;
-      border-radius: 8px;
-      border: 1px solid #374151;
-      padding: 8px 10px;
-    }
-    .preview-tag {
-      display: inline-block;
-      font-size: 10px;
-      padding: 2px 6px;
-      border-radius: 999px;
-      background-color: #1f2937;
-      color: #e5e7eb;
-      margin-bottom: 4px;
-    }
-    .preview-title {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 4px;
-    }
-    .preview-sub {
-      font-size: 11px;
-      color: #9ca3af;
-      margin-bottom: 6px;
-    }
-    .preview-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 11px;
-      color: #9ca3af;
+
+    @media (max-width: 960px) {
+      .container {
+        flex-direction: column;
+        padding: 16px;
+      }
+      .sidebar {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 <header>
-  重点关注品种 - 后台界面交互（示意原型）
+  <h1>重点关注品种 · 后台界面交互</h1>
+  <span>示意原型 · 静态 HTML</span>
 </header>
 
 <div class="container">
-  <!-- 左侧：说明 -->
+  <!-- 左侧说明 -->
   <aside class="sidebar">
     <h2>模块说明</h2>
-    <p>本页面是「四、后台界面交互」的一个简单可视化原型，包含：</p>
+    <p>本页面对应 PRD 中的「四、后台界面交互」，用于向研发展示：</p>
     <ul>
-      <li>入口说明</li>
-      <li>列表页（筛选 / 排序 / 操作）</li>
-      <li>新建 / 编辑页</li>
-      <li>发布 / 下线 / 删除弹窗</li>
-      <li>策略预览弹窗</li>
+      <li>入口位置与权限要求</li>
+      <li>列表页字段、筛选、排序与操作</li>
+      <li>新建 / 编辑页的字段布局</li>
+      <li>发布 / 下线 / 删除的确认弹窗</li>
+      <li>预览弹窗：仅作为容器，不包含示例文案</li>
     </ul>
-    <p class="muted">仅为前端静态示意，不接真实数据和接口。</p>
-    <p class="muted">删除权限规则：</p>
-    <ul>
-      <li>草稿：运营 + 系统管理员可删</li>
-      <li>已下线：仅系统管理员可删</li>
-    </ul>
+    <p class="muted">本页不接真实接口，仅为结构和样式示意。</p>
   </aside>
 
-  <!-- 右侧：主内容 -->
+  <!-- 右侧主内容 -->
   <main class="main">
     <!-- 4.1 入口 -->
     <section class="card">
@@ -311,11 +440,11 @@
 
     <!-- 4.2 列表页 -->
     <section class="card">
-      <h2>4.2 列表页 <span class="tag">示意</span></h2>
+      <h2>4.2 列表页 <span class="chip">UI 结构示意</span></h2>
 
       <div class="filters">
         <label>
-          内容维度：
+          内容维度
           <select>
             <option>全部</option>
             <option>日度</option>
@@ -324,7 +453,7 @@
           </select>
         </label>
         <label>
-          发布状态：
+          发布状态
           <select>
             <option>全部</option>
             <option>草稿</option>
@@ -333,13 +462,13 @@
           </select>
         </label>
         <label>
-          发布时间：
-          <input type="datetime-local" /> -
+          发布时间
+          <input type="datetime-local" /> —
           <input type="datetime-local" />
         </label>
         <label>
-          内容关键词：
-          <input type="text" placeholder="支持按标题/正文关键字搜索" />
+          内容关键词
+          <input type="text" placeholder="支持按标题 / 正文关键字搜索" />
         </label>
       </div>
 
@@ -349,10 +478,10 @@
         <button class="danger" onclick="openConfirm('delete', 1)">批量删除（草稿）</button>
       </div>
 
-      <table>
+      <table aria-label="重点关注品种列表">
         <thead>
           <tr>
-            <th><input type="checkbox" /></th>
+            <th><input type="checkbox" aria-label="全选" /></th>
             <th>内容维度</th>
             <th>品种代码</th>
             <th>标题</th>
@@ -368,7 +497,7 @@
           </tr>
         </thead>
         <tbody>
-          <!-- 示例行 1：已发布 -->
+          <!-- 示例行：已发布 -->
           <tr>
             <td><input type="checkbox" /></td>
             <td>日度</td>
@@ -376,19 +505,17 @@
             <td>【日度】贵金属策略解读 2025-12-04</td>
             <td>2025-12-04 09:15</td>
             <td>2025-12-04 09:20</td>
-            <td>
-              <span class="status-pill status-published">已发布</span>
-            </td>
+            <td><span class="status-pill status-published">已发布</span></td>
             <td>运营A</td>
             <td>
-              <button onclick="alert('跳转到编辑页示意')">编辑</button>
+              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
               <button onclick="openConfirm('offline', 1)">下线</button>
-              <!-- 已发布不允许删除 -->
+              <!-- 已发布不展示删除 -->
               <button onclick="openPreview()">预览</button>
             </td>
           </tr>
 
-          <!-- 示例行 2：草稿 -->
+          <!-- 示例行：草稿 -->
           <tr>
             <td><input type="checkbox" /></td>
             <td>周度</td>
@@ -396,20 +523,17 @@
             <td>【周度】PVC 供需节奏观察</td>
             <td>—</td>
             <td>2025-12-03 17:30</td>
-            <td>
-              <span class="status-pill status-draft">草稿</span>
-            </td>
+            <td><span class="status-pill status-draft">草稿</span></td>
             <td>运营B</td>
             <td>
-              <button onclick="alert('跳转到编辑页示意')">编辑</button>
+              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
               <button onclick="openConfirm('publish', 1)">发布</button>
-              <!-- 草稿：运营 + 管理员均可删，这里直接展示删除按钮 -->
               <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
               <button onclick="openPreview()">预览</button>
             </td>
           </tr>
 
-          <!-- 示例行 3：已下线（仅系统管理员可以看到删除按钮，页面上可以通过角色控制） -->
+          <!-- 示例行：已下线（假设当前为系统管理员，可见删除按钮） -->
           <tr>
             <td><input type="checkbox" /></td>
             <td>夜盘</td>
@@ -417,13 +541,10 @@
             <td>【夜盘】能化短线情绪观察</td>
             <td>2025-11-30 21:00</td>
             <td>2025-12-01 09:10</td>
-            <td>
-              <span class="status-pill status-offline">已下线</span>
-            </td>
+            <td><span class="status-pill status-offline">已下线</span></td>
             <td>运营C</td>
             <td>
-              <button onclick="alert('跳转到编辑页示意')">编辑</button>
-              <!-- 示例：假设当前为系统管理员角色 -->
+              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
               <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
               <button onclick="openPreview()">预览</button>
             </td>
@@ -432,13 +553,13 @@
       </table>
 
       <p class="muted" style="margin-top: 8px;">
-        提示：实际系统中，是否显示「删除」按钮应由前后端共同根据用户角色和当前状态控制。
+        实际系统中，「删除」按钮的展示应结合用户角色与当前状态在前后端共同控制。
       </p>
     </section>
 
     <!-- 4.3 新建 / 编辑页 -->
     <section class="card">
-      <h2>4.3 新建 / 编辑页 <span class="tag">示意</span></h2>
+      <h2>4.3 新建 / 编辑页 <span class="chip">UI 结构示意</span></h2>
 
       <div class="form-grid">
         <div class="form-item">
@@ -469,9 +590,8 @@
         </div>
       </div>
 
-      <p class="muted">支持输入多个品种代码，每个品种一块内容。</p>
+      <p class="muted">支持输入多个品种代码，每个品种单独填写对应的策略内容。</p>
 
-      <!-- 示例：一个品种内容块 -->
       <div class="symbol-block">
         <div class="symbol-block-header">
           <span>品种：<strong>ag2602</strong></span>
@@ -479,7 +599,7 @@
         </div>
         <div class="form-grid">
           <div class="form-item">
-            <label>行情解析（多行文本）</label>
+            <label>行情解析</label>
             <textarea placeholder="对宏观、供需、盘面等的详细分析"></textarea>
           </div>
           <div class="form-item">
@@ -494,31 +614,30 @@
             <label>K 线图上传</label>
             <input type="file" />
           </div>
-          <div class="form-item" style="grid-column: 1 / 3;">
+          <div class="form-item" style="grid-column: 1 / -1;">
             <label>数据来源</label>
             <textarea placeholder="例如：文华财经、五矿期货交易咨询部"></textarea>
           </div>
         </div>
       </div>
 
-      <button onclick="alert('添加新合约示意')">+ 添加品种代码</button>
+      <button style="margin-top: 8px;" onclick="alert('添加新合约（示意）')">+ 添加品种代码</button>
 
       <div class="page-actions" style="margin-top: 12px;">
-        <button onclick="alert('保存草稿示意（无校验）')">保存草稿</button>
+        <button onclick="alert('保存草稿（示意，不做校验）')">保存草稿</button>
         <button onclick="openPreview()">预览</button>
         <button class="primary" onclick="openConfirm('publish', 1)">发布</button>
-        <button onclick="alert('返回列表页示意')">取消</button>
+        <button onclick="alert('返回列表页（示意）')">取消</button>
       </div>
     </section>
 
-    <!-- 4.4 弹窗与交互 -->
+    <!-- 4.4 弹窗与交互说明 -->
     <section class="card">
-      <h2>4.4 操作弹窗与交互 <span class="tag">示意</span></h2>
-      <p class="muted">下面两个弹窗是通过上面的按钮触发的。</p>
+      <h2>4.4 操作弹窗与交互 <span class="chip">交互说明</span></h2>
       <ul>
-        <li>发布 / 下线确认弹窗：确认后调用接口，改变发布状态。</li>
-        <li>删除确认弹窗：仅草稿 + 已下线允许删除，且需确认。</li>
-        <li>预览弹窗：展示 C 端「重点关注品种」的展示样式，不改变状态。</li>
+        <li>发布 / 下线确认弹窗：在单条或批量发布 / 下线前，给出操作影响提示。</li>
+        <li>删除确认弹窗：仅草稿 + 已下线可删除，操作前二次确认，删除后不可恢复。</li>
+        <li>预览弹窗：用于预览 C 端展示样式，本示例中仅保留空容器，不展示具体内容文案。</li>
       </ul>
     </section>
   </main>
@@ -526,7 +645,7 @@
 
 <!-- 确认弹窗 -->
 <div class="modal-backdrop" id="confirm-backdrop">
-  <div class="modal" id="confirm-modal">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="confirm-title">
     <h3 id="confirm-title">确认操作</h3>
     <p id="confirm-message"></p>
     <div class="modal-footer">
@@ -536,23 +655,14 @@
   </div>
 </div>
 
-<!-- 预览弹窗 -->
+<!-- 预览弹窗（无示例内容，只保留结构占位） -->
 <div class="modal-backdrop" id="preview-backdrop">
-  <div class="modal">
-    <h3>预览 - C 端展示样式</h3>
-    <div class="preview-phone">
-      <div class="preview-phone-header">重点关注品种</div>
-      <div class="preview-card">
-        <div class="preview-tag">日度 · ag2602</div>
-        <div class="preview-title">贵金属策略解读 2025-12-04</div>
-        <div class="preview-sub">
-          观点：择机试多 · 参考区间：7200-7400
-        </div>
-        <div class="preview-footer">
-          <span>来源：五矿期货交易咨询部</span>
-          <span>免费 · 已签约</span>
-        </div>
-      </div>
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
+    <h3 id="preview-title">预览 - C 端展示样式</h3>
+    <div class="preview-placeholder">
+      这里是预览区域。<br>
+      实际项目中请由前端根据「日度 / 周度 / 夜盘」数据渲染真实样式。<br>
+      本 HTML 仅提供容器和交互结构示意。
     </div>
     <div class="modal-footer">
       <button onclick="closePreview()">关闭</button>
@@ -567,18 +677,21 @@
   function openConfirm(type, count) {
     currentAction = type;
     currentCount = count;
-    var title = document.getElementById('confirm-title');
-    var msg = document.getElementById('confirm-message');
+    const title = document.getElementById('confirm-title');
+    const msg = document.getElementById('confirm-message');
 
     if (type === 'publish') {
       title.textContent = '确认发布';
-      msg.textContent = '本次将发布 ' + count + ' 条内容，发布后将在投顾商城「重点关注品种」中展示给用户，是否确认发布？';
+      msg.textContent = '本次将发布 ' + count +
+        ' 条内容，发布后将在投顾商城「重点关注品种」中展示给用户，是否确认发布？';
     } else if (type === 'offline') {
       title.textContent = '确认下线';
-      msg.textContent = '本次将下线 ' + count + ' 条内容，下线后将不再在「重点关注品种」中展示，但后台仍保留历史记录，是否确认下线？';
+      msg.textContent = '本次将下线 ' + count +
+        ' 条内容，下线后将不再在「重点关注品种」中展示，但后台仍保留历史记录，是否确认下线？';
     } else if (type === 'delete') {
       title.textContent = '确认删除';
-      msg.textContent = '本次将删除 ' + count + ' 条内容，删除后无法恢复，请谨慎操作，是否确认删除？';
+      msg.textContent = '本次将删除 ' + count +
+        ' 条内容，删除后无法恢复，请谨慎操作，是否确认删除？';
     }
 
     document.getElementById('confirm-backdrop').style.display = 'flex';
@@ -591,7 +704,7 @@
   }
 
   function doConfirm() {
-    // 这里只做示意：实际应调用接口
+    // 这里只是示意，真实项目中应调用后端接口
     if (currentAction === 'publish') {
       alert('已执行发布操作（示意）');
     } else if (currentAction === 'offline') {
