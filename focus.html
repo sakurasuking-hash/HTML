@@ -377,7 +377,7 @@
     </p>
     <ul>
       <li>包含：列表页交互、新建/编辑页交互、发布 / 下线 / 删除确认弹窗、预览弹窗。</li>
-      <li>不再重复文档中的入口说明、字段说明、业务逻辑，只做结构与交互演示。</li>
+      <li>新增：新建 / 编辑页支持通过 Excel 模板批量导入品种名称、行情解析等内容字段的入口（图标 + 文本按钮）。</li>
       <li>所有按钮操作均为示意，不会调用真实接口或修改数据。</li>
     </ul>
   </section>
@@ -526,7 +526,17 @@
       </div>
     </div>
 
-    <p class="muted">支持输入多个品种代码，每个品种单独填写对应的策略内容。</p>
+    <p class="muted">
+      支持输入多个品种代码，每个品种单独填写对应的策略内容。也支持通过 Excel 模板批量导入品种名称、行情解析等字段。
+    </p>
+
+    <!-- Excel 导入入口：图标 + 文字按钮，位于策略内容区域上方 -->
+    <div style="margin: 6px 0 4px; display: flex; justify-content: flex-start; gap: 8px; align-items: center;">
+      <button onclick="alert('通过 Excel 导入（示意）：\n实际项目中可弹出说明 / 上传弹窗，支持下载模板并导入数据。')">
+        📥 通过 Excel 导入
+      </button>
+      <span class="muted">支持通过模板导入：品种名称 / 行情解析 / 核心观点 / 参考区间等字段。</span>
+    </div>
 
     <div class="symbol-block">
       <div class="symbol-block-header">
