@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <title>重点关注品种 - 后台界面交互</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "PingFang SC", "Microsoft YaHei", sans-serif;
+      margin: 0;
+      padding: 0;
+      background-color: #f5f5f7;
+    }
+    header {
+      background-color: #1f2933;
+      color: #fff;
+      padding: 12px 20px;
+      font-size: 16px;
+    }
+    .container {
+      display: flex;
+      padding: 16px;
+      gap: 16px;
+    }
+    .sidebar {
+      width: 240px;
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 12px 16px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.1);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+    .sidebar h2 {
+      font-size: 15px;
+      margin-top: 0;
+      margin-bottom: 8px;
+    }
+    .sidebar ul {
+      padding-left: 16px;
+      margin: 4px 0;
+    }
+    .sidebar li {
+      margin: 2px 0;
+    }
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+    .card {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 16px 18px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+    .card h2 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+    }
+    .card h3 {
+      margin: 12px 0 8px 0;
+      font-size: 14px;
+    }
+    .card p, .card li {
+      font-size: 13px;
+      line-height: 1.7;
+    }
+    .tag {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
+      margin-left: 4px;
+      background-color: #eef2ff;
+      color: #4338ca;
+    }
+    .toolbar, .filters, .batch-actions, .page-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+      flex-wrap: wrap;
+    }
+    .filters label {
+      font-size: 12px;
+    }
+    select, input[type="text"], input[type="datetime-local"] {
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      min-width: 120px;
+    }
+    button {
+      font-size: 12px;
+      padding: 4px 10px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      background-color: #fff;
+      cursor: pointer;
+    }
+    button.primary {
+      background-color: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+    button.danger {
+      background-color: #dc2626;
+      border-color: #dc2626;
+      color: #fff;
+    }
+    button[disabled] {
+      opacity: 0.5;
+      cursor: default;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+    th, td {
+      border: 1px solid #e5e7eb;
+      padding: 6px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      background-color: #f3f4f6;
+      cursor: default;
+    }
+    th.sortable {
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    th.sortable span {
+      font-size: 11px;
+      color: #6b7280;
+      margin-left: 4px;
+    }
+    .status-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 999px;
+      font-size: 11px;
+    }
+    .status-draft {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    .status-published {
+      background-color: #dcfce7;
+      color: #166534;
+    }
+    .status-offline {
+      background-color: #e5e7eb;
+      color: #374151;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px 16px;
+      margin-bottom: 8px;
+    }
+    .form-item label {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 2px;
+    }
+    textarea {
+      width: 100%;
+      min-height: 60px;
+      font-size: 12px;
+      padding: 4px 6px;
+      border-radius: 4px;
+      border: 1px solid #d1d5db;
+      resize: vertical;
+    }
+    .symbol-block {
+      border: 1px dashed #e5e7eb;
+      border-radius: 6px;
+      padding: 10px 12px;
+      margin-bottom: 8px;
+    }
+    .symbol-block-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+    .muted {
+      color: #6b7280;
+      font-size: 12px;
+    }
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.35);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+    .modal {
+      background-color: #ffffff;
+      border-radius: 8px;
+      padding: 16px 18px;
+      width: 380px;
+      max-width: 90vw;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.3);
+      font-size: 13px;
+    }
+    .modal h3 {
+      margin: 0 0 8px 0;
+      font-size: 14px;
+    }
+    .modal-footer {
+      margin-top: 12px;
+      text-align: right;
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+    }
+    .preview-phone {
+      width: 320px;
+      max-width: 80vw;
+      background-color: #111827;
+      border-radius: 16px;
+      padding: 10px;
+      color: #f9fafb;
+      font-size: 12px;
+    }
+    .preview-phone-header {
+      text-align: center;
+      font-size: 11px;
+      margin-bottom: 4px;
+      color: #9ca3af;
+    }
+    .preview-card {
+      background-color: #111827;
+      border-radius: 8px;
+      border: 1px solid #374151;
+      padding: 8px 10px;
+    }
+    .preview-tag {
+      display: inline-block;
+      font-size: 10px;
+      padding: 2px 6px;
+      border-radius: 999px;
+      background-color: #1f2937;
+      color: #e5e7eb;
+      margin-bottom: 4px;
+    }
+    .preview-title {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .preview-sub {
+      font-size: 11px;
+      color: #9ca3af;
+      margin-bottom: 6px;
+    }
+    .preview-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 11px;
+      color: #9ca3af;
+    }
+  </style>
+</head>
+<body>
+<header>
+  重点关注品种 - 后台界面交互（示意原型）
+</header>
+
+<div class="container">
+  <!-- 左侧：说明 -->
+  <aside class="sidebar">
+    <h2>模块说明</h2>
+    <p>本页面是「四、后台界面交互」的一个简单可视化原型，包含：</p>
+    <ul>
+      <li>入口说明</li>
+      <li>列表页（筛选 / 排序 / 操作）</li>
+      <li>新建 / 编辑页</li>
+      <li>发布 / 下线 / 删除弹窗</li>
+      <li>策略预览弹窗</li>
+    </ul>
+    <p class="muted">仅为前端静态示意，不接真实数据和接口。</p>
+    <p class="muted">删除权限规则：</p>
+    <ul>
+      <li>草稿：运营 + 系统管理员可删</li>
+      <li>已下线：仅系统管理员可删</li>
+    </ul>
+  </aside>
+
+  <!-- 右侧：主内容 -->
+  <main class="main">
+    <!-- 4.1 入口 -->
+    <section class="card">
+      <h2>4.1 入口（优化现有产品结构）</h2>
+      <h3>菜单入口位置</h3>
+      <p>在投顾后台「内容管理」模块下新增子菜单「重点关注品种」。</p>
+      <p>后续将「期市聚焦」等产品也列到二级菜单展示，各产品内容分开管理。</p>
+      <h3>访问权限</h3>
+      <p>功能入口仅对具备「策略内容管理」权限的运营人员开放。</p>
+    </section>
+
+    <!-- 4.2 列表页 -->
+    <section class="card">
+      <h2>4.2 列表页 <span class="tag">示意</span></h2>
+
+      <div class="filters">
+        <label>
+          内容维度：
+          <select>
+            <option>全部</option>
+            <option>日度</option>
+            <option>周度</option>
+            <option>夜盘</option>
+          </select>
+        </label>
+        <label>
+          发布状态：
+          <select>
+            <option>全部</option>
+            <option>草稿</option>
+            <option>已发布</option>
+            <option>已下线</option>
+          </select>
+        </label>
+        <label>
+          发布时间：
+          <input type="datetime-local" /> -
+          <input type="datetime-local" />
+        </label>
+        <label>
+          内容关键词：
+          <input type="text" placeholder="支持按标题/正文关键字搜索" />
+        </label>
+      </div>
+
+      <div class="batch-actions">
+        <button class="primary" onclick="openConfirm('publish', 2)">批量发布</button>
+        <button onclick="openConfirm('offline', 2)">批量下线</button>
+        <button class="danger" onclick="openConfirm('delete', 1)">批量删除（草稿）</button>
+      </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th><input type="checkbox" /></th>
+            <th>内容维度</th>
+            <th>品种代码</th>
+            <th>标题</th>
+            <th class="sortable" onclick="toggleSort('publishTime')">
+              发布时间 <span>▼</span>
+            </th>
+            <th class="sortable" onclick="toggleSort('lastEditTime')">
+              最近编辑时间 <span>▼</span>
+            </th>
+            <th>发布状态</th>
+            <th>最近编辑人</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- 示例行 1：已发布 -->
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>日度</td>
+            <td>ag2602</td>
+            <td>【日度】贵金属策略解读 2025-12-04</td>
+            <td>2025-12-04 09:15</td>
+            <td>2025-12-04 09:20</td>
+            <td>
+              <span class="status-pill status-published">已发布</span>
+            </td>
+            <td>运营A</td>
+            <td>
+              <button onclick="alert('跳转到编辑页示意')">编辑</button>
+              <button onclick="openConfirm('offline', 1)">下线</button>
+              <!-- 已发布不允许删除 -->
+              <button onclick="openPreview()">预览</button>
+            </td>
+          </tr>
+
+          <!-- 示例行 2：草稿 -->
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>周度</td>
+            <td>v2601</td>
+            <td>【周度】PVC 供需节奏观察</td>
+            <td>—</td>
+            <td>2025-12-03 17:30</td>
+            <td>
+              <span class="status-pill status-draft">草稿</span>
+            </td>
+            <td>运营B</td>
+            <td>
+              <button onclick="alert('跳转到编辑页示意')">编辑</button>
+              <button onclick="openConfirm('publish', 1)">发布</button>
+              <!-- 草稿：运营 + 管理员均可删，这里直接展示删除按钮 -->
+              <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
+              <button onclick="openPreview()">预览</button>
+            </td>
+          </tr>
+
+          <!-- 示例行 3：已下线（仅系统管理员可以看到删除按钮，页面上可以通过角色控制） -->
+          <tr>
+            <td><input type="checkbox" /></td>
+            <td>夜盘</td>
+            <td>eg2601</td>
+            <td>【夜盘】能化短线情绪观察</td>
+            <td>2025-11-30 21:00</td>
+            <td>2025-12-01 09:10</td>
+            <td>
+              <span class="status-pill status-offline">已下线</span>
+            </td>
+            <td>运营C</td>
+            <td>
+              <button onclick="alert('跳转到编辑页示意')">编辑</button>
+              <!-- 示例：假设当前为系统管理员角色 -->
+              <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
+              <button onclick="openPreview()">预览</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p class="muted" style="margin-top: 8px;">
+        提示：实际系统中，是否显示「删除」按钮应由前后端共同根据用户角色和当前状态控制。
+      </p>
+    </section>
+
+    <!-- 4.3 新建 / 编辑页 -->
+    <section class="card">
+      <h2>4.3 新建 / 编辑页 <span class="tag">示意</span></h2>
+
+      <div class="form-grid">
+        <div class="form-item">
+          <label>内容类型</label>
+          <select>
+            <option>日度</option>
+            <option>周度</option>
+            <option>夜盘</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label>发布状态</label>
+          <select>
+            <option>草稿</option>
+            <option>已发布</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label>发布时间类型</label>
+          <select>
+            <option>立即发布</option>
+            <option>定时发布</option>
+          </select>
+        </div>
+        <div class="form-item">
+          <label>定时发布时间</label>
+          <input type="datetime-local" />
+        </div>
+      </div>
+
+      <p class="muted">支持输入多个品种代码，每个品种一块内容。</p>
+
+      <!-- 示例：一个品种内容块 -->
+      <div class="symbol-block">
+        <div class="symbol-block-header">
+          <span>品种：<strong>ag2602</strong></span>
+          <button>移除该品种</button>
+        </div>
+        <div class="form-grid">
+          <div class="form-item">
+            <label>行情解析（多行文本）</label>
+            <textarea placeholder="对宏观、供需、盘面等的详细分析"></textarea>
+          </div>
+          <div class="form-item">
+            <label>观点及建议（核心观点）</label>
+            <input type="text" style="width: 100%;" placeholder="例如：择机试多" />
+          </div>
+          <div class="form-item">
+            <label>参考区间</label>
+            <input type="text" style="width: 100%;" placeholder="例如：7200-7400" />
+          </div>
+          <div class="form-item">
+            <label>K 线图上传</label>
+            <input type="file" />
+          </div>
+          <div class="form-item" style="grid-column: 1 / 3;">
+            <label>数据来源</label>
+            <textarea placeholder="例如：文华财经、五矿期货交易咨询部"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <button onclick="alert('添加新合约示意')">+ 添加品种代码</button>
+
+      <div class="page-actions" style="margin-top: 12px;">
+        <button onclick="alert('保存草稿示意（无校验）')">保存草稿</button>
+        <button onclick="openPreview()">预览</button>
+        <button class="primary" onclick="openConfirm('publish', 1)">发布</button>
+        <button onclick="alert('返回列表页示意')">取消</button>
+      </div>
+    </section>
+
+    <!-- 4.4 弹窗与交互 -->
+    <section class="card">
+      <h2>4.4 操作弹窗与交互 <span class="tag">示意</span></h2>
+      <p class="muted">下面两个弹窗是通过上面的按钮触发的。</p>
+      <ul>
+        <li>发布 / 下线确认弹窗：确认后调用接口，改变发布状态。</li>
+        <li>删除确认弹窗：仅草稿 + 已下线允许删除，且需确认。</li>
+        <li>预览弹窗：展示 C 端「重点关注品种」的展示样式，不改变状态。</li>
+      </ul>
+    </section>
+  </main>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="modal-backdrop" id="confirm-backdrop">
+  <div class="modal" id="confirm-modal">
+    <h3 id="confirm-title">确认操作</h3>
+    <p id="confirm-message"></p>
+    <div class="modal-footer">
+      <button onclick="closeConfirm()">取消</button>
+      <button class="primary" onclick="doConfirm()">确认</button>
+    </div>
+  </div>
+</div>
+
+<!-- 预览弹窗 -->
+<div class="modal-backdrop" id="preview-backdrop">
+  <div class="modal">
+    <h3>预览 - C 端展示样式</h3>
+    <div class="preview-phone">
+      <div class="preview-phone-header">重点关注品种</div>
+      <div class="preview-card">
+        <div class="preview-tag">日度 · ag2602</div>
+        <div class="preview-title">贵金属策略解读 2025-12-04</div>
+        <div class="preview-sub">
+          观点：择机试多 · 参考区间：7200-7400
+        </div>
+        <div class="preview-footer">
+          <span>来源：五矿期货交易咨询部</span>
+          <span>免费 · 已签约</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closePreview()">关闭</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentAction = null;
+  let currentCount = 0;
+
+  function openConfirm(type, count) {
+    currentAction = type;
+    currentCount = count;
+    var title = document.getElementById('confirm-title');
+    var msg = document.getElementById('confirm-message');
+
+    if (type === 'publish') {
+      title.textContent = '确认发布';
+      msg.textContent = '本次将发布 ' + count + ' 条内容，发布后将在投顾商城「重点关注品种」中展示给用户，是否确认发布？';
+    } else if (type === 'offline') {
+      title.textContent = '确认下线';
+      msg.textContent = '本次将下线 ' + count + ' 条内容，下线后将不再在「重点关注品种」中展示，但后台仍保留历史记录，是否确认下线？';
+    } else if (type === 'delete') {
+      title.textContent = '确认删除';
+      msg.textContent = '本次将删除 ' + count + ' 条内容，删除后无法恢复，请谨慎操作，是否确认删除？';
+    }
+
+    document.getElementById('confirm-backdrop').style.display = 'flex';
+  }
+
+  function closeConfirm() {
+    document.getElementById('confirm-backdrop').style.display = 'none';
+    currentAction = null;
+    currentCount = 0;
+  }
+
+  function doConfirm() {
+    // 这里只做示意：实际应调用接口
+    if (currentAction === 'publish') {
+      alert('已执行发布操作（示意）');
+    } else if (currentAction === 'offline') {
+      alert('已执行下线操作（示意）');
+    } else if (currentAction === 'delete') {
+      alert('已执行删除操作（示意）');
+    }
+    closeConfirm();
+  }
+
+  function openPreview() {
+    document.getElementById('preview-backdrop').style.display = 'flex';
+  }
+
+  function closePreview() {
+    document.getElementById('preview-backdrop').style.display = 'none';
+  }
+
+  function toggleSort(field) {
+    alert('按 ' + (field === 'publishTime' ? '发布时间' : '最近编辑时间') + ' 排序（示意）');
+  }
+</script>
+</body>
+</html>
