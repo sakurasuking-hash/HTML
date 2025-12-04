@@ -2,10 +2,9 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>重点关注品种 - 后台界面交互</title>
+  <title>重点关注品种 - 后台交互演示</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
-    /* ====== 基础样式，偏 Material Design 风格 ====== */
     :root {
       color-scheme: light;
       --color-bg: #f5f5f5;
@@ -59,50 +58,9 @@
     }
 
     .container {
-      display: flex;
-      padding: 20px 24px 32px;
-      gap: 20px;
       max-width: 1280px;
       margin: 0 auto;
-    }
-
-    .sidebar {
-      width: 260px;
-      flex-shrink: 0;
-      background-color: var(--color-surface);
-      border-radius: var(--radius-md);
-      box-shadow: var(--shadow-sm);
-      padding: 16px 18px;
-      font-size: 13px;
-    }
-
-    .sidebar h2 {
-      margin: 0 0 8px;
-      font-size: 15px;
-      font-weight: 600;
-    }
-
-    .sidebar p {
-      margin: 4px 0;
-      line-height: 1.6;
-    }
-
-    .sidebar ul {
-      margin: 6px 0 0;
-      padding-left: 18px;
-    }
-
-    .sidebar li {
-      margin: 2px 0;
-    }
-
-    .muted {
-      color: var(--color-text-secondary);
-      font-size: 12px;
-    }
-
-    .main {
-      flex: 1;
+      padding: 20px 24px 32px;
       display: flex;
       flex-direction: column;
       gap: 16px;
@@ -145,7 +103,11 @@
       background-color: #f8f9fa;
     }
 
-    /* ====== 表单/按钮/表格 ====== */
+    .muted {
+      color: var(--color-text-secondary);
+      font-size: 12px;
+    }
+
     .filters,
     .batch-actions,
     .page-actions {
@@ -292,7 +254,6 @@
       color: #37474f;
     }
 
-    /* ====== 新建/编辑表单 ====== */
     .form-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
@@ -344,7 +305,6 @@
       font-weight: 600;
     }
 
-    /* ====== 弹窗 ====== */
     .modal-backdrop {
       position: fixed;
       inset: 0;
@@ -396,251 +356,224 @@
 
     @media (max-width: 960px) {
       .container {
-        flex-direction: column;
         padding: 16px;
-      }
-      .sidebar {
-        width: 100%;
       }
     }
   </style>
 </head>
 <body>
 <header>
-  <h1>重点关注品种 · 后台界面交互</h1>
-  <span>示意原型 · 静态 HTML</span>
+  <h1>重点关注品种 · 后台交互演示</h1>
+  <span>静态 HTML · 仅用于交互演示</span>
 </header>
 
 <div class="container">
-  <!-- 左侧说明 -->
-  <aside class="sidebar">
-    <h2>模块说明</h2>
-    <p>本页面对应 PRD 中的「四、后台界面交互」，用于向研发展示：</p>
+  <!-- 顶部模块说明（移到这里） -->
+  <section class="card">
+    <h2>说明</h2>
+    <p class="muted">
+      本页面代码仅用于「重点关注品种」后台的交互演示，配合 PRD 文档中的
+      「四、后台界面交互」说明使用。
+    </p>
     <ul>
-      <li>入口位置与权限要求</li>
-      <li>列表页字段、筛选、排序与操作</li>
-      <li>新建 / 编辑页的字段布局</li>
-      <li>发布 / 下线 / 删除的确认弹窗</li>
-      <li>预览弹窗：仅作为容器，不包含示例文案</li>
+      <li>包含：列表页交互、新建/编辑页交互、发布 / 下线 / 删除确认弹窗、预览弹窗。</li>
+      <li>不再重复文档中的入口说明、字段说明、业务逻辑，只做结构与交互演示。</li>
+      <li>所有按钮操作均为示意，不会调用真实接口或修改数据。</li>
     </ul>
-    <p class="muted">本页不接真实接口，仅为结构和样式示意。</p>
-  </aside>
+  </section>
 
-  <!-- 右侧主内容 -->
-  <main class="main">
-    <!-- 4.1 入口 -->
-    <section class="card">
-      <h2>4.1 入口（优化现有产品结构）</h2>
-      <h3>菜单入口位置</h3>
-      <p>在投顾后台「内容管理」模块下新增子菜单「重点关注品种」。</p>
-      <p>后续将「期市聚焦」等产品也列到二级菜单展示，各产品内容分开管理。</p>
-      <h3>访问权限</h3>
-      <p>功能入口仅对具备「策略内容管理」权限的运营人员开放。</p>
-    </section>
+  <!-- 列表页（原 4.2） -->
+  <section class="card">
+    <h2>列表页 <span class="chip">交互示意</span></h2>
 
-    <!-- 4.2 列表页 -->
-    <section class="card">
-      <h2>4.2 列表页 <span class="chip">UI 结构示意</span></h2>
+    <div class="filters">
+      <label>
+        内容维度
+        <select>
+          <option>全部</option>
+          <option>日度</option>
+          <option>周度</option>
+          <option>夜盘</option>
+        </select>
+      </label>
+      <label>
+        发布状态
+        <select>
+          <option>全部</option>
+          <option>草稿</option>
+          <option>已发布</option>
+          <option>已下线</option>
+        </select>
+      </label>
+      <label>
+        发布时间
+        <input type="datetime-local" /> —
+        <input type="datetime-local" />
+      </label>
+      <label>
+        内容关键词
+        <input type="text" placeholder="支持按标题 / 正文关键字搜索" />
+      </label>
+    </div>
 
-      <div class="filters">
-        <label>
-          内容维度
-          <select>
-            <option>全部</option>
-            <option>日度</option>
-            <option>周度</option>
-            <option>夜盘</option>
-          </select>
-        </label>
-        <label>
-          发布状态
-          <select>
-            <option>全部</option>
-            <option>草稿</option>
-            <option>已发布</option>
-            <option>已下线</option>
-          </select>
-        </label>
-        <label>
-          发布时间
-          <input type="datetime-local" /> —
-          <input type="datetime-local" />
-        </label>
-        <label>
-          内容关键词
-          <input type="text" placeholder="支持按标题 / 正文关键字搜索" />
-        </label>
+    <div class="batch-actions">
+      <button class="primary" onclick="openConfirm('publish', 2)">批量发布</button>
+      <button onclick="openConfirm('offline', 2)">批量下线</button>
+      <button class="danger" onclick="openConfirm('delete', 1)">批量删除（草稿）</button>
+    </div>
+
+    <table aria-label="重点关注品种列表">
+      <thead>
+        <tr>
+          <th><input type="checkbox" aria-label="全选" /></th>
+          <th>内容维度</th>
+          <th>品种代码</th>
+          <th>标题</th>
+          <th class="sortable" onclick="toggleSort('publishTime')">
+            发布时间 <span>▼</span>
+          </th>
+          <th class="sortable" onclick="toggleSort('lastEditTime')">
+            最近编辑时间 <span>▼</span>
+          </th>
+          <th>发布状态</th>
+          <th>最近编辑人</th>
+          <th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- 示例行：已发布 -->
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td>日度</td>
+          <td>ag2602</td>
+          <td>【日度】贵金属策略解读 2025-12-04</td>
+          <td>2025-12-04 09:15</td>
+          <td>2025-12-04 09:20</td>
+          <td><span class="status-pill status-published">已发布</span></td>
+          <td>运营A</td>
+          <td>
+            <button onclick="alert('跳转编辑页（示意）')">编辑</button>
+            <button onclick="openConfirm('offline', 1)">下线</button>
+            <!-- 已发布不展示删除 -->
+            <button onclick="openPreview()">预览</button>
+          </td>
+        </tr>
+
+        <!-- 示例行：草稿 -->
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td>周度</td>
+          <td>v2601</td>
+          <td>【周度】PVC 供需节奏观察</td>
+          <td>—</td>
+          <td>2025-12-03 17:30</td>
+          <td><span class="status-pill status-draft">草稿</span></td>
+          <td>运营B</td>
+          <td>
+            <button onclick="alert('跳转编辑页（示意）')">编辑</button>
+            <button onclick="openConfirm('publish', 1)">发布</button>
+            <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
+            <button onclick="openPreview()">预览</button>
+          </td>
+        </tr>
+
+        <!-- 示例行：已下线（假设当前为系统管理员，可见删除按钮） -->
+        <tr>
+          <td><input type="checkbox" /></td>
+          <td>夜盘</td>
+          <td>eg2601</td>
+          <td>【夜盘】能化短线情绪观察</td>
+          <td>2025-11-30 21:00</td>
+          <td>2025-12-01 09:10</td>
+          <td><span class="status-pill status-offline">已下线</span></td>
+          <td>运营C</td>
+          <td>
+            <button onclick="alert('跳转编辑页（示意）')">编辑</button>
+            <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
+            <button onclick="openPreview()">预览</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p class="muted" style="margin-top: 8px;">
+      提示：真实环境中，「删除」按钮的展示应结合用户角色与当前状态，由前后端共同控制。
+    </p>
+  </section>
+
+  <!-- 新建 / 编辑页（原 4.3） -->
+  <section class="card">
+    <h2>新建 / 编辑页 <span class="chip">交互示意</span></h2>
+
+    <div class="form-grid">
+      <div class="form-item">
+        <label>内容类型</label>
+        <select>
+          <option>日度</option>
+          <option>周度</option>
+          <option>夜盘</option>
+        </select>
       </div>
-
-      <div class="batch-actions">
-        <button class="primary" onclick="openConfirm('publish', 2)">批量发布</button>
-        <button onclick="openConfirm('offline', 2)">批量下线</button>
-        <button class="danger" onclick="openConfirm('delete', 1)">批量删除（草稿）</button>
+      <div class="form-item">
+        <label>发布状态</label>
+        <select>
+          <option>草稿</option>
+          <option>已发布</option>
+        </select>
       </div>
+      <div class="form-item">
+        <label>发布时间类型</label>
+        <select>
+          <option>立即发布</option>
+          <option>定时发布</option>
+        </select>
+      </div>
+      <div class="form-item">
+        <label>定时发布时间</label>
+        <input type="datetime-local" />
+      </div>
+    </div>
 
-      <table aria-label="重点关注品种列表">
-        <thead>
-          <tr>
-            <th><input type="checkbox" aria-label="全选" /></th>
-            <th>内容维度</th>
-            <th>品种代码</th>
-            <th>标题</th>
-            <th class="sortable" onclick="toggleSort('publishTime')">
-              发布时间 <span>▼</span>
-            </th>
-            <th class="sortable" onclick="toggleSort('lastEditTime')">
-              最近编辑时间 <span>▼</span>
-            </th>
-            <th>发布状态</th>
-            <th>最近编辑人</th>
-            <th>操作</th>
-          </tr>
-        </thead>
-        <tbody>
-          <!-- 示例行：已发布 -->
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>日度</td>
-            <td>ag2602</td>
-            <td>【日度】贵金属策略解读 2025-12-04</td>
-            <td>2025-12-04 09:15</td>
-            <td>2025-12-04 09:20</td>
-            <td><span class="status-pill status-published">已发布</span></td>
-            <td>运营A</td>
-            <td>
-              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
-              <button onclick="openConfirm('offline', 1)">下线</button>
-              <!-- 已发布不展示删除 -->
-              <button onclick="openPreview()">预览</button>
-            </td>
-          </tr>
+    <p class="muted">支持输入多个品种代码，每个品种单独填写对应的策略内容。</p>
 
-          <!-- 示例行：草稿 -->
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>周度</td>
-            <td>v2601</td>
-            <td>【周度】PVC 供需节奏观察</td>
-            <td>—</td>
-            <td>2025-12-03 17:30</td>
-            <td><span class="status-pill status-draft">草稿</span></td>
-            <td>运营B</td>
-            <td>
-              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
-              <button onclick="openConfirm('publish', 1)">发布</button>
-              <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
-              <button onclick="openPreview()">预览</button>
-            </td>
-          </tr>
-
-          <!-- 示例行：已下线（假设当前为系统管理员，可见删除按钮） -->
-          <tr>
-            <td><input type="checkbox" /></td>
-            <td>夜盘</td>
-            <td>eg2601</td>
-            <td>【夜盘】能化短线情绪观察</td>
-            <td>2025-11-30 21:00</td>
-            <td>2025-12-01 09:10</td>
-            <td><span class="status-pill status-offline">已下线</span></td>
-            <td>运营C</td>
-            <td>
-              <button onclick="alert('跳转编辑页（示意）')">编辑</button>
-              <button class="danger" onclick="openConfirm('delete', 1)">删除</button>
-              <button onclick="openPreview()">预览</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      <p class="muted" style="margin-top: 8px;">
-        实际系统中，「删除」按钮的展示应结合用户角色与当前状态在前后端共同控制。
-      </p>
-    </section>
-
-    <!-- 4.3 新建 / 编辑页 -->
-    <section class="card">
-      <h2>4.3 新建 / 编辑页 <span class="chip">UI 结构示意</span></h2>
-
+    <div class="symbol-block">
+      <div class="symbol-block-header">
+        <span>品种：<strong>ag2602</strong></span>
+        <button>移除该品种</button>
+      </div>
       <div class="form-grid">
         <div class="form-item">
-          <label>内容类型</label>
-          <select>
-            <option>日度</option>
-            <option>周度</option>
-            <option>夜盘</option>
-          </select>
+          <label>行情解析</label>
+          <textarea placeholder="对宏观、供需、盘面等的详细分析"></textarea>
         </div>
         <div class="form-item">
-          <label>发布状态</label>
-          <select>
-            <option>草稿</option>
-            <option>已发布</option>
-          </select>
+          <label>观点及建议（核心观点）</label>
+          <input type="text" style="width: 100%;" placeholder="例如：择机试多" />
         </div>
         <div class="form-item">
-          <label>发布时间类型</label>
-          <select>
-            <option>立即发布</option>
-            <option>定时发布</option>
-          </select>
+          <label>参考区间</label>
+          <input type="text" style="width: 100%;" placeholder="例如：7200-7400" />
         </div>
         <div class="form-item">
-          <label>定时发布时间</label>
-          <input type="datetime-local" />
+          <label>K 线图上传</label>
+          <input type="file" />
+        </div>
+        <div class="form-item" style="grid-column: 1 / -1;">
+          <label>数据来源</label>
+          <textarea placeholder="例如：文华财经、五矿期货交易咨询部"></textarea>
         </div>
       </div>
+    </div>
 
-      <p class="muted">支持输入多个品种代码，每个品种单独填写对应的策略内容。</p>
+    <button style="margin-top: 8px;" onclick="alert('添加新合约（示意）')">+ 添加品种代码</button>
 
-      <div class="symbol-block">
-        <div class="symbol-block-header">
-          <span>品种：<strong>ag2602</strong></span>
-          <button>移除该品种</button>
-        </div>
-        <div class="form-grid">
-          <div class="form-item">
-            <label>行情解析</label>
-            <textarea placeholder="对宏观、供需、盘面等的详细分析"></textarea>
-          </div>
-          <div class="form-item">
-            <label>观点及建议（核心观点）</label>
-            <input type="text" style="width: 100%;" placeholder="例如：择机试多" />
-          </div>
-          <div class="form-item">
-            <label>参考区间</label>
-            <input type="text" style="width: 100%;" placeholder="例如：7200-7400" />
-          </div>
-          <div class="form-item">
-            <label>K 线图上传</label>
-            <input type="file" />
-          </div>
-          <div class="form-item" style="grid-column: 1 / -1;">
-            <label>数据来源</label>
-            <textarea placeholder="例如：文华财经、五矿期货交易咨询部"></textarea>
-          </div>
-        </div>
-      </div>
-
-      <button style="margin-top: 8px;" onclick="alert('添加新合约（示意）')">+ 添加品种代码</button>
-
-      <div class="page-actions" style="margin-top: 12px;">
-        <button onclick="alert('保存草稿（示意，不做校验）')">保存草稿</button>
-        <button onclick="openPreview()">预览</button>
-        <button class="primary" onclick="openConfirm('publish', 1)">发布</button>
-        <button onclick="alert('返回列表页（示意）')">取消</button>
-      </div>
-    </section>
-
-    <!-- 4.4 弹窗与交互说明 -->
-    <section class="card">
-      <h2>4.4 操作弹窗与交互 <span class="chip">交互说明</span></h2>
-      <ul>
-        <li>发布 / 下线确认弹窗：在单条或批量发布 / 下线前，给出操作影响提示。</li>
-        <li>删除确认弹窗：仅草稿 + 已下线可删除，操作前二次确认，删除后不可恢复。</li>
-        <li>预览弹窗：用于预览 C 端展示样式，本示例中仅保留空容器，不展示具体内容文案。</li>
-      </ul>
-    </section>
-  </main>
+    <div class="page-actions" style="margin-top: 12px;">
+      <button onclick="alert('保存草稿（示意，不做校验）')">保存草稿</button>
+      <button onclick="openPreview()">预览</button>
+      <button class="primary" onclick="openConfirm('publish', 1)">发布</button>
+      <button onclick="alert('返回列表页（示意）')">取消</button>
+    </div>
+  </section>
 </div>
 
 <!-- 确认弹窗 -->
@@ -655,7 +588,7 @@
   </div>
 </div>
 
-<!-- 预览弹窗（无示例内容，只保留结构占位） -->
+<!-- 预览弹窗（空容器，仅结构示意） -->
 <div class="modal-backdrop" id="preview-backdrop">
   <div class="modal" role="dialog" aria-modal="true" aria-labelledby="preview-title">
     <h3 id="preview-title">预览 - C 端展示样式</h3>
