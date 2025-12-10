@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8">
+	<title>组合产品编辑页 - 静态说明</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<style>
+		/* Material 风格基础色彩与排版 */
+		:root {
+			--primary: #1976d2;
+			--primary-dark: #115293;
+			--primary-light: #E3F2FD;
+			--accent: #ff9800;
+			--error: #d32f2f;
+			--bg: #fafafa;
+			--surface: #ffffff;
+			--text-main: #212121;
+			--text-secondary: #616161;
+			--divider: #e0e0e0;
+		}
+
+		* {
+			box-sizing: border-box;
+		}
+
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
+			background-color: var(--bg);
+			color: var(--text-main);
+		}
+
+		body {
+			line-height: 1.6;
+		}
+
+		.app-bar {
+			background-color: var(--primary);
+			color: #fff;
+			padding: 12px 24px;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			position: sticky;
+			top: 0;
+			z-index: 10;
+		}
+
+		.app-bar-title {
+			font-size: 18px;
+			font-weight: 500;
+		}
+
+		.app-bar-subtitle {
+			font-size: 13px;
+			opacity: 0.9;
+		}
+
+		.app-bar-right {
+			font-size: 12px;
+			opacity: 0.9;
+		}
+
+		.container {
+			max-width: 1160px;
+			margin: 24px auto 40px;
+			padding: 0 16px;
+		}
+
+		.breadcrumb {
+			font-size: 13px;
+			color: var(--text-secondary);
+			margin-bottom: 8px;
+		}
+
+		.breadcrumb span {
+			color: var(--text-secondary);
+		}
+
+		.breadcrumb strong {
+			color: var(--text-main);
+		}
+
+		h1, h2, h3 {
+			margin: 16px 0 8px;
+			font-weight: 500;
+		}
+
+		h1 {
+			font-size: 24px;
+		}
+
+		h2 {
+			font-size: 20px;
+		}
+
+		h3 {
+			font-size: 16px;
+		}
+
+		.subtitle {
+			font-size: 13px;
+			color: var(--text-secondary);
+			margin-bottom: 16px;
+		}
+
+		.section-card {
+			background-color: var(--surface);
+			border-radius: 8px;
+			padding: 20px 20px 16px;
+			margin-bottom: 16px;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+		}
+
+		.section-header {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 8px;
+		}
+
+		.section-title {
+			font-size: 16px;
+			font-weight: 500;
+		}
+
+		.section-tag {
+			font-size: 11px;
+			padding: 2px 8px;
+			border-radius: 999px;
+			background-color: #e0e0e0;
+			color: #424242;
+		}
+
+		.chip {
+			display: inline-flex;
+			align-items: center;
+			border-radius: 16px;
+			padding: 2px 10px;
+			font-size: 11px;
+			background-color: var(--primary-light);
+			color: var(--primary-dark);
+			margin-left: 4px;
+		}
+
+		p {
+			margin: 4px 0 8px;
+			font-size: 14px;
+		}
+
+		.text-muted {
+			color: var(--text-secondary);
+			font-size: 13px;
+		}
+
+		.table-wrapper {
+			overflow-x: auto;
+			margin: 8px 0 4px;
+		}
+
+		table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+			min-width: 720px;
+		}
+
+		th, td {
+			border-bottom: 1px solid var(--divider);
+			padding: 8px 10px;
+			text-align: left;
+			vertical-align: top;
+		}
+
+		th {
+			font-weight: 500;
+			color: var(--text-secondary);
+			background-color: #f5f5f5;
+		}
+
+		tr:nth-child(even) td {
+			background-color: #fafafa;
+		}
+
+		code {
+			font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+			font-size: 12px;
+			background-color: #f5f5f5;
+			padding: 1px 4px;
+			border-radius: 3px;
+		}
+
+		.list {
+			margin: 4px 0 8px;
+			padding-left: 18px;
+			font-size: 14px;
+		}
+
+		.list li {
+			margin-bottom: 2px;
+		}
+
+		.list-nested {
+			margin-top: 4px;
+			padding-left: 18px;
+		}
+
+		.caption {
+			font-size: 12px;
+			color: var(--text-secondary);
+			margin-top: 4px;
+		}
+
+		.inline-label {
+			display: inline-block;
+			min-width: 76px;
+			font-weight: 500;
+			font-size: 13px;
+		}
+
+		.condition-chip {
+			display: inline-flex;
+			align-items: center;
+			border-radius: 999px;
+			padding: 2px 10px;
+			font-size: 11px;
+			background-color: #fff3e0;
+			color: #ef6c00;
+			margin-left: 4px;
+		}
+
+		.helper-text {
+			font-size: 12px;
+			color: var(--text-secondary);
+			margin-top: 2px;
+		}
+
+		.helper-text-strong {
+			color: var(--primary-dark);
+		}
+
+		.toolbar {
+			display: flex;
+			align-items: center;
+			justify-content: flex-end;
+			gap: 8px;
+			margin-top: 8px;
+		}
+
+		.btn {
+			border: none;
+			border-radius: 4px;
+			padding: 6px 14px;
+			font-size: 13px;
+			cursor: default;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			white-space: nowrap;
+		}
+
+		.btn-text {
+			background-color: transparent;
+			color: var(--primary-dark);
+		}
+
+		.btn-outlined {
+			background-color: transparent;
+			border: 1px solid var(--divider);
+			color: var(--text-main);
+		}
+
+		.btn-contained {
+			background-color: var(--primary);
+			color: #fff;
+		}
+
+		.btn-contained.secondary {
+			background-color: #9e9e9e;
+		}
+
+		.btn-contained.warning {
+			background-color: var(--accent);
+			color: #fff;
+		}
+
+		.btn + .btn {
+			margin-left: 4px;
+		}
+
+		.footer-note {
+			font-size: 12px;
+			color: var(--text-secondary);
+			margin-top: 4px;
+		}
+
+		.error-text {
+			color: var(--error);
+		}
+
+		.error-banner {
+			background-color: #ffebee;
+			color: var(--error);
+			border-radius: 4px;
+			padding: 8px 10px;
+			font-size: 13px;
+			display: inline-block;
+			margin-top: 4px;
+		}
+
+		.note {
+			font-size: 12px;
+			color: var(--text-secondary);
+			border-left: 3px solid var(--divider);
+			padding-left: 8px;
+			margin: 4px 0 0;
+		}
+
+		.chip-group {
+			display: inline-flex;
+			flex-wrap: wrap;
+			gap: 4px;
+			margin-top: 4px;
+		}
+
+		.chip-outline {
+			border-radius: 16px;
+			padding: 2px 10px;
+			font-size: 11px;
+			border: 1px solid var(--divider);
+			color: var(--text-secondary);
+			background-color: #fff;
+		}
+
+		.section-divider {
+			height: 1px;
+			background-color: var(--divider);
+			margin: 20px 0 12px;
+		}
+
+		.badge-required {
+			color: var(--error);
+			font-size: 12px;
+			margin-left: 4px;
+		}
+
+		@media (max-width: 768px) {
+			.section-card {
+				padding: 16px 12px 12px;
+			}
+
+			h1 {
+				font-size: 20px;
+			}
+
+			h2 {
+				font-size: 18px;
+			}
+
+			.app-bar {
+				padding: 10px 16px;
+			}
+		}
+	</style>
+</head>
+<body>
+	<header class="app-bar">
+		<div>
+			<div class="app-bar-title">组合产品编辑页</div>
+			<div class="app-bar-subtitle">后台交互说明 · 静态文档</div>
+		</div>
+		<div class="app-bar-right">策略管理平台 / 产品管理</div>
+	</header>
+
+	<main class="container">
+		<div class="breadcrumb">
+			<span>策略管理平台 &gt; 产品列表 &gt; </span><strong>组合产品编辑页</strong>
+		</div>
+
+		<h1>四、产品编辑页</h1>
+		<p class="subtitle">本页面用于配置组合量化产品的基础信息、组合构成与权重，以及表单级操作与状态流转。</p>
+
+		<!-- 4.1 基础信息区 -->
+		<section class="section-card" id="basic-info">
+			<div class="section-header">
+				<div class="section-title">4.1 基础信息区</div>
+				<span class="section-tag">表单区块</span>
+			</div>
+			<p class="text-muted">用于填写产品的基础属性，部分字段为必填项，将影响前端展示与后续组合配置。</p>
+
+			<h3>4.1.1 字段列表</h3>
+			<div class="table-wrapper">
+				<table>
+					<thead>
+					<tr>
+						<th style="width: 22%;">字段名称</th>
+						<th style="width: 48%;">说明</th>
+						<th style="width: 30%;">示例</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>产品名称 <span class="badge-required">＊必填</span></td>
+						<td>前端展示名称，必填，用于在产品列表与详情页中标识该产品。</td>
+						<td>矿金优选12号-燃料油FU</td>
+					</tr>
+					<tr>
+						<td>产品编号</td>
+						<td>系统生成或运营配置的唯一编码，不可重复，用于对接外部系统和内部数据表。</td>
+						<td>WK001220251022</td>
+					</tr>
+					<tr>
+						<td>风险等级</td>
+						<td>下拉选择，与风险评级体系保持一致，决定前端合规提示与签约要求。</td>
+						<td>R3</td>
+					</tr>
+					<tr>
+						<td>产品类型 <span class="badge-required">＊必填</span></td>
+						<td>下拉选择，与现有产品分类保持一致（如：量化信号类 / 投研资讯服务类 / 培训课程类等），影响后续可选的产品形式。</td>
+						<td>量化信号类</td>
+					</tr>
+					<tr>
+						<td>产品出品人</td>
+						<td>文本输入或选择已有团队 / 投顾名称，用于前端展示及责任归属。</td>
+						<td>五矿期货投资咨询团队</td>
+					</tr>
+					<tr>
+						<td>产品等级</td>
+						<td>下拉选择，用于区分产品级别（如：初级 / 中级 / 高级），可影响前端标签展示或人群定位。</td>
+						<td>中级</td>
+					</tr>
+					<tr>
+						<td>产品简介</td>
+						<td>多行文本，用于描述产品的核心策略逻辑、适用人群与收益 / 风险特征，前端详情页直接展示。</td>
+						<td>本策略采用动态波动过滤与趋势捕捉的量化择时模型，结合品种基本面与盘面特征，力求在控制回撤的前提下获取稳健超额收益。</td>
+					</tr>
+					<tr>
+						<td>所属系列</td>
+						<td>下拉选择，绑定到已有系列（如「矿金优选（R3）」），用于签约及系列维度管理。</td>
+						<td>矿金优选（R3）</td>
+					</tr>
+					<tr>
+						<td>产品形式</td>
+						<td>下拉选择，用于区分单品种策略 / 组合策略 / 线上产品 / 直播产品 / 线下产品 / 同花顺产品 / 自定义产品等，影响后续配置区块显隐。</td>
+						<td>线上产品</td>
+					</tr>
+					<tr>
+						<td>组合类型</td>
+						<td>下拉选择，区分不同组合结构形态（类型1、类型2、类型3），部分组合相关区块仅在指定类型下展示。</td>
+						<td>类型1 / 类型2 / 类型3</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+			<p class="caption">注：具体字段是否必填、是否只读，需结合实际实现与业务规则细化。</p>
+		</section>
+
+		<!-- 4.2 组合构成与权重区 -->
+		<section class="section-card" id="weight-area">
+			<div class="section-header">
+				<div class="section-title">4.2 组合构成与权重区（组合量化产品适用）</div>
+				<span class="section-tag">条件展示区块</span>
+			</div>
+
+			<p>
+				<span class="inline-label">展示条件</span>
+				<span>仅当 <code>产品形式 = 组合策略</code>，且 <code>组合类型 = 1</code> 时展示本区块。</span>
+			</p>
+			<p class="helper-text">其他产品形式或组合类型下，本区块隐藏，不参与表单校验。</p>
+
+			<h3>4.2.1 列表字段</h3>
+
+			<ul class="list">
+				<li>
+					<span class="inline-label">权重分配类型</span>
+					<span>控制组合内各子腿品种的权重分配方式。</span>
+					<div class="helper-text">
+						<span class="inline-label">取值：</span>等权 / 自定义
+					</div>
+					<div class="helper-text">
+						<span class="inline-label">示例：</span>等权
+					</div>
+				</li>
+				<li>
+					<span class="inline-label">总权益</span>
+					<span>当前组合产品对应的总权益数值，用于后续按权重分配至各子腿。</span>
+				</li>
+				<li>
+					<span class="inline-label">份额</span>
+					<span>组合产品的总份额或单位数，用于计算单位净值。</span>
+				</li>
+				<li>
+					<span class="inline-label">净值</span>
+					<span>组合当前单位净值，一般由结算系统计算产生，在此仅展示。</span>
+				</li>
+				<li>
+					<span class="inline-label">策略列表和权重值</span>
+					<span>展示策略列表和各个策略对应的权重值。</span>
+					<div class="helper-text">
+						<span class="inline-label">示例：</span>矿金智选14号-焦炭J　0.2
+					</div>
+				</li>
+				<li>
+					<span class="inline-label">操作</span>
+					<span>支持对组合构成进行调整与资金操作，典型动作：</span>
+					<ul class="list-nested">
+						<li>编辑</li>
+						<li>入金</li>
+					</ul>
+				</li>
+			</ul>
+
+			<div class="table-wrapper">
+				<table>
+					<thead>
+					<tr>
+						<th>单腿品种</th>
+						<th>单腿产品ID</th>
+						<th>Cmb_id</th>
+						<th>组合产品ID</th>
+						<th>权益</th>
+						<th>品种权重比例</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>M</td>
+						<td>Kuangjinyx03</td>
+						<td>Kuangjincmb01</td>
+						<td>Kuangjincmb01</td>
+						<td>50w</td>
+						<td>0.2</td>
+					</tr>
+					<tr>
+						<td>CU</td>
+						<td>Kuangjinzx05</td>
+						<td>Kuangjincmb01</td>
+						<td>Kuangjincmb01</td>
+						<td>50w</td>
+						<td>0.2</td>
+					</tr>
+					<tr>
+						<td>FG</td>
+						<td>Kuangjinzx08</td>
+						<td>Kuangjincmb01</td>
+						<td>Kuangjincmb01</td>
+						<td>50w</td>
+						<td>0.2</td>
+					</tr>
+					<tr>
+						<td>SH</td>
+						<td>Kuangjinzx02</td>
+						<td>Kuangjincmb01</td>
+						<td>Kuangjincmb01</td>
+						<td>50w</td>
+						<td>0.2</td>
+					</tr>
+					<tr>
+						<td>A</td>
+						<td>Kuangjinzx04</td>
+						<td>Kuangjincmb01</td>
+						<td>Kuangjincmb01</td>
+						<td>50w</td>
+						<td>0.2</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<h3>4.2.2 交互与校验说明</h3>
+
+			<ul class="list">
+				<li>
+					当 <strong>权重分配类型 = 等权</strong> 时：
+					<ul class="list-nested">
+						<li>随着子腿新增 / 删除，系统自动重新均分权重。</li>
+						<li>权重值不可手动编辑，仅展示为只读字段。</li>
+					</ul>
+				</li>
+				<li>
+					当 <strong>权重分配类型 = 自定义</strong> 时：
+					<ul class="list-nested">
+						<li>支持逐行编辑各子腿的权重值。</li>
+						<li>需要<strong>实时校验</strong>所有启用子腿的权重和 = 100%。</li>
+						<li>当权重和 ≠ 100% 时：
+							<ul class="list-nested">
+								<li>不允许执行「发布 / 启用」操作。</li>
+								<li>仅允许保存为草稿。</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+				<li>
+					删除子腿或停用子腿后：
+					<ul class="list-nested">
+						<li>需重新计算权重或提示运营调整权重。</li>
+						<li>避免启用子腿权重总和 ≠ 100%，以免影响结算与展示。</li>
+					</ul>
+				</li>
+				<li>
+					入金：
+					<ul class="list-nested">
+						<li>点击「入金」按钮后，弹出对话框，允许输入入金金额。</li>
+						<li>确认后，增加当前组合产品的总权益，并按既定规则分配至各子腿。</li>
+					</ul>
+				</li>
+				<li>
+					编辑：
+					<ul class="list-nested">
+						<li>点击「编辑」可调整组合构成，包括：
+							<ul class="list-nested">
+								<li>增加新的单腿品种；</li>
+								<li>移除已有品种；</li>
+								<li>在「自定义」模式下，对品种权重进行设置或调整。</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+		</section>
+
+		<div class="section-divider"></div>
+
+		<!-- 4.4 操作与状态流转（表单级） -->
+		<section class="section-card" id="form-actions">
+			<div class="section-header">
+				<div class="section-title">4.4 操作与状态流转（表单级）</div>
+				<span class="section-tag">表单底部操作</span>
+			</div>
+			<p class="text-muted">表单级操作按钮位于页面底部，负责控制产品的保存、启用与返回上一页。</p>
+
+			<h3>4.4.1 底部操作按钮</h3>
+
+			<div class="table-wrapper">
+				<table>
+					<thead>
+					<tr>
+						<th style="width: 18%;">按钮</th>
+						<th style="width: 47%;">行为说明</th>
+						<th style="width: 35%;">校验要求</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr>
+						<td>保存草稿</td>
+						<td>允许保存当前填写内容，不对全部业务规则做强校验，用于分阶段配置。</td>
+						<td>通过基础必填校验（如产品名称、产品类型）即可。</td>
+					</tr>
+					<tr>
+						<td>发布 / 启用</td>
+						<td>将产品状态置为「启用」，并对前端生效，开始对客户可见 / 可购买（视前端权限而定）。</td>
+						<td>
+							<ul class="list">
+								<li>基础必填字段全部通过校验。</li>
+								<li>若为组合量化产品：
+									<ul class="list-nested">
+										<li>权重总和 = 100%。</li>
+										<li>至少存在一条启用状态的子腿。</li>
+									</ul>
+								</li>
+							</ul>
+						</td>
+					</tr>
+					<tr>
+						<td>取消</td>
+						<td>返回上一页（通常为产品列表页）。如存在未保存修改，需先弹出二次确认。</td>
+						<td>无业务规则校验，但如有未保存内容需提示「是否放弃未保存修改」。</td>
+					</tr>
+					</tbody>
+				</table>
+			</div>
+
+			<div class="toolbar" aria-label="底部按钮示意，仅展示不交互">
+				<button class="btn btn-outlined">取消</button>
+				<button class="btn btn-contained secondary">保存草稿</button>
+				<button class="btn btn-contained">发布 / 启用</button>
+			</div>
+			<p class="footer-note">上图仅为按钮示意，实际状态（可点 / 置灰）需根据表单校验结果动态控制。</p>
+
+			<h3>4.4.2 校验与提示</h3>
+
+			<ul class="list">
+				<li>
+					<strong>必填项缺失</strong>：
+					<ul class="list-nested">
+						<li>在对应字段下方展示红色错误文案，例如：
+							<div class="helper-text error-text">请输入产品名称</div>
+						</li>
+						<li>可在字段上方或标签处以红色星号标识必填。</li>
+					</ul>
+				</li>
+				<li>
+					<strong>组合权重异常</strong>：
+					<ul class="list-nested">
+						<li>在组合构成区对应位置或表单顶部集中提示。</li>
+						<li>提示文案示例：
+							<div class="error-banner">权重总和需为 100%，当前为 92%</div>
+						</li>
+						<li>在异常未处理前，「发布 / 启用」按钮保持置灰或点击后给出阻断提示。</li>
+					</ul>
+				</li>
+				<li>
+					<strong>保存草稿与发布的校验强度不同</strong>：
+					<ul class="list-nested">
+						<li>
+							<span class="helper-text-strong">保存草稿：</span>允许存在未补全配置，便于分阶段填写，主要校验表单结构是否完整与基础字段合法性（如数据类型）。
+						</li>
+						<li>
+							<span class="helper-text-strong">发布 / 启用：</span>必须所有关键业务规则通过校验，包括：
+							<ul class="list-nested">
+								<li>基础必填字段完整且合法。</li>
+								<li>组合量化产品权重总和 = 100%。</li>
+								<li>至少一条启用子腿。</li>
+								<li>暂无明显冲突配置（如时间区间、价格、关联系列等约束）。</li>
+							</ul>
+						</li>
+					</ul>
+				</li>
+			</ul>
+
+			<p class="note">
+				建议在表单顶部保留统一的错误提示区，用于汇总关键阻断性错误，减少运营人员逐字段排查成本。
+			</p>
+		</section>
+	</main>
+</body>
+</html>
