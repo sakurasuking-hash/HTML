@@ -1,0 +1,982 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+	<meta charset="UTF-8" />
+	<title>组合产品编辑页 - 策略管理平台</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<style>
+		/* ========= 基础重置 ========= */
+		* {
+			box-sizing: border-box;
+		}
+		html, body {
+			margin: 0;
+			padding: 0;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+			background-color: #F5F5F5;
+			color: #212121;
+		}
+		body {
+			display: flex;
+			justify-content: center;
+		}
+
+		/* ========= 页面布局 ========= */
+		.app-shell {
+			width: 100%;
+			max-width: 1280px;
+			min-height: 100vh;
+			display: flex;
+			flex-direction: column;
+			background-color: #FAFAFA;
+		}
+
+		.app-bar {
+			height: 64px;
+			display: flex;
+			align-items: center;
+			padding: 0 24px;
+			background-color: #1976D2;
+			color: #fff;
+			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		}
+		.app-bar__title {
+			font-size: 18px;
+			font-weight: 500;
+		}
+		.app-bar__subtitle {
+			font-size: 13px;
+			opacity: 0.8;
+			margin-left: 8px;
+		}
+
+		.app-content {
+			flex: 1;
+			padding: 16px 24px 88px; /* 底部给按钮区留空间 */
+			overflow-y: auto;
+		}
+
+		.section {
+			background-color: #FFFFFF;
+			border-radius: 8px;
+			box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+			padding: 20px 24px 16px;
+			margin-bottom: 16px;
+		}
+		.section__header {
+			display: flex;
+			align-items: center;
+			margin-bottom: 12px;
+		}
+		.section__title {
+			font-size: 16px;
+			font-weight: 500;
+			color: #212121;
+		}
+		.section__desc {
+			font-size: 12px;
+			color: #757575;
+			margin-left: 8px;
+		}
+		.section__divider {
+			margin: 12px 0 8px;
+			border: none;
+			border-top: 1px solid #E0E0E0;
+		}
+
+		.section__grid {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			column-gap: 24px;
+			row-gap: 12px;
+		}
+		@media (max-width: 960px) {
+			.section__grid {
+				grid-template-columns: 1fr;
+			}
+		}
+
+		/* ========= 表单控件 ========= */
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			position: relative;
+		}
+		.form-field__label {
+			font-size: 13px;
+			color: #616161;
+			margin-bottom: 4px;
+		}
+		.form-field__label--required::after {
+			content: " *";
+			color: #D32F2F;
+		}
+		.form-field__input,
+		.form-field__select,
+		.form-field__textarea {
+			font-size: 14px;
+			padding: 8px 10px;
+			border-radius: 4px;
+			border: 1px solid #BDBDBD;
+			outline: none;
+			background-color: #FFFFFF;
+			transition: border 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+		}
+		.form-field__input:focus,
+		.form-field__select:focus,
+		.form-field__textarea:focus {
+			border-color: #1976D2;
+			box-shadow: 0 0 0 1px #1976D2;
+		}
+		.form-field__input[readonly],
+		.form-field__input[disabled] {
+			background-color: #F5F5F5;
+			color: #757575;
+		}
+		.form-field__textarea {
+			min-height: 80px;
+			resize: vertical;
+		}
+		.form-field__hint {
+			font-size: 12px;
+			color: #9E9E9E;
+			margin-top: 2px;
+		}
+		.form-field__error {
+			font-size: 12px;
+			color: #D32F2F;
+			margin-top: 2px;
+			display: none;
+		}
+		.form-field--error .form-field__input,
+		.form-field--error .form-field__select,
+		.form-field--error .form-field__textarea {
+			border-color: #D32F2F;
+		}
+		.form-field--error .form-field__error {
+			display: block;
+		}
+
+		/* ========= 组合详情表格 ========= */
+		.combo-header-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 12px;
+		}
+		.combo-header-left {
+			display: flex;
+			align-items: center;
+			gap: 16px;
+		}
+		.chip-label {
+			font-size: 12px;
+			color: #616161;
+		}
+		.radio-group {
+			display: inline-flex;
+			align-items: center;
+			gap: 12px;
+			font-size: 13px;
+		}
+		.radio-group label {
+			display: inline-flex;
+			align-items: center;
+			cursor: pointer;
+			color: #424242;
+		}
+		.radio-group input {
+			margin-right: 4px;
+		}
+
+		.combo-actions {
+			display: flex;
+			gap: 8px;
+		}
+
+		table.combo-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+		}
+		table.combo-table thead {
+			background-color: #F5F5F5;
+		}
+		table.combo-table th,
+		table.combo-table td {
+			padding: 8px 6px;
+			border-bottom: 1px solid #E0E0E0;
+			text-align: left;
+			vertical-align: middle;
+		}
+		table.combo-table th {
+			font-weight: 500;
+			color: #616161;
+		}
+		table.combo-table td input {
+			width: 100%;
+			border-radius: 3px;
+			border: 1px solid #BDBDBD;
+			padding: 4px 6px;
+			font-size: 13px;
+		}
+		table.combo-table td input[readonly] {
+			background-color: #F5F5F5;
+			color: #757575;
+		}
+		.combo-footer {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-top: 8px;
+			font-size: 12px;
+		}
+		.combo-footer-left {
+			color: #9E9E9E;
+		}
+		.combo-footer-left--error {
+			color: #D32F2F;
+		}
+		.combo-footer-right {
+			color: #9E9E9E;
+		}
+
+		/* ========= 按钮 ========= */
+		.btn {
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			min-width: 72px;
+			padding: 0 16px;
+			height: 32px;
+			border-radius: 16px;
+			font-size: 13px;
+			font-weight: 500;
+			border: none;
+			cursor: pointer;
+			outline: none;
+			transition: background-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+		}
+		.btn--primary {
+			background-color: #1976D2;
+			color: #FFFFFF;
+			box-shadow: 0 2px 4px rgba(25,118,210,0.4);
+		}
+		.btn--primary:hover {
+			background-color: #1565C0;
+		}
+		.btn--secondary {
+			background-color: #FFFFFF;
+			color: #1976D2;
+			border: 1px solid #1976D2;
+		}
+		.btn--secondary:hover {
+			background-color: #E3F2FD;
+		}
+		.btn--text {
+			background-color: transparent;
+			color: #1976D2;
+			box-shadow: none;
+		}
+		.btn--text:hover {
+			background-color: rgba(25,118,210,0.08);
+		}
+		.btn--sm {
+			height: 28px;
+			min-width: 60px;
+			padding: 0 10px;
+			border-radius: 14px;
+			font-size: 12px;
+		}
+		.btn:disabled {
+			opacity: 0.5;
+			cursor: default;
+			box-shadow: none;
+		}
+
+		/* ========= 底部操作条 ========= */
+		.footer-bar {
+			position: fixed;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			justify-content: center;
+			background-color: transparent;
+			pointer-events: none;
+		}
+		.footer-bar__inner {
+			pointer-events: auto;
+			width: 100%;
+			max-width: 1280px;
+			padding: 8px 24px 12px;
+		}
+		.footer-card {
+			background-color: #FFFFFF;
+			border-radius: 8px;
+			box-shadow: 0 -2px 6px rgba(0,0,0,0.12);
+			padding: 8px 16px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 8px;
+		}
+		.footer-card__info {
+			font-size: 12px;
+			color: #9E9E9E;
+		}
+		.footer-card__actions {
+			display: flex;
+			gap: 8px;
+		}
+
+		/* ========= 顶部小提示 ========= */
+		.banner {
+			font-size: 12px;
+			color: #616161;
+			background-color: #FFF3E0;
+			border-radius: 6px;
+			padding: 8px 10px;
+			margin-bottom: 12px;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.banner-icon {
+			font-size: 16px;
+		}
+		.banner-strong {
+			font-weight: 500;
+			color: #EF6C00;
+		}
+
+		/* ========= 模态框 ========= */
+		.modal-backdrop {
+			position: fixed;
+			inset: 0;
+			background: rgba(0,0,0,0.32);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 1000;
+		}
+		.modal {
+			width: 100%;
+			max-width: 420px;
+			background-color: #FFFFFF;
+			border-radius: 8px;
+			box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+			padding: 16px 20px 12px;
+		}
+		.modal__title {
+			font-size: 16px;
+			font-weight: 500;
+			margin-bottom: 4px;
+		}
+		.modal__content {
+			font-size: 13px;
+			color: #424242;
+			margin: 8px 0 12px;
+		}
+		.modal__footer {
+			display: flex;
+			justify-content: flex-end;
+			gap: 8px;
+			margin-top: 8px;
+		}
+		.modal__row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-top: 8px;
+		}
+		.modal__row-label {
+			font-size: 13px;
+			color: #616161;
+		}
+		.modal__row-value {
+			font-size: 13px;
+			color: #212121;
+		}
+		.modal__input {
+			width: 140px;
+		}
+	</style>
+</head>
+<body>
+<div class="app-shell">
+
+	<!-- 顶部 AppBar -->
+	<header class="app-bar">
+		<div class="app-bar__title">组合产品编辑</div>
+		<div class="app-bar__subtitle">策略管理平台 / 产品编辑页</div>
+	</header>
+
+	<!-- 主体内容 -->
+	<main class="app-content">
+		<!-- 顶部整体结构提示 -->
+		<div class="banner">
+			<span class="banner-icon">ℹ️</span>
+			<div>
+				<span class="banner-strong">页面说明：</span>
+				从上到下依次为基础信息、拓展信息、量化资金信息、组合详情，以及底部统一操作区。
+			</div>
+		</div>
+
+		<!-- 4.1 基础信息填写 -->
+		<section class="section" id="section-basic">
+			<div class="section__header">
+				<div class="section__title">4.1 基础信息</div>
+				<div class="section__desc">由 EKP 带入为主，部分字段可编辑</div>
+			</div>
+			<hr class="section__divider" />
+			<div class="section__grid">
+				<!-- 产品名称（可修改） -->
+				<div class="form-field" data-field="productName">
+					<label class="form-field__label form-field__label--required">产品名称</label>
+					<input class="form-field__input" type="text" id="productName" placeholder="例：矿金优选12号-燃料油FU" />
+					<div class="form-field__hint">EKP 带入默认值，运营可在此微调展示名称。</div>
+					<div class="form-field__error">请输入产品名称</div>
+				</div>
+
+				<!-- 产品编号（只读） -->
+				<div class="form-field">
+					<label class="form-field__label">产品编号</label>
+					<input class="form-field__input" type="text" value="WK001220251022" readonly />
+					<div class="form-field__hint">由 EKP 提交生成，仅展示不可修改。</div>
+				</div>
+
+				<!-- 风险等级（只读） -->
+				<div class="form-field">
+					<label class="form-field__label">风险等级</label>
+					<input class="form-field__input" type="text" value="R3" readonly />
+				</div>
+
+				<!-- 产品类型（只读） -->
+				<div class="form-field">
+					<label class="form-field__label">产品类型</label>
+					<input class="form-field__input" type="text" value="量化信号类" readonly />
+				</div>
+
+				<!-- 产品出品人（只读） -->
+				<div class="form-field">
+					<label class="form-field__label">产品出品人</label>
+					<input class="form-field__input" type="text" value="五矿期货投资咨询团队" readonly />
+				</div>
+
+				<!-- 产品等级（只读） -->
+				<div class="form-field">
+					<label class="form-field__label">产品等级</label>
+					<input class="form-field__input" type="text" value="矿金优选(R3)" readonly />
+				</div>
+
+				<!-- 是否签约产品 -->
+				<div class="form-field" data-field="isContract">
+					<label class="form-field__label form-field__label--required">是否签约产品</label>
+					<select class="form-field__select" id="isContract">
+						<option value="">请选择</option>
+						<option value="yes">是</option>
+						<option value="no">否</option>
+					</select>
+					<div class="form-field__error">请选择是否为签约产品</div>
+				</div>
+
+				<!-- 价格类型 -->
+				<div class="form-field" data-field="priceType">
+					<label class="form-field__label form-field__label--required">价格类型</label>
+					<select class="form-field__select" id="priceType">
+						<option value="">请选择</option>
+						<option value="free">免费</option>
+						<option value="once">单次购买</option>
+						<option value="monthly">按月订阅</option>
+					</select>
+					<div class="form-field__error">请选择价格类型</div>
+				</div>
+
+				<!-- 价格 -->
+				<div class="form-field" data-field="price">
+					<label class="form-field__label form-field__label--required">价格（元）</label>
+					<input class="form-field__input" type="number" min="0" step="0.01" id="price" placeholder="例：1999.00" />
+					<div class="form-field__error">请输入有效价格</div>
+				</div>
+
+				<!-- 优惠价格（选填） -->
+				<div class="form-field">
+					<label class="form-field__label">优惠价格（元）</label>
+					<input class="form-field__input" type="number" min="0" step="0.01" id="discountPrice" placeholder="例：1599.00（可选）" />
+					<div class="form-field__hint">选填，用于限时优惠或会员价等场景。</div>
+				</div>
+
+				<!-- 产品简介（跨两列） -->
+				<div class="form-field" style="grid-column: 1 / -1;" data-field="description">
+					<label class="form-field__label form-field__label--required">产品简介</label>
+					<textarea class="form-field__textarea" id="description" placeholder="简要说明该组合策略的核心逻辑、适用人群、风险提示等，用于前台展示。"></textarea>
+					<div class="form-field__error">请输入产品简介</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 4.2 拓展信息填写 -->
+		<section class="section" id="section-extend">
+			<div class="section__header">
+				<div class="section__title">4.2 拓展信息</div>
+				<div class="section__desc">用于前台分组展示与后续组合配置</div>
+			</div>
+			<hr class="section__divider" />
+			<div class="section__grid">
+				<!-- 所属系列 -->
+				<div class="form-field" data-field="series">
+					<label class="form-field__label form-field__label--required">所属系列</label>
+					<select class="form-field__select" id="series">
+						<option value="">请选择</option>
+						<option value="youxuan-r3">矿金优选(R3)</option>
+						<option value="zhixuan-r3">矿金智选(R3)</option>
+						<option value="custom">自定义系列...</option>
+					</select>
+					<div class="form-field__hint">用于签约及前台分组展示。</div>
+					<div class="form-field__error">请选择所属系列</div>
+				</div>
+
+				<!-- 产品形式 -->
+				<div class="form-field" data-field="form">
+					<label class="form-field__label form-field__label--required">产品形式</label>
+					<select class="form-field__select" id="productForm">
+						<option value="">请选择</option>
+						<option value="single">单品种策略</option>
+						<option value="combo">组合策略</option>
+						<option value="ths">同花顺产品</option>
+					</select>
+					<div class="form-field__hint">量化产品可选：单品种策略 / 组合策略 / 同花顺。</div>
+					<div class="form-field__error">请选择产品形式</div>
+				</div>
+
+				<!-- 组合类型（仅组合策略显示） -->
+				<div class="form-field" id="comboTypeField" style="display:none;" data-field="comboType">
+					<label class="form-field__label">组合类型</label>
+					<select class="form-field__select" id="comboType">
+						<option value="">请选择</option>
+						<option value="1">类型1（份额制 + 权重分配）</option>
+						<option value="2">类型2</option>
+						<option value="3">类型3</option>
+					</select>
+					<div class="form-field__hint">不同组合类型会影响下方组合详情与结算规则。</div>
+					<div class="form-field__error">请选择组合类型</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 4.2.2 量化产品基本信息（仅当 组合策略 + 类型1 时展示） -->
+		<section class="section" id="section-quant-basic" style="display:none;">
+			<div class="section__header">
+				<div class="section__title">4.2.2 量化产品基本信息</div>
+				<div class="section__desc">组合产品的总权益、净值、份额由创建与结算系统共同维护</div>
+			</div>
+			<hr class="section__divider" />
+			<div class="section__grid">
+				<!-- 总权益 -->
+				<div class="form-field">
+					<label class="form-field__label">总权益</label>
+					<input class="form-field__input" type="number" min="0" step="0.01" id="totalEquity" value="1000000.00" readonly />
+					<div class="form-field__hint">创建时录入的初始总权益，后续仅通过“入金”等操作调整，由系统回写。</div>
+				</div>
+				<!-- 净值 -->
+				<div class="form-field">
+					<label class="form-field__label">净值</label>
+					<input class="form-field__input" type="number" step="0.0001" id="nav" value="1.0000" readonly />
+					<div class="form-field__hint">默认创建时为 1.0000，之后由结算系统计算回写。</div>
+				</div>
+				<!-- 份额 -->
+				<div class="form-field">
+					<label class="form-field__label">份额</label>
+					<input class="form-field__input" type="number" step="0.0001" id="shares" value="1000000.0000" readonly />
+					<div class="form-field__hint">按“初始总权益 / 初始净值”计算，后续随入金 / 减资按规则自动调整。</div>
+				</div>
+			</div>
+		</section>
+
+		<!-- 4.2.3 组合详情（量化策略组合） -->
+		<section class="section" id="section-combo-detail" style="display:none;">
+			<div class="section__header">
+				<div class="section__title">4.2.3 组合详情（量化策略组合）</div>
+				<div class="section__desc">管理组合内各单腿策略的权重与权益分配</div>
+			</div>
+			<hr class="section__divider" />
+
+			<div class="combo-header-row">
+				<div class="combo-header-left">
+					<span class="chip-label">权重分配类型：</span>
+					<div class="radio-group" id="weightTypeGroup">
+						<label>
+							<input type="radio" name="weightType" value="equal" checked />
+							等权
+						</label>
+						<label>
+							<input type="radio" name="weightType" value="custom" />
+							自定义
+						</label>
+					</div>
+				</div>
+				<div class="combo-actions">
+					<button class="btn btn--secondary btn--sm" type="button" id="btnEditLegs">编辑</button>
+					<button class="btn btn--primary btn--sm" type="button" id="btnDeposit">入金</button>
+				</div>
+			</div>
+
+			<table class="combo-table" id="comboTable">
+				<thead>
+				<tr>
+					<th>单腿品种</th>
+					<th>单腿产品ID</th>
+					<th>Cmb_id</th>
+					<th>组合产品ID</th>
+					<th>权益（元）</th>
+					<th>品种权重比例（%）</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr data-row>
+					<td>燃料油 FU</td>
+					<td>LEG0001</td>
+					<td>CMB1001</td>
+					<td>CP0001</td>
+					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+				</tr>
+				<tr data-row>
+					<td>焦炭 J</td>
+					<td>LEG0002</td>
+					<td>CMB1002</td>
+					<td>CP0001</td>
+					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+				</tr>
+				</tbody>
+			</table>
+
+			<div class="combo-footer" id="comboFooter">
+				<div class="combo-footer-left" id="weightSummary">当前权重总和：100.00%</div>
+				<div class="combo-footer-right">说明：等权模式下，权重由系统按启用单腿数量自动均分。</div>
+			</div>
+		</section>
+
+	</main>
+
+	<!-- 底部操作条 -->
+	<div class="footer-bar">
+		<div class="footer-bar__inner">
+			<div class="footer-card">
+				<div class="footer-card__info" id="footerInfo">
+					草稿状态，尚未发布。仅保存必填字段，通过后即可在列表页查看并继续编辑。
+				</div>
+				<div class="footer-card__actions">
+					<button class="btn btn--text" type="button" id="btnCancel">取消</button>
+					<button class="btn btn--primary" type="button" id="btnSave">保存</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- 入金弹窗 -->
+	<div class="modal-backdrop" id="modalDeposit">
+		<div class="modal">
+			<div class="modal__title">组合入金</div>
+			<div class="modal__content">
+				<div class="modal__row">
+					<div class="modal__row-label">当前总权益：</div>
+					<div class="modal__row-value" id="currentEquityLabel">1,000,000.00 元</div>
+				</div>
+				<div class="modal__row">
+					<div class="modal__row-label">当前净值：</div>
+					<div class="modal__row-value" id="currentNavLabel">1.0000</div>
+				</div>
+				<div class="modal__row">
+					<div class="modal__row-label">本次入金金额：</div>
+					<input class="form-field__input modal__input" type="number" min="0" step="0.01" id="depositAmount" />
+				</div>
+				<div class="form-field__error" id="depositError" style="margin-top:6px;display:none;">请输入大于 0 的入金金额</div>
+				<div style="font-size:12px;color:#9E9E9E;margin-top:8px;">
+					确认后：系统将增加组合总权益，并按当前权重比例同步更新各单腿权益，份额调整由结算系统计算。
+				</div>
+			</div>
+			<div class="modal__footer">
+				<button class="btn btn--text btn--sm" type="button" id="btnDepositCancel">取消</button>
+				<button class="btn btn--primary btn--sm" type="button" id="btnDepositConfirm">确认入金</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 取消确认弹窗 -->
+    <div class="modal-backdrop" id="modalCancelConfirm">
+        <div class="modal">
+            <div class="modal__title">放弃未保存修改？</div>
+            <div class="modal__content">
+                当前页面存在未保存的修改，离开后将不会保留。<br/>
+                确认要返回产品列表吗？
+            </div>
+            <div class="modal__footer">
+                <button class="btn btn--text btn--sm" type="button" id="btnCancelBack">返回继续编辑</button>
+                <button class="btn btn--primary btn--sm" type="button" id="btnCancelConfirm">确认离开</button>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<script>
+	// ========== 工具函数 ==========
+	function showSectionIfNeeded() {
+		const form = document.getElementById('productForm').value;
+		const comboType = document.getElementById('comboType').value;
+
+		const comboTypeField = document.getElementById('comboTypeField');
+		const quantBasic = document.getElementById('section-quant-basic');
+		const comboDetail = document.getElementById('section-combo-detail');
+
+		// 控制组合类型字段显隐
+		if (form === 'combo') {
+			comboTypeField.style.display = 'flex';
+		} else {
+			comboTypeField.style.display = 'none';
+			document.getElementById('comboType').value = '';
+		}
+
+		// 控制量化基本信息与组合详情的显隐
+		const shouldShowCombo = (form === 'combo' && comboType === '1');
+		quantBasic.style.display = shouldShowCombo ? 'block' : 'none';
+		comboDetail.style.display = shouldShowCombo ? 'block' : 'none';
+	}
+
+	function updateWeightInputsState() {
+		const type = document.querySelector('input[name="weightType"]:checked')?.value || 'equal';
+		const table = document.getElementById('comboTable');
+		const weightInputs = table.querySelectorAll('input[data-weight]');
+
+		if (type === 'equal') {
+			// 按行数自动均分
+			const rows = table.querySelectorAll('tbody tr[data-row]');
+			const count = rows.length || 1;
+			const value = (100 / count).toFixed(2);
+			weightInputs.forEach(function (input) {
+				input.value = value;
+				input.readOnly = true;
+				input.style.backgroundColor = '#F5F5F5';
+			});
+		} else {
+			weightInputs.forEach(function (input) {
+				input.readOnly = false;
+				input.style.backgroundColor = '#FFFFFF';
+			});
+		}
+		updateWeightSummary();
+	}
+
+	function updateWeightSummary() {
+		const table = document.getElementById('comboTable');
+		const weightInputs = table.querySelectorAll('input[data-weight]');
+		let sum = 0;
+		weightInputs.forEach(function (input) {
+			const v = parseFloat(input.value);
+			if (!isNaN(v)) sum += v;
+		});
+		const summaryEl = document.getElementById('weightSummary');
+		const footer = document.getElementById('comboFooter');
+		const type = document.querySelector('input[name="weightType"]:checked')?.value || 'equal';
+
+		const text = '当前权重总和：' + sum.toFixed(2) + '%';
+		summaryEl.textContent = text;
+
+		if (type === 'custom' && Math.abs(sum - 100) > 0.01) {
+			summaryEl.classList.add('combo-footer-left--error');
+			footer.querySelector('.combo-footer-right').textContent = '提示：自定义模式下，权重总和需为 100% 才允许发布。';
+			return false;
+		} else {
+			summaryEl.classList.remove('combo-footer-left--error');
+			footer.querySelector('.combo-footer-right').textContent =
+				type === 'equal'
+					? '说明：等权模式下，权重由系统按启用单腿数量自动均分。'
+					: '说明：自定义模式下，可手动调整各单腿权重，总和需为 100%。';
+			return true;
+		}
+	}
+
+	function validateRequired() {
+		let valid = true;
+
+		function markError(fieldName, condition) {
+			const field = document.querySelector('.form-field[data-field="' + fieldName + '"]');
+			if (!field) return;
+			if (condition) {
+				field.classList.add('form-field--error');
+				valid = false;
+			} else {
+				field.classList.remove('form-field--error');
+			}
+		}
+
+		// 基础信息必填
+		markError('productName', !document.getElementById('productName').value.trim());
+		markError('isContract', !document.getElementById('isContract').value);
+		const priceValue = document.getElementById('price').value;
+		markError('price', priceValue === '' || parseFloat(priceValue) < 0);
+		markError('priceType', !document.getElementById('priceType').value);
+		markError('description', !document.getElementById('description').value.trim());
+
+		// 拓展信息必填
+		markError('series', !document.getElementById('series').value);
+		markError('form', !document.getElementById('productForm').value);
+
+		// 仅当 组合策略 时，组合类型必填
+		const formValue = document.getElementById('productForm').value;
+		if (formValue === 'combo') {
+			markError('comboType', !document.getElementById('comboType').value);
+		} else {
+			const comboField = document.querySelector('.form-field[data-field="comboType"]');
+			if (comboField) comboField.classList.remove('form-field--error');
+		}
+
+		return valid;
+	}
+
+	// ========== 状态 & 事件 ==========
+	let dirty = false;
+
+	function markDirty() {
+		if (!dirty) {
+			dirty = true;
+			document.getElementById('footerInfo').textContent =
+				'存在未保存修改，保存后变更将生效但仍处于草稿状态。';
+		}
+	}
+
+	document.addEventListener('input', function (e) {
+		const target = e.target;
+		if (target.closest('main')) {
+			markDirty();
+		}
+		if (target.hasAttribute('data-weight')) {
+			updateWeightSummary();
+		}
+	});
+
+	document.addEventListener('change', function (e) {
+		const target = e.target;
+		if (target.id === 'productForm' || target.id === 'comboType') {
+			showSectionIfNeeded();
+		}
+		if (target.name === 'weightType') {
+			updateWeightInputsState();
+		}
+		if (target.closest('main')) {
+			markDirty();
+		}
+	});
+
+	// 保存
+	document.getElementById('btnSave').addEventListener('click', function () {
+		const baseValid = validateRequired();
+
+		// 若组合详情展示且为自定义权重，需校验权重总和
+		let weightValid = true;
+		const comboDetailVisible = document.getElementById('section-combo-detail').style.display !== 'none';
+		if (comboDetailVisible) {
+			const type = document.querySelector('input[name="weightType"]:checked')?.value || 'equal';
+			if (type === 'custom') {
+				weightValid = updateWeightSummary();
+			}
+		}
+
+		if (!baseValid || !weightValid) {
+			alert('请检查必填项与权重配置后再保存。');
+			return;
+		}
+
+		dirty = false;
+		document.getElementById('footerInfo').textContent =
+			'已保存为草稿。你可以继续编辑，或返回列表后再次进入进行修改。';
+		alert('保存成功（模拟）。');
+	});
+
+	// 取消：弹出确认
+	document.getElementById('btnCancel').addEventListener('click', function () {
+		if (!dirty) {
+			alert('模拟返回：将跳转回产品列表页。');
+			return;
+		}
+		document.getElementById('modalCancelConfirm').style.display = 'flex';
+	});
+
+	document.getElementById('btnCancelBack').addEventListener('click', function () {
+		document.getElementById('modalCancelConfirm').style.display = 'none';
+	});
+
+	document.getElementById('btnCancelConfirm').addEventListener('click', function () {
+		document.getElementById('modalCancelConfirm').style.display = 'none';
+		alert('模拟返回：丢弃修改并返回产品列表页。');
+	});
+
+	// 入金弹窗
+	document.getElementById('btnDeposit').addEventListener('click', function () {
+		const totalEquity = parseFloat(document.getElementById('totalEquity').value || '0');
+		const nav = parseFloat(document.getElementById('nav').value || '0');
+
+		document.getElementById('currentEquityLabel').textContent =
+			totalEquity.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' 元';
+		document.getElementById('currentNavLabel').textContent = nav.toFixed(4);
+		document.getElementById('depositAmount').value = '';
+		document.getElementById('depositError').style.display = 'none';
+
+		document.getElementById('modalDeposit').style.display = 'flex';
+	});
+
+	document.getElementById('btnDepositCancel').addEventListener('click', function () {
+		document.getElementById('modalDeposit').style.display = 'none';
+	});
+
+	document.getElementById('btnDepositConfirm').addEventListener('click', function () {
+		const amountInput = document.getElementById('depositAmount');
+		const errorEl = document.getElementById('depositError');
+		const value = parseFloat(amountInput.value);
+
+		if (isNaN(value) || value <= 0) {
+			errorEl.style.display = 'block';
+			return;
+		}
+		errorEl.style.display = 'none';
+
+		// 简单模拟：增加总权益，按当前权重更新各单腿权益
+		const totalEquityInput = document.getElementById('totalEquity');
+		let totalEquity = parseFloat(totalEquityInput.value || '0');
+		totalEquity += value;
+		totalEquityInput.value = totalEquity.toFixed(2);
+
+		const table = document.getElementById('comboTable');
+		const rows = table.querySelectorAll('tbody tr[data-row]');
+		rows.forEach(function (row) {
+			const weightInput = row.querySelector('input[data-weight]');
+			const equityInput = row.querySelector('td:nth-child(5) input');
+			const weight = parseFloat(weightInput.value || '0');
+			if (!isNaN(weight)) {
+				const shareEquity = totalEquity * (weight / 100);
+				equityInput.value = shareEquity.toFixed(2);
+			}
+		});
+
+		document.getElementById('modalDeposit').style.display = 'none';
+		alert('入金成功（模拟），组合总权益与各单腿权益已更新展示。');
+		markDirty();
+	});
+
+	// 编辑单腿（简化：仅提示说明）
+	document.getElementById('btnEditLegs').addEventListener('click', function () {
+		alert('这里可接入单腿编辑弹窗 / 侧滑面板，用于新增 / 删除品种与调整启用状态（此处为静态原型示意）。');
+	});
+
+	// 初始化
+	window.addEventListener('DOMContentLoaded', function () {
+		showSectionIfNeeded();      // 根据初始产品形式控制显示
+		updateWeightInputsState();  // 初始化权重输入状态
+	});
+</script>
+</body>
+</html>
