@@ -363,11 +363,14 @@
 		}
 		.modal {
 			width: 100%;
-			max-width: 420px;
+			max-width: 520px;
 			background-color: #FFFFFF;
 			border-radius: 8px;
 			box-shadow: 0 4px 16px rgba(0,0,0,0.3);
 			padding: 16px 20px 12px;
+		}
+		.modal--wide {
+			max-width: 720px; /* 策略编辑弹窗略宽一点，表格更好展示 */
 		}
 		.modal__title {
 			font-size: 16px;
@@ -401,6 +404,41 @@
 		}
 		.modal__input {
 			width: 140px;
+		}
+
+		/* 策略编辑列表样式（继承表格样式） */
+		table.strategy-table {
+			width: 100%;
+			border-collapse: collapse;
+			font-size: 13px;
+			margin-top: 8px;
+		}
+		table.strategy-table thead {
+			background-color: #F5F5F5;
+		}
+		table.strategy-table th,
+		table.strategy-table td {
+			padding: 6px 6px;
+			border-bottom: 1px solid #E0E0E0;
+			text-align: left;
+			vertical-align: middle;
+		}
+		table.strategy-table th {
+			font-weight: 500;
+			color: #616161;
+		}
+		table.strategy-table td button {
+			font-size: 12px;
+		}
+		.strategy-toolbar {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin: 4px 0 4px;
+		}
+		.strategy-toolbar-left {
+			font-size: 12px;
+			color: #9E9E9E;
 		}
 	</style>
 </head>
@@ -679,7 +717,7 @@
 
 	<!-- 入金弹窗 -->
 	<div class="modal-backdrop" id="modalDeposit">
-		<div class="modal">
+		<div class="modal modal--medium">
 			<div class="modal__title">组合入金</div>
 			<div class="modal__content">
 				<div class="modal__row">
@@ -707,19 +745,87 @@
 	</div>
 
 	<!-- 取消确认弹窗 -->
-    <div class="modal-backdrop" id="modalCancelConfirm">
-        <div class="modal">
-            <div class="modal__title">放弃未保存修改？</div>
-            <div class="modal__content">
-                当前页面存在未保存的修改，离开后将不会保留。<br/>
-                确认要返回产品列表吗？
-            </div>
-            <div class="modal__footer">
-                <button class="btn btn--text btn--sm" type="button" id="btnCancelBack">返回继续编辑</button>
-                <button class="btn btn--primary btn--sm" type="button" id="btnCancelConfirm">确认离开</button>
-            </div>
-        </div>
-    </div>
+	<div class="modal-backdrop" id="modalCancelConfirm">
+		<div class="modal">
+			<div class="modal__title">放弃未保存修改？</div>
+			<div class="modal__content">
+				当前页面存在未保存的修改，离开后将不会保留。<br/>
+				确认要返回产品列表吗？
+			</div>
+			<div class="modal__footer">
+				<button class="btn btn--text btn--sm" type="button" id="btnCancelBack">返回继续编辑</button>
+				<button class="btn btn--primary btn--sm" type="button" id="btnCancelConfirm">确认离开</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- 策略编辑弹窗 -->
+	<div class="modal-backdrop" id="modalStrategyEdit">
+		<div class="modal modal--wide">
+			<div class="modal__title">组合策略编辑</div>
+			<div class="modal__content">
+				<div style="font-size:12px;color:#757575;margin-bottom:4px;">
+					管理当前组合内的单腿策略，可新增 / 删除。保存后将同步到组合详情表格。
+				</div>
+
+				<div class="strategy-toolbar">
+					<div class="strategy-toolbar-left">
+						当前共 <span id="strategyCountLabel">2</span> 条策略
+					</div>
+					<div style="display:flex;gap:8px;align-items:center;">
+						<button class="btn btn--secondary btn--sm" type="button" id="btnStrategyAdd">新增策略</button>
+						<button class="btn btn--text btn--sm" type="button" id="btnStrategyBatchDelete">批量删除</button>
+					</div>
+				</div>
+
+				<table class="strategy-table" id="strategyTable">
+					<thead>
+					<tr>
+						<th style="width:32px;"><input type="checkbox" id="strategyCheckAll" /></th>
+						<th>单腿品种</th>
+						<th>单腿产品ID</th>
+						<th>Cmb_id</th>
+						<th>组合产品ID</th>
+						<th style="width:80px;text-align:center;">操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr data-strategy-row>
+						<td><input type="checkbox" class="strategy-check" /></td>
+						<td>燃料油 FU</td>
+						<td>LEG0001</td>
+						<td>CMB1001</td>
+						<td>CP0001</td>
+						<td style="text-align:center;">
+							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+						</td>
+					</tr>
+					<tr data-strategy-row>
+						<td><input type="checkbox" class="strategy-check" /></td>
+						<td>焦炭 J</td>
+						<td>LEG0002</td>
+						<td>CMB1002</td>
+						<td>CP0001</td>
+						<td style="text-align:center;">
+							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+						</td>
+					</tr>
+					</tbody>
+				</table>
+
+				<div id="strategyError" class="form-field__error" style="margin-top:8px;display:none;">
+					组合内至少需要保留 1 条策略，请勿全部删除。
+				</div>
+				<div style="font-size:12px;color:#9E9E9E;margin-top:6px;">
+					说明：策略编辑仅影响组合构成，具体权重与权益分配仍在主页面“组合详情”中配置。
+				</div>
+			</div>
+			<div class="modal__footer">
+				<button class="btn btn--text btn--sm" type="button" id="btnStrategyCancel">取消</button>
+				<button class="btn btn--primary btn--sm" type="button" id="btnStrategySave">保存</button>
+			</div>
+		</div>
+	</div>
 
 </div>
 
@@ -967,15 +1073,174 @@
 		markDirty();
 	});
 
-	// 编辑单腿（简化：仅提示说明）
+	// ==== 策略编辑弹窗逻辑 ====
+	const modalStrategyEdit = document.getElementById('modalStrategyEdit');
+	const strategyTable = document.getElementById('strategyTable').querySelector('tbody');
+	const strategyCountLabel = document.getElementById('strategyCountLabel');
+	const strategyError = document.getElementById('strategyError');
+	const strategyCheckAll = document.getElementById('strategyCheckAll');
+
+	function updateStrategyCount() {
+		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
+		strategyCountLabel.textContent = rows.length;
+	}
+
+	function syncStrategyFromCombo() {
+		// 将主页面组合详情表中的行同步到策略编辑弹窗
+		const comboRows = document.querySelectorAll('#comboTable tbody tr[data-row]');
+		strategyTable.innerHTML = '';
+		comboRows.forEach(function (row) {
+			const cells = row.querySelectorAll('td');
+			const tr = document.createElement('tr');
+			tr.setAttribute('data-strategy-row', '');
+
+			const legName = cells[0].textContent.trim();
+			const legId = cells[1].textContent.trim();
+			const cmbId = cells[2].textContent.trim();
+			const comboId = cells[3].textContent.trim();
+
+			tr.innerHTML = `
+				<td><input type="checkbox" class="strategy-check" /></td>
+				<td>${legName}</td>
+				<td>${legId}</td>
+				<td>${cmbId}</td>
+				<td>${comboId}</td>
+				<td style="text-align:center;">
+					<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+				</td>
+			`;
+			strategyTable.appendChild(tr);
+		});
+		updateStrategyCount();
+		strategyCheckAll.checked = false;
+		strategyError.style.display = 'none';
+	}
+
+	function syncStrategyToCombo() {
+		// 把策略弹窗里的列表回写到主页面组合详情表（保持样例里的权益与权重不变，只更新行结构和 ID 等）
+		const comboBody = document.querySelector('#comboTable tbody');
+		comboBody.innerHTML = '';
+
+		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
+		const totalEquity = parseFloat(document.getElementById('totalEquity').value || '0');
+		const count = rows.length || 1;
+		const perEquity = (totalEquity / count).toFixed(2);
+		const weightPer = (100 / count).toFixed(2);
+
+		rows.forEach(function (row, index) {
+			const tds = row.querySelectorAll('td');
+			const legName = tds[1].textContent.trim();
+			const legId = tds[2].textContent.trim();
+			const cmbId = tds[3].textContent.trim();
+			const comboId = tds[4].textContent.trim();
+
+			const tr = document.createElement('tr');
+			tr.setAttribute('data-row', '');
+			tr.innerHTML = `
+				<td>${legName}</td>
+				<td>${legId}</td>
+				<td>${cmbId}</td>
+				<td>${comboId}</td>
+				<td><input type="number" step="0.01" value="${perEquity}" readonly /></td>
+				<td><input type="number" step="0.01" value="${weightPer}" data-weight /></td>
+			`;
+			comboBody.appendChild(tr);
+		});
+
+		updateWeightInputsState();
+	}
+
+	// 打开策略编辑弹窗
 	document.getElementById('btnEditLegs').addEventListener('click', function () {
-		alert('这里可接入单腿编辑弹窗 / 侧滑面板，用于新增 / 删除品种与调整启用状态（此处为静态原型示意）。');
+		syncStrategyFromCombo();
+		modalStrategyEdit.style.display = 'flex';
 	});
 
-	// 初始化
+	// 全选
+	strategyCheckAll.addEventListener('change', function () {
+		const checks = strategyTable.querySelectorAll('.strategy-check');
+		checks.forEach(function (c) {
+			c.checked = strategyCheckAll.checked;
+		});
+	});
+
+	// 行内事件：删除单行
+	strategyTable.addEventListener('click', function (e) {
+		const btn = e.target.closest('button[data-action="delete-row"]');
+		if (!btn) return;
+		const row = btn.closest('tr[data-strategy-row]');
+		if (row) {
+			row.remove();
+			updateStrategyCount();
+			strategyCheckAll.checked = false;
+		}
+	});
+
+	// 批量删除
+	document.getElementById('btnStrategyBatchDelete').addEventListener('click', function () {
+		const checks = strategyTable.querySelectorAll('.strategy-check:checked');
+		if (checks.length === 0) {
+			alert('请先选择要删除的策略。');
+			return;
+		}
+		if (!confirm('确认删除选中的 ' + checks.length + ' 条策略吗？')) {
+			return;
+		}
+		checks.forEach(function (c) {
+			const row = c.closest('tr[data-strategy-row]');
+			if (row) row.remove();
+		});
+		updateStrategyCount();
+		strategyCheckAll.checked = false;
+	});
+
+	// 新增策略（简单模拟：添加一条示例记录）
+	document.getElementById('btnStrategyAdd').addEventListener('click', function () {
+		const index = strategyTable.querySelectorAll('tr[data-strategy-row]').length + 1;
+		const tr = document.createElement('tr');
+		tr.setAttribute('data-strategy-row', '');
+		tr.innerHTML = `
+			<td><input type="checkbox" class="strategy-check" /></td>
+			<td>示例品种 ${index}</td>
+			<td>LEG9${String(index).padStart(3,'0')}</td>
+			<td>CMB9${String(index).padStart(3,'0')}</td>
+			<td>CP0001</td>
+			<td style="text-align:center;">
+				<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+			</td>
+		`;
+		strategyTable.appendChild(tr);
+		updateStrategyCount();
+		strategyCheckAll.checked = false;
+	});
+
+	// 策略弹窗取消
+	document.getElementById('btnStrategyCancel').addEventListener('click', function () {
+		// 简化：不做未保存校验，真实环境可增加“确认放弃修改”弹窗
+		modalStrategyEdit.style.display = 'none';
+	});
+
+	// 策略弹窗保存
+	document.getElementById('btnStrategySave').addEventListener('click', function () {
+		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
+		if (rows.length === 0) {
+			strategyError.style.display = 'block';
+			return;
+		}
+		strategyError.style.display = 'none';
+
+		// 同步回主页面组合详情区
+		syncStrategyToCombo();
+		markDirty();
+		modalStrategyEdit.style.display = 'none';
+		alert('策略列表已保存，并同步到组合详情（模拟）。');
+	});
+
+	// ==== 初始化 ====
 	window.addEventListener('DOMContentLoaded', function () {
 		showSectionIfNeeded();      // 根据初始产品形式控制显示
 		updateWeightInputsState();  // 初始化权重输入状态
+		updateStrategyCount();      // 初始化策略数量
 	});
 </script>
 </body>
