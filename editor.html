@@ -1,729 +1,2235 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-	<meta charset="UTF-8">
-	<title>组合产品编辑页 - 静态说明</title>
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta charset="UTF-8" />
+	<title>组合产品编辑页 - 后台交互原型</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<style>
-		/* Material 风格基础色彩与排版 */
 		:root {
 			--primary: #1976d2;
 			--primary-dark: #115293;
-			--primary-light: #E3F2FD;
+			--primary-light: #e3f2fd;
 			--accent: #ff9800;
 			--error: #d32f2f;
 			--bg: #fafafa;
-			--surface: #ffffff;
+			--border: #e0e0e0;
 			--text-main: #212121;
-			--text-secondary: #616161;
-			--divider: #e0e0e0;
+			--text-sub: #757575;
+			--radius: 8px;
+			--shadow-1: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+			--shadow-2: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
 		}
 
-		* {
+		*,
+		*::before,
+		*::after {
 			box-sizing: border-box;
 		}
 
-		html, body {
+		body {
 			margin: 0;
 			padding: 0;
-			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "PingFang SC", "Microsoft YaHei", sans-serif;
-			background-color: var(--bg);
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+			background: var(--bg);
 			color: var(--text-main);
 		}
 
-		body {
-			line-height: 1.6;
-		}
-
-		.app-bar {
-			background-color: var(--primary);
-			color: #fff;
-			padding: 12px 24px;
-			box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+		.app-shell {
 			display: flex;
-			align-items: center;
-			justify-content: space-between;
-			position: sticky;
-			top: 0;
-			z-index: 10;
+			min-height: 100vh;
 		}
 
-		.app-bar-title {
+		/* 左侧导航占位（非重点，仅示意） */
+		.nav {
+			width: 220px;
+			background: #111827;
+			color: #e5e7eb;
+			padding: 16px 0;
+		}
+
+		.nav-header {
+			padding: 0 24px 16px;
 			font-size: 18px;
-			font-weight: 500;
+			font-weight: 600;
 		}
 
-		.app-bar-subtitle {
-			font-size: 13px;
-			opacity: 0.9;
-		}
-
-		.app-bar-right {
+		.nav-section-title {
+			padding: 8px 24px;
 			font-size: 12px;
-			opacity: 0.9;
+			text-transform: uppercase;
+			color: #9ca3af;
 		}
 
-		.container {
-			max-width: 1160px;
-			margin: 24px auto 40px;
-			padding: 0 16px;
-		}
-
-		.breadcrumb {
-			font-size: 13px;
-			color: var(--text-secondary);
-			margin-bottom: 8px;
-		}
-
-		.breadcrumb span {
-			color: var(--text-secondary);
-		}
-
-		.breadcrumb strong {
-			color: var(--text-main);
-		}
-
-		h1, h2, h3 {
-			margin: 16px 0 8px;
-			font-weight: 500;
-		}
-
-		h1 {
-			font-size: 24px;
-		}
-
-		h2 {
-			font-size: 20px;
-		}
-
-		h3 {
-			font-size: 16px;
-		}
-
-		.subtitle {
-			font-size: 13px;
-			color: var(--text-secondary);
-			margin-bottom: 16px;
-		}
-
-		.section-card {
-			background-color: var(--surface);
-			border-radius: 8px;
-			padding: 20px 20px 16px;
-			margin-bottom: 16px;
-			box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-		}
-
-		.section-header {
+		.nav-item {
+			padding: 8px 24px;
 			display: flex;
 			align-items: center;
+			font-size: 14px;
+			color: #d1d5db;
+			cursor: pointer;
+		}
+
+		.nav-item.active {
+			background: rgba(59, 130, 246, 0.2);
+			color: #fff;
+		}
+
+		.nav-item span.icon {
+			display: inline-block;
+			width: 18px;
+			margin-right: 12px;
+			text-align: center;
+		}
+
+		main {
+			flex: 1;
+			padding: 24px 32px 32px;
+			overflow: auto;
+		}
+
+		header.page-header {
+			display: flex;
 			justify-content: space-between;
-			margin-bottom: 8px;
+			align-items: center;
+			margin-bottom: 16px;
 		}
 
-		.section-title {
-			font-size: 16px;
-			font-weight: 500;
+		.breadcrumbs {
+			font-size: 13px;
+			color: var(--text-sub);
+			margin-bottom: 4px;
 		}
 
-		.section-tag {
-			font-size: 11px;
+		.breadcrumbs span {
+			cursor: default;
+		}
+
+		.breadcrumbs .divider {
+			margin: 0 4px;
+		}
+
+		.page-title {
+			font-size: 22px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.page-title-badge {
+			display: inline-flex;
+			align-items: center;
 			padding: 2px 8px;
 			border-radius: 999px;
-			background-color: #e0e0e0;
-			color: #424242;
+			background: #e8f5e9;
+			color: #2e7d32;
+			font-size: 11px;
 		}
 
 		.chip {
 			display: inline-flex;
 			align-items: center;
-			border-radius: 16px;
 			padding: 2px 10px;
+			border-radius: 999px;
 			font-size: 11px;
-			background-color: var(--primary-light);
-			color: var(--primary-dark);
-			margin-left: 4px;
+			background: #e3f2fd;
+			color: #1565c0;
+			margin-left: 8px;
 		}
 
-		p {
-			margin: 4px 0 8px;
-			font-size: 14px;
-		}
-
-		.text-muted {
-			color: var(--text-secondary);
+		.page-header-actions {
+			display: flex;
+			align-items: center;
+			gap: 8px;
 			font-size: 13px;
+			color: var(--text-sub);
 		}
 
+		.status-pill {
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			padding: 4px 10px;
+			border-radius: 999px;
+			background: #fff3e0;
+			color: #ef6c00;
+			font-size: 12px;
+		}
+
+		.status-dot {
+			width: 8px;
+			height: 8px;
+			border-radius: 999px;
+			background: #ef6c00;
+		}
+
+		.helper-text-inline {
+			font-size: 12px;
+			color: var(--text-sub);
+		}
+
+		/* 顶部提示 / 错误栏 */
+		.info-banner {
+			display: none;
+			margin-bottom: 16px;
+			padding: 10px 12px;
+			border-radius: var(--radius);
+			font-size: 13px;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.info-banner.visible {
+			display: flex;
+		}
+
+		.info-banner.error {
+			background: #ffebee;
+			color: var(--error);
+			border: 1px solid #ffcdd2;
+		}
+
+		.info-banner.success {
+			background: #e8f5e9;
+			color: #2e7d32;
+			border: 1px solid #c8e6c9;
+		}
+
+		.info-banner .icon {
+			font-size: 18px;
+		}
+
+		.info-banner .message {
+			flex: 1;
+		}
+
+		.info-banner .link {
+			color: var(--primary);
+			cursor: pointer;
+			text-decoration: underline;
+		}
+
+		/* 卡片布局 */
+		.card {
+			background: #fff;
+			border-radius: var(--radius);
+			box-shadow: var(--shadow-1);
+			padding: 20px 24px 16px;
+			margin-bottom: 16px;
+		}
+
+		.card-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: baseline;
+			margin-bottom: 12px;
+		}
+
+		.card-title {
+			font-size: 16px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+
+		.card-subtitle {
+			font-size: 12px;
+			color: var(--text-sub);
+		}
+
+		.required-dot {
+			color: var(--error);
+			margin-left: 2px;
+		}
+
+		.section-divider {
+			height: 1px;
+			background: var(--border);
+			margin: 8px 0 16px;
+		}
+
+		.form-row {
+			display: grid;
+			grid-template-columns: repeat(2, minmax(0, 1fr));
+			gap: 16px 24px;
+		}
+
+		@media (max-width: 960px) {
+			.nav {
+				display: none;
+			}
+
+			main {
+				padding: 16px;
+			}
+
+			.form-row {
+				grid-template-columns: minmax(0, 1fr);
+			}
+		}
+
+		.form-field {
+			display: flex;
+			flex-direction: column;
+			position: relative;
+		}
+
+		.label-row {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			margin-bottom: 4px;
+		}
+
+		label {
+			font-size: 13px;
+			color: var(--text-main);
+		}
+
+		label .required {
+			color: var(--error);
+			margin-left: 2px;
+		}
+
+		label .tag {
+			display: inline-flex;
+			align-items: center;
+			padding: 1px 6px;
+			border-radius: 4px;
+			background: #f3f4f6;
+			font-size: 11px;
+			color: var(--text-sub);
+			margin-left: 6px;
+		}
+
+		.input,
+		.select,
+		.textarea {
+			width: 100%;
+			padding: 10px 12px;
+			font-size: 13px;
+			border-radius: 4px;
+			border: 1px solid var(--border);
+			background: #fff;
+			color: var(--text-main);
+			outline: none;
+			transition: border-color 0.15s ease, box-shadow 0.15s ease;
+		}
+
+		.input:focus,
+		.select:focus,
+		.textarea:focus {
+			border-color: var(--primary);
+			box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.2);
+		}
+
+		.input.error,
+		.select.error,
+		.textarea.error {
+			border-color: var(--error);
+			box-shadow: 0 0 0 1px rgba(211, 47, 47, 0.2);
+		}
+
+		.textarea {
+			min-height: 96px;
+			resize: vertical;
+		}
+
+		.helper-text {
+			font-size: 12px;
+			color: var(--text-sub);
+			margin-top: 4px;
+		}
+
+		.error-text {
+			font-size: 12px;
+			color: var(--error);
+			margin-top: 4px;
+		}
+
+		/* 组合构成表格 */
 		.table-wrapper {
-			overflow-x: auto;
-			margin: 8px 0 4px;
+			border-radius: 6px;
+			border: 1px solid var(--border);
+			overflow: hidden;
 		}
 
 		table {
 			width: 100%;
 			border-collapse: collapse;
 			font-size: 13px;
-			min-width: 720px;
 		}
 
-		th, td {
-			border-bottom: 1px solid var(--divider);
+		thead {
+			background: #f5f5f5;
+		}
+
+		th,
+		td {
 			padding: 8px 10px;
 			text-align: left;
-			vertical-align: top;
+			border-bottom: 1px solid var(--border);
+			vertical-align: middle;
 		}
 
 		th {
 			font-weight: 500;
-			color: var(--text-secondary);
-			background-color: #f5f5f5;
+			color: var(--text-sub);
 		}
 
-		tr:nth-child(even) td {
-			background-color: #fafafa;
+		tbody tr:nth-child(even) {
+			background: #fafafa;
 		}
 
-		code {
-			font-family: "SFMono-Regular", Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+		tbody tr:last-child td {
+			border-bottom: none;
+		}
+
+		.table-input {
+			width: 100%;
+			padding: 6px 8px;
 			font-size: 12px;
-			background-color: #f5f5f5;
-			padding: 1px 4px;
-			border-radius: 3px;
+			border-radius: 4px;
+			border: 1px solid var(--border);
+			outline: none;
 		}
 
-		.list {
-			margin: 4px 0 8px;
-			padding-left: 18px;
-			font-size: 14px;
+		.table-input[readonly] {
+			background: #f9fafb;
+			color: var(--text-sub);
 		}
 
-		.list li {
-			margin-bottom: 2px;
-		}
-
-		.list-nested {
-			margin-top: 4px;
-			padding-left: 18px;
-		}
-
-		.caption {
-			font-size: 12px;
-			color: var(--text-secondary);
-			margin-top: 4px;
-		}
-
-		.inline-label {
-			display: inline-block;
-			min-width: 76px;
-			font-weight: 500;
-			font-size: 13px;
-		}
-
-		.condition-chip {
+		.badge {
 			display: inline-flex;
 			align-items: center;
+			padding: 2px 8px;
 			border-radius: 999px;
-			padding: 2px 10px;
 			font-size: 11px;
-			background-color: #fff3e0;
+			background: #e3f2fd;
+			color: #1565c0;
+		}
+
+		.badge-muted {
+			background: #f3f4f6;
+			color: var(--text-sub);
+		}
+
+		.badge-success {
+			background: #e8f5e9;
+			color: #2e7d32;
+		}
+
+		.badge-warning {
+			background: #fff3e0;
 			color: #ef6c00;
+		}
+
+		.badge-error {
+			background: #ffebee;
+			color: var(--error);
+		}
+
+		.chip-compact {
+			display: inline-flex;
+			align-items: center;
+			padding: 0 6px;
+			border-radius: 999px;
+			font-size: 10px;
+			background: #e0f2f1;
+			color: #00695c;
 			margin-left: 4px;
 		}
 
-		.helper-text {
+		.chip-compact.error {
+			background: #ffebee;
+			color: #c62828;
+		}
+
+		/* 表格内按钮 */
+		.btn-text {
+			display: inline-flex;
+			align-items: center;
+			border: none;
+			background: transparent;
+			padding: 2px 6px;
+			color: var(--primary);
 			font-size: 12px;
-			color: var(--text-secondary);
-			margin-top: 2px;
+			border-radius: 4px;
+			cursor: pointer;
 		}
 
-		.helper-text-strong {
-			color: var(--primary-dark);
+		.btn-text:hover {
+			background: rgba(25, 118, 210, 0.04);
 		}
 
-		.toolbar {
+		.btn-text-danger {
+			color: var(--error);
+		}
+
+		.btn-text-danger:hover {
+			background: rgba(211, 47, 47, 0.04);
+		}
+
+		.btn-chip {
+			display: inline-flex;
+			align-items: center;
+			padding: 2px 8px;
+			border-radius: 999px;
+			border: 1px dashed var(--border);
+			background: #fafafa;
+			color: var(--text-sub);
+			font-size: 12px;
+			cursor: pointer;
+		}
+
+		.btn-chip:hover {
+			background: #f3f4f6;
+		}
+
+		.btn-icon {
+			border: none;
+			background: transparent;
+			cursor: pointer;
+			width: 28px;
+			height: 28px;
+			border-radius: 50%;
+			display: inline-flex;
+			align-items: center;
+			justify-content: center;
+			color: var(--text-sub);
+		}
+
+		.btn-icon:hover {
+			background: rgba(0, 0, 0, 0.04);
+		}
+
+		.btn-icon[disabled] {
+			opacity: 0.4;
+			cursor: default;
+		}
+
+		/* 权重汇总 */
+		.weight-summary {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 8px 10px;
+			background: #fafafa;
+			border-top: 1px solid var(--border);
+			font-size: 12px;
+		}
+
+		.weight-total {
+			display: inline-flex;
+			align-items: baseline;
+			gap: 4px;
+		}
+
+		.weight-total span.value {
+			font-weight: 600;
+		}
+
+		.weight-total.ok span.value {
+			color: #2e7d32;
+		}
+
+		.weight-total.error span.value {
+			color: var(--error);
+		}
+
+		.weight-hint {
+			color: var(--text-sub);
+		}
+
+		/* 底部操作区 */
+		.form-footer {
+			position: sticky;
+			bottom: 0;
+			margin-top: 16px;
+			padding-top: 12px;
+			padding-bottom: 8px;
+			background: linear-gradient(to top, rgba(250, 250, 250, 0.98), rgba(250, 250, 250, 0.7));
+			border-top: 1px solid rgba(224, 224, 224, 0.8);
+			backdrop-filter: blur(6px);
+		}
+
+		.form-footer-inner {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+
+		.footer-left {
 			display: flex;
 			align-items: center;
-			justify-content: flex-end;
 			gap: 8px;
-			margin-top: 8px;
+			font-size: 12px;
+			color: var(--text-sub);
+		}
+
+		.footer-right {
+			display: flex;
+			align-items: center;
+			gap: 8px;
 		}
 
 		.btn {
 			border: none;
 			border-radius: 4px;
-			padding: 6px 14px;
 			font-size: 13px;
-			cursor: default;
+			padding: 8px 16px;
 			display: inline-flex;
 			align-items: center;
 			justify-content: center;
+			cursor: pointer;
+			transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.05s ease;
 			white-space: nowrap;
 		}
 
-		.btn-text {
-			background-color: transparent;
-			color: var(--primary-dark);
-		}
-
-		.btn-outlined {
-			background-color: transparent;
-			border: 1px solid var(--divider);
-			color: var(--text-main);
-		}
-
-		.btn-contained {
-			background-color: var(--primary);
+		.btn-primary {
+			background: var(--primary);
 			color: #fff;
+			box-shadow: var(--shadow-1);
 		}
 
-		.btn-contained.secondary {
-			background-color: #9e9e9e;
+		.btn-primary:hover {
+			background: var(--primary-dark);
+			box-shadow: var(--shadow-2);
 		}
 
-		.btn-contained.warning {
-			background-color: var(--accent);
-			color: #fff;
+		.btn-primary:active {
+			transform: translateY(1px);
+			box-shadow: none;
 		}
 
-		.btn + .btn {
-			margin-left: 4px;
+		.btn-secondary {
+			background: #fff;
+			color: var(--primary);
+			border: 1px solid rgba(25, 118, 210, 0.4);
 		}
 
-		.footer-note {
+		.btn-secondary:hover {
+			background: #f5fafe;
+		}
+
+		.btn-ghost {
+			background: transparent;
+			color: var(--text-sub);
+		}
+
+		.btn-ghost:hover {
+			background: rgba(0, 0, 0, 0.04);
+		}
+
+		.btn[disabled] {
+			opacity: 0.6;
+			cursor: default;
+			box-shadow: none;
+		}
+
+		.btn span.icon {
+			margin-right: 6px;
+			font-size: 16px;
+		}
+
+		.toggle-group {
+			display: inline-flex;
+			border-radius: 999px;
+			background: #f3f4f6;
+			padding: 2px;
+		}
+
+		.toggle-chip {
+			border: none;
+			border-radius: 999px;
+			background: transparent;
+			padding: 4px 10px;
+			font-size: 11px;
+			color: var(--text-sub);
+			cursor: pointer;
+		}
+
+		.toggle-chip.active {
+			background: #fff;
+			color: #1565c0;
+			box-shadow: 0 0 0 1px rgba(25, 118, 210, 0.3);
+		}
+
+		/* 模拟开关 */
+		.switch {
+			position: relative;
+			display: inline-flex;
+			align-items: center;
+			gap: 6px;
+			cursor: pointer;
 			font-size: 12px;
-			color: var(--text-secondary);
-			margin-top: 4px;
+			color: var(--text-sub);
 		}
 
-		.error-text {
-			color: var(--error);
+		.switch input {
+			display: none;
 		}
 
-		.error-banner {
-			background-color: #ffebee;
-			color: var(--error);
+		.switch-slider {
+			width: 32px;
+			height: 18px;
+			border-radius: 999px;
+			background: #e5e7eb;
+			position: relative;
+			transition: background 0.15s ease;
+		}
+
+		.switch-knob {
+			position: absolute;
+			top: 2px;
+			left: 2px;
+			width: 14px;
+			height: 14px;
+			border-radius: 50%;
+			background: #fff;
+			box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
+			transition: transform 0.15s ease;
+		}
+
+		.switch input:checked + .switch-slider {
+			background: var(--primary);
+		}
+
+		.switch input:checked + .switch-slider .switch-knob {
+			transform: translateX(14px);
+		}
+
+		/* 简易对话框（入金 / 增加品种） */
+		.dialog-backdrop {
+			position: fixed;
+			inset: 0;
+			background: rgba(0, 0, 0, 0.35);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 10;
+		}
+
+		.dialog-backdrop.visible {
+			display: flex;
+		}
+
+		.dialog {
+			background: #fff;
+			border-radius: 8px;
+			box-shadow: var(--shadow-2);
+			width: 100%;
+			max-width: 420px;
+			padding: 20px 24px 16px;
+			animation: dialog-in 0.18s ease-out;
+		}
+
+		@keyframes dialog-in {
+			from {
+				opacity: 0;
+				transform: translateY(8px);
+			}
+			to {
+				opacity: 1;
+				transform: translateY(0);
+			}
+		}
+
+		.dialog-title {
+			font-size: 16px;
+			font-weight: 600;
+			margin-bottom: 4px;
+		}
+
+		.dialog-desc {
+			font-size: 13px;
+			color: var(--text-sub);
+			margin-bottom: 16px;
+		}
+
+		.dialog-footer {
+			display: flex;
+			justify-content: flex-end;
+			gap: 8px;
+			margin-top: 16px;
+		}
+
+		/* 发布前确认弹窗 */
+		.dialog-warning {
+			background: #fffde7;
 			border-radius: 4px;
 			padding: 8px 10px;
-			font-size: 13px;
-			display: inline-block;
-			margin-top: 4px;
-		}
-
-		.note {
 			font-size: 12px;
-			color: var(--text-secondary);
-			border-left: 3px solid var(--divider);
-			padding-left: 8px;
-			margin: 4px 0 0;
+			color: #f57f17;
+			display: flex;
+			align-items: flex-start;
+			gap: 8px;
+			margin-bottom: 12px;
 		}
 
-		.chip-group {
+		.dialog-warning .icon {
+			font-size: 18px;
+		}
+
+		.dialog-list {
+			margin: 0;
+			padding-left: 18px;
+			font-size: 12px;
+			color: var(--text-sub);
+		}
+
+		.dialog-list li {
+			margin-bottom: 4px;
+		}
+
+		/* 简易标签、R 级别等 */
+		.tag-inline {
 			display: inline-flex;
-			flex-wrap: wrap;
-			gap: 4px;
-			margin-top: 4px;
-		}
-
-		.chip-outline {
-			border-radius: 16px;
-			padding: 2px 10px;
+			align-items: center;
+			padding: 0 6px;
+			border-radius: 999px;
 			font-size: 11px;
-			border: 1px solid var(--divider);
-			color: var(--text-secondary);
-			background-color: #fff;
-		}
-
-		.section-divider {
-			height: 1px;
-			background-color: var(--divider);
-			margin: 20px 0 12px;
-		}
-
-		.badge-required {
-			color: var(--error);
-			font-size: 12px;
+			background: #ede7f6;
+			color: #5e35b1;
 			margin-left: 4px;
 		}
 
-		@media (max-width: 768px) {
-			.section-card {
-				padding: 16px 12px 12px;
-			}
+		.tag-inline.r3 {
+			background: #e3f2fd;
+			color: #1565c0;
+		}
 
-			h1 {
-				font-size: 20px;
-			}
-
-			h2 {
-				font-size: 18px;
-			}
-
-			.app-bar {
-				padding: 10px 16px;
-			}
+		/* 小提示工具条 */
+		.inline-hints {
+			display: flex;
+			gap: 12px;
+			font-size: 11px;
+			color: var(--text-sub);
+			flex-wrap: wrap;
+			margin-top: 4px;
 		}
 	</style>
 </head>
 <body>
-	<header class="app-bar">
-		<div>
-			<div class="app-bar-title">组合产品编辑页</div>
-			<div class="app-bar-subtitle">后台交互说明 · 静态文档</div>
-		</div>
-		<div class="app-bar-right">策略管理平台 / 产品管理</div>
-	</header>
+<div class="app-shell">
+	<!-- 左侧导航占位：策略管理平台 - 产品列表 -->
+        <aside class="nav">
+            <div class="nav-header">策略管理平台</div>
+            <div class="nav-section-title">产品管理</div>
+            <div class="nav-item">
+                <span class="icon">📄</span>
+                <span>单品种策略列表</span>
+            </div>
+            <div class="nav-item active">
+                <span class="icon">📊</span>
+                <span>组合产品列表</span>
+            </div>
+            <div class="nav-item">
+                <span class="icon">⚙️</span>
+                <span>系列与签约配置</span>
+            </div>
+        </aside>
 
-	<main class="container">
-		<div class="breadcrumb">
-			<span>策略管理平台 &gt; 产品列表 &gt; </span><strong>组合产品编辑页</strong>
-		</div>
+	<main>
+		<header class="page-header">
+			<div>
+				<div class="breadcrumbs">
+					<span>策略管理平台</span>
+					<span class="divider">/</span>
+					<span>产品列表</span>
+					<span class="divider">/</span>
+					<span>组合产品编辑</span>
+				</div>
+				<div class="page-title">
+					<span id="pageTitleText">矿金优选12号-燃料油FU</span>
+					<span class="page-title-badge">
+						组合策略 · 量化信号类
+					</span>
+					<span class="chip">
+						当前为草稿
+					</span>
+				</div>
+			</div>
+			<div class="page-header-actions">
+				<div class="status-pill" id="statusPill">
+					<span class="status-dot"></span>
+					<span id="statusPillText">草稿 · 未发布</span>
+				</div>
+			</div>
+		</header>
 
-		<h1>四、产品编辑页</h1>
-		<p class="subtitle">本页面用于配置组合量化产品的基础信息、组合构成与权重，以及表单级操作与状态流转。</p>
+		<!-- 顶部信息条：用于展示校验错误或成功提示 -->
+		<div id="banner" class="info-banner">
+			<div class="icon">ℹ️</div>
+			<div class="message" id="bannerMessage"></div>
+			<div class="link" id="scrollToErrorLink" style="display:none;">查看详情</div>
+		</div>
 
 		<!-- 4.1 基础信息区 -->
-		<section class="section-card" id="basic-info">
-			<div class="section-header">
-				<div class="section-title">4.1 基础信息区</div>
-				<span class="section-tag">表单区块</span>
+		<section class="card" id="basicInfoCard">
+			<div class="card-header">
+				<div>
+					<div class="card-title">
+						基础信息
+						<span class="required-dot">· 必填核心</span>
+					</div>
+					<div class="card-subtitle">
+						用于前端展示、签约和合规校验的基础字段
+					</div>
+				</div>
+				<div class="helper-text-inline">
+					<span>产品编号一旦发布后仅支持只读查看</span>
+				</div>
 			</div>
-			<p class="text-muted">用于填写产品的基础属性，部分字段为必填项，将影响前端展示与后续组合配置。</p>
+			<div class="section-divider"></div>
 
-			<h3>4.1.1 字段列表</h3>
-			<div class="table-wrapper">
-				<table>
-					<thead>
-					<tr>
-						<th style="width: 22%;">字段名称</th>
-						<th style="width: 48%;">说明</th>
-						<th style="width: 30%;">示例</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>产品名称 <span class="badge-required">＊必填</span></td>
-						<td>前端展示名称，必填，用于在产品列表与详情页中标识该产品。</td>
-						<td>矿金优选12号-燃料油FU</td>
-					</tr>
-					<tr>
-						<td>产品编号</td>
-						<td>系统生成或运营配置的唯一编码，不可重复，用于对接外部系统和内部数据表。</td>
-						<td>WK001220251022</td>
-					</tr>
-					<tr>
-						<td>风险等级</td>
-						<td>下拉选择，与风险评级体系保持一致，决定前端合规提示与签约要求。</td>
-						<td>R3</td>
-					</tr>
-					<tr>
-						<td>产品类型 <span class="badge-required">＊必填</span></td>
-						<td>下拉选择，与现有产品分类保持一致（如：量化信号类 / 投研资讯服务类 / 培训课程类等），影响后续可选的产品形式。</td>
-						<td>量化信号类</td>
-					</tr>
-					<tr>
-						<td>产品出品人</td>
-						<td>文本输入或选择已有团队 / 投顾名称，用于前端展示及责任归属。</td>
-						<td>五矿期货投资咨询团队</td>
-					</tr>
-					<tr>
-						<td>产品等级</td>
-						<td>下拉选择，用于区分产品级别（如：初级 / 中级 / 高级），可影响前端标签展示或人群定位。</td>
-						<td>中级</td>
-					</tr>
-					<tr>
-						<td>产品简介</td>
-						<td>多行文本，用于描述产品的核心策略逻辑、适用人群与收益 / 风险特征，前端详情页直接展示。</td>
-						<td>本策略采用动态波动过滤与趋势捕捉的量化择时模型，结合品种基本面与盘面特征，力求在控制回撤的前提下获取稳健超额收益。</td>
-					</tr>
-					<tr>
-						<td>所属系列</td>
-						<td>下拉选择，绑定到已有系列（如「矿金优选（R3）」），用于签约及系列维度管理。</td>
-						<td>矿金优选（R3）</td>
-					</tr>
-					<tr>
-						<td>产品形式</td>
-						<td>下拉选择，用于区分单品种策略 / 组合策略 / 线上产品 / 直播产品 / 线下产品 / 同花顺产品 / 自定义产品等，影响后续配置区块显隐。</td>
-						<td>线上产品</td>
-					</tr>
-					<tr>
-						<td>组合类型</td>
-						<td>下拉选择，区分不同组合结构形态（类型1、类型2、类型3），部分组合相关区块仅在指定类型下展示。</td>
-						<td>类型1 / 类型2 / 类型3</td>
-					</tr>
-					</tbody>
-				</table>
+			<div class="form-row">
+				<!-- 产品名称 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="productName">
+							产品名称<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">前端列表 & 详情页主标题</span>
+					</div>
+					<input
+						id="productName"
+						class="input"
+						type="text"
+						placeholder="例如：矿金优选12号-燃料油FU"
+						value="矿金优选12号-燃料油FU"
+						required
+					/>
+					<div class="helper-text">
+						建议格式：系列名称 + 期号 + 核心品种，便于前端统一展示
+					</div>
+					<div class="error-text" data-error-for="productName"></div>
+				</div>
+
+				<!-- 产品编号 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="productCode">
+							产品编号<span class="required">*</span>
+							<span class="tag">系统生成 / 只读</span>
+						</label>
+					</div>
+					<input
+						id="productCode"
+						class="input"
+						type="text"
+						value="WK001220251022"
+						readonly
+					/>
+					<div class="helper-text">
+						用于对接外部系统与内部数据表，确保唯一且不可重复
+					</div>
+					<div class="error-text" data-error-for="productCode"></div>
+				</div>
+
+				<!-- 风险等级 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="riskLevel">
+							风险等级<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">影响前端合规提示与签约要求</span>
+					</div>
+					<select id="riskLevel" class="select" required>
+						<option value="">请选择</option>
+						<option value="R1">R1</option>
+						<option value="R2">R2</option>
+						<option value="R3" selected>R3</option>
+						<option value="R4">R4</option>
+					</select>
+					<div class="helper-text">
+						与公司风险评级体系保持一致，如 R1 / R2 / R3 / R4
+					</div>
+					<div class="error-text" data-error-for="riskLevel"></div>
+				</div>
+
+				<!-- 产品类型 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="productType">
+							产品类型<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">影响后续可选的产品形式</span>
+					</div>
+					<select id="productType" class="select" required>
+						<option value="">请选择</option>
+						<option value="量化信号类" selected>量化信号类</option>
+						<option value="投研资讯服务类">投研资讯服务类</option>
+						<option value="培训课程类">培训课程类</option>
+						<option value="主观策略类">主观策略类</option>
+						<option value="信息服务类">信息服务类</option>
+						<option value="其他">其他</option>
+					</select>
+					<div class="helper-text">
+						下拉选项与现有产品分类保持一致
+					</div>
+					<div class="error-text" data-error-for="productType"></div>
+				</div>
+
+				<!-- 产品出品人 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="producer">
+							产品出品人<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">前端展示 & 责任归属</span>
+					</div>
+					<input
+						id="producer"
+						class="input"
+						type="text"
+						placeholder="例如：五矿期货投资咨询团队"
+						value="五矿期货投资咨询团队"
+						required
+					/>
+					<div class="helper-text">
+						可为团队名称或投顾名称，需与从业资格公示信息对应
+					</div>
+					<div class="error-text" data-error-for="producer"></div>
+				</div>
+
+				<!-- 产品等级 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="productLevel">
+							产品等级
+						</label>
+						<span class="helper-text-inline">用于前端标签与人群定位</span>
+					</div>
+					<select id="productLevel" class="select">
+						<option value="">可选</option>
+						<option value="初级">初级</option>
+						<option value="中级" selected>中级</option>
+						<option value="高级">高级</option>
+					</select>
+					<div class="helper-text">
+						示例：初级 / 中级 / 高级，用于标签或筛选
+					</div>
+					<div class="error-text" data-error-for="productLevel"></div>
+				</div>
+
+				<!-- 所属系列 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="series">
+							所属系列<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">用于签约关联</span>
+					</div>
+					<select id="series" class="select" required>
+						<option value="">请选择</option>
+						<option value="矿金优选（R3）" selected>矿金优选（R3）</option>
+						<option value="矿金智选（R3）">矿金智选（R3）</option>
+						<option value="矿耀系列（R4）">矿耀系列（R4）</option>
+						<option value="自定义系列">自定义系列</option>
+					</select>
+					<div class="helper-text">
+						绑定到已有系列（如「矿金优选（R3）」），用于合同签约与权益配置
+					</div>
+					<div class="error-text" data-error-for="series"></div>
+				</div>
+
+				<!-- 产品形式 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="productForm">
+							产品形式<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">与产品类型存在约束关系</span>
+					</div>
+					<select id="productForm" class="select" required>
+						<option value="">请选择</option>
+						<option value="单品种策略">单品种策略</option>
+						<option value="组合策略" selected>组合策略</option>
+						<option value="线上产品">线上产品</option>
+						<option value="直播产品">直播产品</option>
+						<option value="线下产品">线下产品</option>
+						<option value="同花顺产品">同花顺产品</option>
+						<option value="自定义产品">自定义产品</option>
+					</select>
+					<div class="inline-hints">
+						<span>量化产品：单品种策略 / 组合策略 / 同花顺指标</span>
+					</div>
+					<div class="error-text" data-error-for="productForm"></div>
+				</div>
+
+				<!-- 组合类型 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="comboType">
+							组合类型<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">
+							示意：类型1 / 类型2 / 类型3
+						</span>
+					</div>
+					<select id="comboType" class="select" required>
+						<option value="">请选择</option>
+						<option value="type1" selected>类型1（权益份额 + 权重制）</option>
+						<option value="type2">类型2（仅权重，不设份额）</option>
+						<option value="type3">类型3（其他组合逻辑）</option>
+					</select>
+					<div class="helper-text">
+						仅当「产品形式 = 组合策略」时需选择，类型1 才会展示组合构成与权重区
+					</div>
+					<div class="error-text" data-error-for="comboType"></div>
+				</div>
+
+				<!-- 产品简介 -->
+				<div class="form-field" style="grid-column: 1 / -1;">
+					<div class="label-row">
+						<label for="description">
+							产品简介<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">前端详情页直接展示</span>
+					</div>
+					<textarea
+						id="description"
+						class="textarea"
+						required
+					>本策略采用动态波动过滤与趋势捕捉的量化择时模型，结合品种基本面与盘面特征，力求在控制回撤的前提下获取稳健超额收益。</textarea>
+					<div class="helper-text">
+						建议包含：核心策略逻辑、适用人群、收益 / 风险特征等信息
+					</div>
+					<div class="error-text" data-error-for="description"></div>
+				</div>
 			</div>
-			<p class="caption">注：具体字段是否必填、是否只读，需结合实际实现与业务规则细化。</p>
 		</section>
 
-		<!-- 4.2 组合构成与权重区 -->
-		<section class="section-card" id="weight-area">
-			<div class="section-header">
-				<div class="section-title">4.2 组合构成与权重区（组合量化产品适用）</div>
-				<span class="section-tag">条件展示区块</span>
+		<!-- 4.2 组合构成与权重区（组合量化产品适用） -->
+		<section class="card" id="comboSection">
+			<div class="card-header">
+				<div>
+					<div class="card-title">
+						组合构成与权重
+						<span class="required-dot">· 组合量化产品适用</span>
+					</div>
+					<div class="card-subtitle">
+						仅当「产品形式 = 组合策略，且组合类型为类型1」时展示本区块
+					</div>
+				</div>
+				<div>
+					<div class="label-row" style="justify-content:flex-end;">
+						<span style="font-size:12px;color:var(--text-sub);margin-right:8px;">
+							权重分配类型
+						</span>
+						<div class="toggle-group" id="weightTypeToggle">
+							<button
+								type="button"
+								class="toggle-chip active"
+								data-weight-type="equal"
+							>等权</button>
+							<button
+								type="button"
+								class="toggle-chip"
+								data-weight-type="custom"
+							>自定义</button>
+						</div>
+					</div>
+					<div class="helper-text" style="text-align:right;margin-top:4px;">
+						等权：新增 / 删除子腿时自动均分；自定义：人工维护权重总和 = 100%
+					</div>
+				</div>
+			</div>
+			<div class="section-divider"></div>
+
+			<div class="form-row" style="margin-bottom:16px;">
+				<!-- 总权益 -->
+				<div class="form-field">
+					<div class="label-row">
+						<label for="totalEquity">
+							总权益<span class="required">*</span>
+						</label>
+						<span class="helper-text-inline">
+							当前组合实际管理资金规模
+						</span>
+					</div>
+					<input
+						id="totalEquity"
+						class="input"
+						type="text"
+						value="1000000"
+					/>
+					<div class="helper-text">
+						单位：元，支持点击「入金」后动态增加（示例：当前 100万）
+					</div>
+					<div class="error-text" data-error-for="totalEquity"></div>
+				</div>
+
+				<!-- 份额 & 净值（示意只读） -->
+				<div class="form-field">
+					<div class="label-row">
+						<label>
+							份额 / 净值
+						</label>
+						<span class="helper-text-inline">
+							根据日终结算结果计算
+						</span>
+					</div>
+					<div style="display:flex;gap:8px;">
+						<input
+							id="shareAmount"
+							class="input"
+							type="text"
+							value="1000000"
+							readonly
+						/>
+						<input
+							id="nav"
+							class="input"
+							type="text"
+							value="1.0000"
+							readonly
+						/>
+					</div>
+					<div class="helper-text">
+						左：当前总份额；右：当前组合净值（示例字段，只读）
+					</div>
+				</div>
 			</div>
 
-			<p>
-				<span class="inline-label">展示条件</span>
-				<span>仅当 <code>产品形式 = 组合策略</code>，且 <code>组合类型 = 1</code> 时展示本区块。</span>
-			</p>
-			<p class="helper-text">其他产品形式或组合类型下，本区块隐藏，不参与表单校验。</p>
-
-			<h3>4.2.1 列表字段</h3>
-
-			<ul class="list">
-				<li>
-					<span class="inline-label">权重分配类型</span>
-					<span>控制组合内各子腿品种的权重分配方式。</span>
-					<div class="helper-text">
-						<span class="inline-label">取值：</span>等权 / 自定义
-					</div>
-					<div class="helper-text">
-						<span class="inline-label">示例：</span>等权
-					</div>
-				</li>
-				<li>
-					<span class="inline-label">总权益</span>
-					<span>当前组合产品对应的总权益数值，用于后续按权重分配至各子腿。</span>
-				</li>
-				<li>
-					<span class="inline-label">份额</span>
-					<span>组合产品的总份额或单位数，用于计算单位净值。</span>
-				</li>
-				<li>
-					<span class="inline-label">净值</span>
-					<span>组合当前单位净值，一般由结算系统计算产生，在此仅展示。</span>
-				</li>
-				<li>
-					<span class="inline-label">策略列表和权重值</span>
-					<span>展示策略列表和各个策略对应的权重值。</span>
-					<div class="helper-text">
-						<span class="inline-label">示例：</span>矿金智选14号-焦炭J　0.2
-					</div>
-				</li>
-				<li>
-					<span class="inline-label">操作</span>
-					<span>支持对组合构成进行调整与资金操作，典型动作：</span>
-					<ul class="list-nested">
-						<li>编辑</li>
-						<li>入金</li>
-					</ul>
-				</li>
-			</ul>
-
-			<div class="table-wrapper">
+			<!-- 策略列表和权重表格 -->
+			<div class="table-wrapper" id="strategyTableWrapper">
 				<table>
 					<thead>
 					<tr>
-						<th>单腿品种</th>
-						<th>单腿产品ID</th>
-						<th>Cmb_id</th>
-						<th>组合产品ID</th>
-						<th>权益</th>
-						<th>品种权重比例</th>
+						<th style="width:12%;">单腿品种</th>
+						<th style="width:18%;">单腿产品ID</th>
+						<th style="width:14%;">Cmb_id</th>
+						<th style="width:14%;">组合产品ID</th>
+						<th style="width:14%;">权益</th>
+						<th style="width:12%;">品种权重比例</th>
+						<th style="width:16%;">操作</th>
 					</tr>
 					</thead>
-					<tbody>
-					<tr>
+					<tbody id="strategyTbody">
+					<tr data-row-id="1">
 						<td>M</td>
 						<td>Kuangjinyx03</td>
 						<td>Kuangjincmb01</td>
 						<td>Kuangjincmb01</td>
-						<td>50w</td>
-						<td>0.2</td>
+						<td>
+							<input
+								type="text"
+								class="table-input"
+								value="500000"
+								data-field="equity"
+							/>
+						</td>
+						<td>
+							<input
+								type="number"
+								class="table-input"
+								data-field="weight"
+								value="20"
+								min="0"
+								max="100"
+								step="0.01"
+								readonly
+							/>
+						</td>
+						<td>
+							<button type="button" class="btn-text" data-action="editRow">
+								编辑
+							</button>
+							<button type="button" class="btn-text" data-action="deposit">
+								入金
+							</button>
+							<button type="button" class="btn-text-danger" data-action="removeRow">
+								移除
+							</button>
+						</td>
 					</tr>
-					<tr>
+					<tr data-row-id="2">
 						<td>CU</td>
 						<td>Kuangjinzx05</td>
 						<td>Kuangjincmb01</td>
 						<td>Kuangjincmb01</td>
-						<td>50w</td>
-						<td>0.2</td>
+						<td>
+							<input
+								type="text"
+								class="table-input"
+								value="500000"
+								data-field="equity"
+							/>
+						</td>
+						<td>
+							<input
+								type="number"
+								class="table-input"
+								data-field="weight"
+								value="20"
+								min="0"
+								max="100"
+								step="0.01"
+								readonly
+							/>
+						</td>
+						<td>
+							<button type="button" class="btn-text" data-action="editRow">
+								编辑
+							</button>
+							<button type="button" class="btn-text" data-action="deposit">
+								入金
+							</button>
+							<button type="button" class="btn-text-danger" data-action="removeRow">
+								移除
+							</button>
+						</td>
 					</tr>
-					<tr>
+					<tr data-row-id="3">
 						<td>FG</td>
 						<td>Kuangjinzx08</td>
 						<td>Kuangjincmb01</td>
 						<td>Kuangjincmb01</td>
-						<td>50w</td>
-						<td>0.2</td>
+						<td>
+							<input
+								type="text"
+								class="table-input"
+								value="500000"
+								data-field="equity"
+							/>
+						</td>
+						<td>
+							<input
+								type="number"
+								class="table-input"
+								data-field="weight"
+								value="20"
+								min="0"
+								max="100"
+								step="0.01"
+								readonly
+							/>
+						</td>
+						<td>
+							<button type="button" class="btn-text" data-action="editRow">
+								编辑
+							</button>
+							<button type="button" class="btn-text" data-action="deposit">
+								入金
+							</button>
+							<button type="button" class="btn-text-danger" data-action="removeRow">
+								移除
+							</button>
+						</td>
 					</tr>
-					<tr>
+					<tr data-row-id="4">
 						<td>SH</td>
 						<td>Kuangjinzx02</td>
 						<td>Kuangjincmb01</td>
 						<td>Kuangjincmb01</td>
-						<td>50w</td>
-						<td>0.2</td>
+						<td>
+							<input
+								type="text"
+								class="table-input"
+								value="500000"
+								data-field="equity"
+							/>
+						</td>
+						<td>
+							<input
+								type="number"
+								class="table-input"
+								data-field="weight"
+								value="20"
+								min="0"
+								max="100"
+								step="0.01"
+								readonly
+							/>
+						</td>
+						<td>
+							<button type="button" class="btn-text" data-action="editRow">
+								编辑
+							</button>
+							<button type="button" class="btn-text" data-action="deposit">
+								入金
+							</button>
+							<button type="button" class="btn-text-danger" data-action="removeRow">
+								移除
+							</button>
+						</td>
 					</tr>
-					<tr>
+					<tr data-row-id="5">
 						<td>A</td>
 						<td>Kuangjinzx04</td>
 						<td>Kuangjincmb01</td>
 						<td>Kuangjincmb01</td>
-						<td>50w</td>
-						<td>0.2</td>
-					</tr>
-					</tbody>
-				</table>
-			</div>
-
-			<h3>4.2.2 交互与校验说明</h3>
-
-			<ul class="list">
-				<li>
-					当 <strong>权重分配类型 = 等权</strong> 时：
-					<ul class="list-nested">
-						<li>随着子腿新增 / 删除，系统自动重新均分权重。</li>
-						<li>权重值不可手动编辑，仅展示为只读字段。</li>
-					</ul>
-				</li>
-				<li>
-					当 <strong>权重分配类型 = 自定义</strong> 时：
-					<ul class="list-nested">
-						<li>支持逐行编辑各子腿的权重值。</li>
-						<li>需要<strong>实时校验</strong>所有启用子腿的权重和 = 100%。</li>
-						<li>当权重和 ≠ 100% 时：
-							<ul class="list-nested">
-								<li>不允许执行「发布 / 启用」操作。</li>
-								<li>仅允许保存为草稿。</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-				<li>
-					删除子腿或停用子腿后：
-					<ul class="list-nested">
-						<li>需重新计算权重或提示运营调整权重。</li>
-						<li>避免启用子腿权重总和 ≠ 100%，以免影响结算与展示。</li>
-					</ul>
-				</li>
-				<li>
-					入金：
-					<ul class="list-nested">
-						<li>点击「入金」按钮后，弹出对话框，允许输入入金金额。</li>
-						<li>确认后，增加当前组合产品的总权益，并按既定规则分配至各子腿。</li>
-					</ul>
-				</li>
-				<li>
-					编辑：
-					<ul class="list-nested">
-						<li>点击「编辑」可调整组合构成，包括：
-							<ul class="list-nested">
-								<li>增加新的单腿品种；</li>
-								<li>移除已有品种；</li>
-								<li>在「自定义」模式下，对品种权重进行设置或调整。</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</section>
-
-		<div class="section-divider"></div>
-
-		<!-- 4.4 操作与状态流转（表单级） -->
-		<section class="section-card" id="form-actions">
-			<div class="section-header">
-				<div class="section-title">4.4 操作与状态流转（表单级）</div>
-				<span class="section-tag">表单底部操作</span>
-			</div>
-			<p class="text-muted">表单级操作按钮位于页面底部，负责控制产品的保存、启用与返回上一页。</p>
-
-			<h3>4.4.1 底部操作按钮</h3>
-
-			<div class="table-wrapper">
-				<table>
-					<thead>
-					<tr>
-						<th style="width: 18%;">按钮</th>
-						<th style="width: 47%;">行为说明</th>
-						<th style="width: 35%;">校验要求</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr>
-						<td>保存草稿</td>
-						<td>允许保存当前填写内容，不对全部业务规则做强校验，用于分阶段配置。</td>
-						<td>通过基础必填校验（如产品名称、产品类型）即可。</td>
-					</tr>
-					<tr>
-						<td>发布 / 启用</td>
-						<td>将产品状态置为「启用」，并对前端生效，开始对客户可见 / 可购买（视前端权限而定）。</td>
 						<td>
-							<ul class="list">
-								<li>基础必填字段全部通过校验。</li>
-								<li>若为组合量化产品：
-									<ul class="list-nested">
-										<li>权重总和 = 100%。</li>
-										<li>至少存在一条启用状态的子腿。</li>
-									</ul>
-								</li>
-							</ul>
+							<input
+								type="text"
+								class="table-input"
+								value="500000"
+								data-field="equity"
+							/>
+						</td>
+						<td>
+							<input
+								type="number"
+								class="table-input"
+								data-field="weight"
+								value="20"
+								min="0"
+								max="100"
+								step="0.01"
+								readonly
+							/>
+						</td>
+						<td>
+							<button type="button" class="btn-text" data-action="editRow">
+								编辑
+							</button>
+							<button type="button" class="btn-text" data-action="deposit">
+								入金
+							</button>
+							<button type="button" class="btn-text-danger" data-action="removeRow">
+								移除
+							</button>
 						</td>
 					</tr>
-					<tr>
-						<td>取消</td>
-						<td>返回上一页（通常为产品列表页）。如存在未保存修改，需先弹出二次确认。</td>
-						<td>无业务规则校验，但如有未保存内容需提示「是否放弃未保存修改」。</td>
-					</tr>
 					</tbody>
 				</table>
+				<div class="weight-summary">
+					<div class="weight-total" id="weightTotal">
+						<span>当前权重总和：</span>
+						<span class="value" id="weightTotalValue">100%</span>
+						<span class="chip-compact" id="weightStatusChip">已满足 100%</span>
+					</div>
+					<div>
+						<button type="button" class="btn-chip" id="addStrategyBtn">
+							+ 增加品种
+						</button>
+					</div>
+				</div>
 			</div>
-
-			<div class="toolbar" aria-label="底部按钮示意，仅展示不交互">
-				<button class="btn btn-outlined">取消</button>
-				<button class="btn btn-contained secondary">保存草稿</button>
-				<button class="btn btn-contained">发布 / 启用</button>
+			<div class="helper-text" style="margin-top:8px;">
+				- 权重分配类型为「等权」时：随着子腿新增 / 删除自动重新均分，权重值不可手动编辑。
+				<br />
+				- 权重分配类型为「自定义」时：支持逐行编辑权重值，需实时校验所有启用子腿的权重和 = 100%，否则不允许发布，仅可保存草稿。
 			</div>
-			<p class="footer-note">上图仅为按钮示意，实际状态（可点 / 置灰）需根据表单校验结果动态控制。</p>
-
-			<h3>4.4.2 校验与提示</h3>
-
-			<ul class="list">
-				<li>
-					<strong>必填项缺失</strong>：
-					<ul class="list-nested">
-						<li>在对应字段下方展示红色错误文案，例如：
-							<div class="helper-text error-text">请输入产品名称</div>
-						</li>
-						<li>可在字段上方或标签处以红色星号标识必填。</li>
-					</ul>
-				</li>
-				<li>
-					<strong>组合权重异常</strong>：
-					<ul class="list-nested">
-						<li>在组合构成区对应位置或表单顶部集中提示。</li>
-						<li>提示文案示例：
-							<div class="error-banner">权重总和需为 100%，当前为 92%</div>
-						</li>
-						<li>在异常未处理前，「发布 / 启用」按钮保持置灰或点击后给出阻断提示。</li>
-					</ul>
-				</li>
-				<li>
-					<strong>保存草稿与发布的校验强度不同</strong>：
-					<ul class="list-nested">
-						<li>
-							<span class="helper-text-strong">保存草稿：</span>允许存在未补全配置，便于分阶段填写，主要校验表单结构是否完整与基础字段合法性（如数据类型）。
-						</li>
-						<li>
-							<span class="helper-text-strong">发布 / 启用：</span>必须所有关键业务规则通过校验，包括：
-							<ul class="list-nested">
-								<li>基础必填字段完整且合法。</li>
-								<li>组合量化产品权重总和 = 100%。</li>
-								<li>至少一条启用子腿。</li>
-								<li>暂无明显冲突配置（如时间区间、价格、关联系列等约束）。</li>
-							</ul>
-						</li>
-					</ul>
-				</li>
-			</ul>
-
-			<p class="note">
-				建议在表单顶部保留统一的错误提示区，用于汇总关键阻断性错误，减少运营人员逐字段排查成本。
-			</p>
 		</section>
+
+		<!-- 4.4 操作与状态流转（表单级） -->
+		<section class="card" id="actionsCard">
+			<div class="card-header">
+				<div>
+					<div class="card-title">
+						操作与状态流转
+					</div>
+					<div class="card-subtitle">
+						保存草稿 vs 发布 / 启用的校验强度不同
+					</div>
+				</div>
+			</div>
+			<div class="section-divider"></div>
+
+			<div class="form-row">
+				<div class="form-field">
+					<div class="label-row">
+						<label>表单操作</label>
+					</div>
+					<div class="helper-text">
+						底部统一提供「保存草稿 / 发布 / 取消」操作按钮。保存草稿仅校验基础必填项；发布需通过全部关键业务规则。
+					</div>
+				</div>
+				<div class="form-field">
+					<div class="label-row">
+						<label>状态说明</label>
+					</div>
+					<div class="helper-text">
+						当前示例状态：
+						<span class="badge-warning badge">草稿</span>
+						→ 发布后状态将变更为
+						<span class="badge-success badge">启用</span>
+						，并对前端生效。
+					</div>
+				</div>
+			</div>
+
+			<div class="helper-text" style="margin-top:12px;">
+				- 必填项缺失：在对应字段下方以红色文案提示。
+				<br />
+				- 组合权重异常：在组合构成区或页面顶部集中提示，例如「权重总和需为 100%，当前为 92%」。
+				<br />
+				- 保存草稿：允许存在配置缺失，便于分阶段填写。
+				<br />
+				- 发布 / 启用：所有关键业务规则必须通过校验，才允许变更为启用状态。
+			</div>
+		</section>
+
+		<!-- 底部操作按钮区 -->
+		<footer class="form-footer">
+			<div class="form-footer-inner">
+				<div class="footer-left">
+					<label class="switch">
+						<input type="checkbox" id="switchShowAdvanced" />
+						<span class="switch-slider">
+							<span class="switch-knob"></span>
+						</span>
+						<span>仅展示关键必填项</span>
+					</label>
+					<span>·</span>
+					<span>上次保存时间：<span id="lastSavedTime">尚未保存</span></span>
+				</div>
+				<div class="footer-right">
+					<button type="button" class="btn btn-ghost" id="cancelBtn">
+						取消
+					</button>
+					<button type="button" class="btn btn-secondary" id="saveDraftBtn">
+						<span class="icon">💾</span>
+						<span>保存草稿</span>
+					</button>
+					<button type="button" class="btn btn-primary" id="publishBtn">
+						<span class="icon">🚀</span>
+						<span>发布 / 启用</span>
+					</button>
+				</div>
+			</div>
+		</footer>
 	</main>
+</div>
+
+<!-- 入金对话框 -->
+<div class="dialog-backdrop" id="depositDialogBackdrop">
+	<div class="dialog">
+		<div class="dialog-title">入金</div>
+		<div class="dialog-desc" id="depositDialogDesc">
+			为当前组合产品增加总权益，同时可选择是否同步调整对应子腿权益。
+		</div>
+		<div class="form-field">
+			<div class="label-row">
+				<label for="depositAmount">
+					入金金额（元）<span class="required">*</span>
+				</label>
+			</div>
+			<input
+				id="depositAmount"
+				class="input"
+				type="number"
+				min="0"
+				step="100"
+				placeholder="例如：100000"
+			/>
+			<div class="helper-text">
+				示例：输入 100000，确认后总权益将增加 100000
+			</div>
+			<div class="error-text" data-error-for="depositAmount"></div>
+		</div>
+		<div class="dialog-footer">
+			<button type="button" class="btn btn-ghost" id="depositCancelBtn">
+				取消
+			</button>
+			<button type="button" class="btn btn-primary" id="depositConfirmBtn">
+				确定入金
+			</button>
+		</div>
+	</div>
+</div>
+
+<!-- 增加品种对话框（示意简化） -->
+<div class="dialog-backdrop" id="addStrategyDialogBackdrop">
+	<div class="dialog">
+		<div class="dialog-title">增加组合品种</div>
+		<div class="dialog-desc">
+			手工添加新的单腿品种到当前组合中，等权模式下将自动均分权重。
+		</div>
+		<div class="form-field">
+			<div class="label-row">
+				<label for="newInstrument">
+					单腿品种代码<span class="required">*</span>
+				</label>
+			</div>
+			<input
+				id="newInstrument"
+				class="input"
+				type="text"
+				placeholder="例如：RB、AG"
+			/>
+			<div class="error-text" data-error-for="newInstrument"></div>
+		</div>
+		<div class="form-field">
+			<div class="label-row">
+				<label for="newProductId">
+					单腿产品ID<span class="required">*</span>
+				</label>
+			</div>
+			<input
+				id="newProductId"
+				class="input"
+				type="text"
+				placeholder="例如：Kuangjinzx10"
+			/>
+			<div class="error-text" data-error-for="newProductId"></div>
+		</div>
+		<div class="form-field">
+			<div class="label-row">
+				<label for="newEquity">
+					权益（元）<span class="required">*</span>
+				</label>
+			</div>
+			<input
+				id="newEquity"
+				class="input"
+				type="number"
+				min="0"
+				step="100"
+				placeholder="例如：200000"
+			/>
+			<div class="error-text" data-error-for="newEquity"></div>
+			<div class="helper-text">
+				如果留空将默认与当前其他子腿保持接近规模
+			</div>
+		</div>
+		<div class="dialog-footer">
+			<button type="button" class="btn btn-ghost" id="addStrategyCancelBtn">
+				取消
+			</button>
+			<button type="button" class="btn btn-primary" id="addStrategyConfirmBtn">
+				确定添加
+			</button>
+		</div>
+	</div>
+</div>
+
+<!-- 发布确认对话框 -->
+<div class="dialog-backdrop" id="publishDialogBackdrop">
+	<div class="dialog">
+		<div class="dialog-title">确认发布组合产品</div>
+		<div class="dialog-warning">
+			<div class="icon">⚠️</div>
+			<div>
+				发布后，该组合产品将对前端生效，部分基础字段将仅支持只读查看。
+			</div>
+		</div>
+		<ul class="dialog-list">
+			<li>请确认基础信息已填写完整（产品名称、产品类型、风险等级、所属系列等）。</li>
+			<li>组合量化产品要求：所有启用子腿的权重总和需为 <strong>100%</strong>。</li>
+			<li>发布后如需重大调整，可能需要重新走合规评审流程。</li>
+		</ul>
+		<div class="dialog-footer">
+			<button type="button" class="btn btn-ghost" id="publishCancelBtn">
+				取消
+			</button>
+			<button type="button" class="btn btn-primary" id="publishConfirmBtn">
+				确认发布
+			</button>
+		</div>
+	</div>
+</div>
+
+<script>
+	(function () {
+		const $ = (id) => document.getElementById(id);
+		const banner = $("banner");
+		const bannerMessage = $("bannerMessage");
+		const scrollToErrorLink = $("scrollToErrorLink");
+		const basicInfoCard = $("basicInfoCard");
+		const comboSection = $("comboSection");
+		const actionsCard = $("actionsCard");
+		const productNameInput = $("productName");
+		const productCodeInput = $("productCode");
+		const riskLevelSelect = $("riskLevel");
+		const productTypeSelect = $("productType");
+		const producerInput = $("producer");
+		const productLevelSelect = $("productLevel");
+		const seriesSelect = $("series");
+		const productFormSelect = $("productForm");
+		const comboTypeSelect = $("comboType");
+		const descriptionInput = $("description");
+		const totalEquityInput = $("totalEquity");
+		const weightTypeToggle = $("weightTypeToggle");
+		const strategyTbody = $("strategyTbody");
+		const weightTotal = $("weightTotal");
+		const weightTotalValue = $("weightTotalValue");
+		const weightStatusChip = $("weightStatusChip");
+		const addStrategyBtn = $("addStrategyBtn");
+		const switchShowAdvanced = $("switchShowAdvanced");
+		const lastSavedTime = $("lastSavedTime");
+		const saveDraftBtn = $("saveDraftBtn");
+		const publishBtn = $("publishBtn");
+		const cancelBtn = $("cancelBtn");
+		const statusPill = $("statusPill");
+		const statusPillText = $("statusPillText");
+		const pageTitleText = $("pageTitleText");
+
+		const depositDialogBackdrop = $("depositDialogBackdrop");
+		const depositAmountInput = $("depositAmount");
+		const depositCancelBtn = $("depositCancelBtn");
+		const depositConfirmBtn = $("depositConfirmBtn");
+
+		const addStrategyDialogBackdrop = $("addStrategyDialogBackdrop");
+		const newInstrumentInput = $("newInstrument");
+		const newProductIdInput = $("newProductId");
+		const newEquityInput = $("newEquity");
+		const addStrategyCancelBtn = $("addStrategyCancelBtn");
+		const addStrategyConfirmBtn = $("addStrategyConfirmBtn");
+
+		const publishDialogBackdrop = $("publishDialogBackdrop");
+		const publishCancelBtn = $("publishCancelBtn");
+		const publishConfirmBtn = $("publishConfirmBtn");
+
+		let currentWeightType = "equal"; // equal / custom
+		let pendingDepositRow = null;
+
+		function showBanner(type, message, scrollToError) {
+			banner.className = "info-banner " + type + " visible";
+			bannerMessage.textContent = message;
+			if (scrollToError) {
+				scrollToErrorLink.style.display = "inline";
+			} else {
+				scrollToErrorLink.style.display = "none";
+			}
+		}
+
+		function hideBanner() {
+			banner.className = "info-banner";
+			bannerMessage.textContent = "";
+			scrollToErrorLink.style.display = "none";
+		}
+
+		function setFieldError(id, message) {
+			const inputEl = $(id);
+			const errorEl = document.querySelector('.error-text[data-error-for="' + id + '"]');
+			if (!inputEl || !errorEl) return;
+			if (message) {
+				inputEl.classList.add("error");
+				errorEl.textContent = message;
+			} else {
+				inputEl.classList.remove("error");
+				errorEl.textContent = "";
+			}
+		}
+
+		function clearAllErrors() {
+			document
+				.querySelectorAll(".input, .select, .textarea")
+				.forEach((el) => el.classList.remove("error"));
+			document
+				.querySelectorAll(".error-text")
+				.forEach((el) => (el.textContent = ""));
+		}
+
+		function formatNow() {
+			const d = new Date();
+			const pad = (n) => (n < 10 ? "0" + n : n);
+			return (
+				d.getFullYear() +
+				"-" +
+				pad(d.getMonth() + 1) +
+				"-" +
+				pad(d.getDate()) +
+				" " +
+				pad(d.getHours()) +
+				":" +
+				pad(d.getMinutes())
+			);
+		}
+
+		function parseNumberLike(value) {
+			if (value == null) return NaN;
+			const cleaned = String(value).replace(/[,\s]/g, "");
+			const n = parseFloat(cleaned);
+			return isNaN(n) ? NaN : n;
+		}
+
+		function recalcWeights() {
+			const rows = strategyTbody.querySelectorAll("tr");
+			if (!rows.length) {
+				weightTotalValue.textContent = "0%";
+				weightTotal.classList.remove("ok");
+				weightTotal.classList.add("error");
+				weightStatusChip.textContent = "暂无组合子腿";
+				weightStatusChip.className = "chip-compact error";
+				return;
+			}
+
+			if (currentWeightType === "equal") {
+				const count = rows.length;
+				const equalWeight = parseFloat((100 / count).toFixed(2));
+				let lastWeight = 100 - equalWeight * (count - 1);
+				rows.forEach((row, index) => {
+					const input = row.querySelector('input[data-field="weight"]');
+					if (!input) return;
+					if (index === count - 1) {
+						input.value = lastWeight.toFixed(2);
+					} else {
+						input.value = equalWeight.toFixed(2);
+					}
+				});
+			}
+
+			let total = 0;
+			rows.forEach((row) => {
+				const input = row.querySelector('input[data-field="weight"]');
+				if (!input) return;
+				const val = parseFloat(input.value) || 0;
+				total += val;
+			});
+
+			const rounded = parseFloat(total.toFixed(2));
+			weightTotalValue.textContent = rounded.toFixed(2) + "%";
+
+			if (Math.abs(rounded - 100) < 0.01) {
+				weightTotal.classList.remove("error");
+				weightTotal.classList.add("ok");
+				weightStatusChip.textContent =
+					currentWeightType === "equal"
+						? "等权 · 已自动均分"
+						: "自定义 · 已满足 100%";
+				weightStatusChip.className = "chip-compact";
+			} else {
+				weightTotal.classList.remove("ok");
+				weightTotal.classList.add("error");
+				weightStatusChip.textContent = "当前不等于 100%，发布前需修正";
+				weightStatusChip.className = "chip-compact error";
+			}
+		}
+
+		function setWeightType(type) {
+			currentWeightType = type;
+			const chips = weightTypeToggle.querySelectorAll(".toggle-chip");
+			chips.forEach((chip) => {
+				if (chip.dataset.weightType === type) {
+					chip.classList.add("active");
+				} else {
+					chip.classList.remove("active");
+				}
+			});
+
+			const weightInputs = strategyTbody.querySelectorAll('input[data-field="weight"]');
+			weightInputs.forEach((input) => {
+				if (type === "equal") {
+					input.setAttribute("readonly", "readonly");
+				} else {
+					input.removeAttribute("readonly");
+				}
+			});
+
+			recalcWeights();
+		}
+
+		function validateBasicForDraft() {
+			let ok = true;
+			clearAllErrors();
+			hideBanner();
+
+			if (!productNameInput.value.trim()) {
+				setFieldError("productName", "产品名称为必填项");
+				ok = false;
+			}
+			if (!productTypeSelect.value) {
+				setFieldError("productType", "请选择产品类型");
+				ok = false;
+			}
+			if (!productFormSelect.value) {
+				setFieldError("productForm", "请选择产品形式");
+				ok = false;
+			}
+			if (!comboTypeSelect.value) {
+				setFieldError("comboType", "请选择组合类型");
+				ok = false;
+			}
+
+			if (!ok) {
+				showBanner("error", "请先补全基础必填项后再保存草稿。", true);
+			}
+			return ok;
+		}
+
+		function validateForPublish() {
+			let ok = true;
+			clearAllErrors();
+			hideBanner();
+
+			if (!productNameInput.value.trim()) {
+				setFieldError("productName", "产品名称为必填项");
+				ok = false;
+			}
+			if (!riskLevelSelect.value) {
+				setFieldError("riskLevel", "请选择风险等级");
+				ok = false;
+			}
+			if (!productTypeSelect.value) {
+				setFieldError("productType", "请选择产品类型");
+				ok = false;
+			}
+			if (!producerInput.value.trim()) {
+				setFieldError("producer", "请填写产品出品人");
+				ok = false;
+			}
+			if (!seriesSelect.value) {
+				setFieldError("series", "请选择所属系列");
+				ok = false;
+			}
+			if (!productFormSelect.value) {
+				setFieldError("productForm", "请选择产品形式");
+				ok = false;
+			}
+			if (!comboTypeSelect.value) {
+				setFieldError("comboType", "请选择组合类型");
+				ok = false;
+			}
+			if (!descriptionInput.value.trim()) {
+				setFieldError("description", "请填写产品简介");
+				ok = false;
+			}
+
+			// 组合逻辑校验
+			if (
+				productFormSelect.value === "组合策略" &&
+				comboTypeSelect.value === "type1"
+			) {
+				const rows = strategyTbody.querySelectorAll("tr");
+				if (!rows.length) {
+					ok = false;
+					showBanner(
+						"error",
+						"组合量化产品至少需要配置一条启用子腿，请先在「组合构成与权重」中增加品种。",
+						true
+					);
+					return false;
+				}
+				let total = 0;
+				rows.forEach((row) => {
+					const input = row.querySelector('input[data-field="weight"]');
+					if (!input) return;
+					const val = parseFloat(input.value) || 0;
+					total += val;
+				});
+				const rounded = parseFloat(total.toFixed(2));
+				if (Math.abs(rounded - 100) >= 0.01) {
+					ok = false;
+					showBanner(
+						"error",
+						`权重总和需为 100%，当前为 ${rounded.toFixed(
+							2
+						)}%。请在「组合构成与权重」区块调整后再发布。`,
+						true
+					);
+				}
+			}
+
+			if (!ok && !bannerMessage.textContent) {
+				showBanner("error", "请先修正页面中的红色错误提示后再发布。", true);
+			}
+			return ok;
+		}
+
+		function smoothScrollTo(el) {
+			if (!el) return;
+			const rect = el.getBoundingClientRect();
+			const absoluteY = rect.top + window.scrollY;
+			const offset = 80;
+			window.scrollTo({
+				top: absoluteY - offset,
+				behavior: "smooth"
+			});
+		}
+
+		function openDepositDialog(row) {
+			pendingDepositRow = row;
+			depositAmountInput.value = "";
+			setFieldError("depositAmount", "");
+			depositDialogBackdrop.classList.add("visible");
+			depositAmountInput.focus();
+		}
+
+		function closeDepositDialog() {
+			depositDialogBackdrop.classList.remove("visible");
+			pendingDepositRow = null;
+		}
+
+		function openAddStrategyDialog() {
+			newInstrumentInput.value = "";
+			newProductIdInput.value = "";
+			newEquityInput.value = "";
+			setFieldError("newInstrument", "");
+			setFieldError("newProductId", "");
+			setFieldError("newEquity", "");
+			addStrategyDialogBackdrop.classList.add("visible");
+			newInstrumentInput.focus();
+		}
+
+		function closeAddStrategyDialog() {
+			addStrategyDialogBackdrop.classList.remove("visible");
+		}
+
+		function openPublishDialog() {
+			publishDialogBackdrop.classList.add("visible");
+		}
+
+		function closePublishDialog() {
+			publishDialogBackdrop.classList.remove("visible");
+		}
+
+		// 绑定权重类型切换
+		weightTypeToggle.addEventListener("click", (e) => {
+			const chip = e.target.closest(".toggle-chip");
+			if (!chip) return;
+			const type = chip.dataset.weightType;
+			if (!type || type === currentWeightType) return;
+			setWeightType(type);
+		});
+
+		// 表格中的按钮事件（编辑 / 入金 / 移除）
+		strategyTbody.addEventListener("click", (e) => {
+			const btn = e.target.closest("button");
+			if (!btn) return;
+			const action = btn.dataset.action;
+			const row = btn.closest("tr");
+			if (!row || !action) return;
+
+			if (action === "editRow") {
+				// 简化：模拟「编辑」行为，聚焦到当前行权重输入框
+				const equityInput = row.querySelector('input[data-field="equity"]');
+				if (equityInput) equityInput.focus();
+			} else if (action === "deposit") {
+				openDepositDialog(row);
+			} else if (action === "removeRow") {
+				row.remove();
+				recalcWeights();
+			}
+		});
+
+		// 自定义权重时，实时重算
+		strategyTbody.addEventListener("input", (e) => {
+			const target = e.target;
+			if (!target.matches('input[data-field="weight"]')) return;
+			if (currentWeightType !== "custom") return;
+			recalcWeights();
+		});
+
+		// 入金对话框交互
+		depositCancelBtn.addEventListener("click", () => {
+			closeDepositDialog();
+		});
+
+		depositConfirmBtn.addEventListener("click", () => {
+			const raw = depositAmountInput.value.trim();
+			const amount = parseNumberLike(raw);
+			if (!raw || isNaN(amount) || amount <= 0) {
+				setFieldError("depositAmount", "请输入大于 0 的入金金额");
+				return;
+			}
+			setFieldError("depositAmount", "");
+
+			const currentEquity = parseNumberLike(totalEquityInput.value) || 0;
+			totalEquityInput.value = Math.round(currentEquity + amount);
+
+			if (pendingDepositRow) {
+				const equityInput = pendingDepositRow.querySelector(
+					'input[data-field="equity"]'
+				);
+				if (equityInput) {
+					const oldVal = parseNumberLike(equityInput.value) || 0;
+					equityInput.value = Math.round(oldVal + amount);
+				}
+			}
+			closeDepositDialog();
+			showBanner(
+				"success",
+				"入金成功，已更新总权益和对应子腿权益（示意交互）。",
+				false
+			);
+		});
+
+		// 增加品种对话框交互
+		addStrategyBtn.addEventListener("click", () => {
+			openAddStrategyDialog();
+		});
+
+		addStrategyCancelBtn.addEventListener("click", () => {
+			closeAddStrategyDialog();
+		});
+
+		addStrategyConfirmBtn.addEventListener("click", () => {
+			let ok = true;
+			if (!newInstrumentInput.value.trim()) {
+				setFieldError("newInstrument", "请填写单腿品种代码");
+				ok = false;
+			} else {
+				setFieldError("newInstrument", "");
+			}
+			if (!newProductIdInput.value.trim()) {
+				setFieldError("newProductId", "请填写单腿产品ID");
+				ok = false;
+			} else {
+				setFieldError("newProductId", "");
+			}
+			const equityVal = newEquityInput.value.trim();
+			const equityNum = parseNumberLike(equityVal);
+			if (!equityVal || isNaN(equityNum) || equityNum <= 0) {
+				setFieldError("newEquity", "请输入有效的权益数值");
+				ok = false;
+			} else {
+				setFieldError("newEquity", "");
+			}
+			if (!ok) return;
+
+			const nextId =
+				Math.max(
+					0,
+					...Array.from(strategyTbody.querySelectorAll("tr")).map((tr) =>
+						parseInt(tr.dataset.rowId || "0", 10)
+					)
+				) + 1;
+
+			const tr = document.createElement("tr");
+			tr.dataset.rowId = String(nextId);
+			tr.innerHTML = `
+				<td>${newInstrumentInput.value.trim()}</td>
+				<td>${newProductIdInput.value.trim()}</td>
+				<td>Kuangjincmb01</td>
+				<td>Kuangjincmb01</td>
+				<td>
+					<input
+						type="text"
+						class="table-input"
+						value="${Math.round(equityNum)}"
+						data-field="equity"
+					/>
+				</td>
+				<td>
+					<input
+						type="number"
+						class="table-input"
+						data-field="weight"
+						value="0"
+						min="0"
+						max="100"
+						step="0.01"
+						${currentWeightType === "equal" ? "readonly" : ""}
+					/>
+				</td>
+				<td>
+					<button type="button" class="btn-text" data-action="editRow">
+						编辑
+					</button>
+					<button type="button" class="btn-text" data-action="deposit">
+						入金
+					</button>
+					<button type="button" class="btn-text-danger" data-action="removeRow">
+						移除
+					</button>
+				</td>
+			`;
+			strategyTbody.appendChild(tr);
+
+			closeAddStrategyDialog();
+			recalcWeights();
+			showBanner(
+				"success",
+				"已新增组合品种，等权模式下系统已自动重新分配权重。",
+				false
+			);
+		});
+
+		// 发布前检查 + 打开发布确认弹窗
+		publishBtn.addEventListener("click", () => {
+			const ok = validateForPublish();
+			if (!ok) return;
+			openPublishDialog();
+		});
+
+		// 发布确认弹窗交互
+		publishCancelBtn.addEventListener("click", () => {
+			closePublishDialog();
+		});
+
+		publishConfirmBtn.addEventListener("click", () => {
+			closePublishDialog();
+			const now = formatNow();
+			lastSavedTime.textContent = now;
+			statusPillText.textContent = "已发布 · 启用中";
+			statusPill.style.background = "#e8f5e9";
+			statusPill.style.color = "#2e7d32";
+			statusPill.querySelector(".status-dot").style.background = "#2e7d32";
+			showBanner(
+				"success",
+				"已发布成功，当前产品状态为「启用」，前端将按最新配置展示（示意）。",
+				false
+			);
+			productCodeInput.setAttribute("readonly", "readonly");
+		});
+
+		// 保存草稿
+		saveDraftBtn.addEventListener("click", () => {
+			const ok = validateBasicForDraft();
+			if (!ok) return;
+			const now = formatNow();
+			lastSavedTime.textContent = now;
+			statusPillText.textContent = "草稿 · 未发布";
+			statusPill.style.background = "#fff3e0";
+			statusPill.style.color = "#ef6c00";
+			statusPill.querySelector(".status-dot").style.background = "#ef6c00";
+			showBanner(
+				"success",
+				"草稿已保存。允许后续继续补全配置，再进行发布操作。",
+				false
+			);
+		});
+
+		// 取消按钮：示意返回上一页
+		cancelBtn.addEventListener("click", () => {
+			if (
+				confirm(
+					"存在可能尚未保存的修改，确定要返回产品列表吗？（此为原型交互示意，不会实际跳转）"
+				)
+			) {
+				showBanner(
+					"info",
+					"已取消本次编辑（原型示意）。在真实系统中将返回到组合产品列表页。",
+					false
+				);
+			}
+		});
+
+		// 顶部 banner 的「查看详情」：滚动到第一个错误字段所在区块
+		scrollToErrorLink.addEventListener("click", () => {
+			const errorField = document.querySelector(".input.error, .select.error, .textarea.error");
+			if (errorField) {
+				smoothScrollTo(errorField.closest(".card") || errorField);
+			} else {
+				smoothScrollTo(comboSection);
+			}
+		});
+
+		// 顶部标题跟随产品名称变化（示意）
+		productNameInput.addEventListener("input", () => {
+			pageTitleText.textContent =
+				productNameInput.value.trim() || "组合产品编辑";
+		});
+
+		// 「仅展示关键必填项」开关（示意隐藏部分字段）
+		switchShowAdvanced.addEventListener("change", () => {
+			const showOnlyRequired = switchShowAdvanced.checked;
+			const optionalSelectors = [
+				"#productLevel",
+				"#description",
+				"#totalEquity",
+				"#shareAmount",
+				"#nav"
+			];
+			optionalSelectors.forEach((id) => {
+				const field = $(id);
+				if (!field) return;
+				const container = field.closest(".form-field");
+				if (!container) return;
+				container.style.display = showOnlyRequired ? "none" : "";
+			});
+		});
+
+		// 初始化
+		setWeightType("equal");
+		recalcWeights();
+	})();
+</script>
 </body>
 </html>
