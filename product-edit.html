@@ -662,32 +662,32 @@
 			</div>
 
 			<table class="combo-table" id="comboTable">
-	<thead>
-	<tr>
-		<th>单腿品种</th>
-		<th>单腿产品ID</th>
-		<th>组合产品ID</th>
-		<th>权益（元）</th>
-		<th>品种权重比例（%）</th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr data-row>
-		<td>燃料油 FU</td>
-		<td>LEG0001</td>
-		<td>CP0001</td>
-		<td><input type="number" step="0.01" value="500000.00" readonly /></td>
-		<td><input type="number" step="0.01" value="50.00" data-weight /></td>
-	</tr>
-	<tr data-row>
-		<td>焦炭 J</td>
-		<td>LEG0002</td>
-		<td>CP0001</td>
-		<td><input type="number" step="0.01" value="500000.00" readonly /></td>
-		<td><input type="number" step="0.01" value="50.00" data-weight /></td>
-	</tr>
-	</tbody>
-</table>
+				<thead>
+				<tr>
+					<th>单腿品种</th>
+					<th>单腿产品ID</th>
+					<th>组合产品ID</th>
+					<th>权益（元）</th>
+					<th>品种权重比例（%）</th>
+				</tr>
+				</thead>
+				<tbody>
+				<tr data-row>
+					<td>燃料油 FU</td>
+					<td>LEG0001</td>
+					<td>CP0001</td>
+					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+				</tr>
+				<tr data-row>
+					<td>焦炭 J</td>
+					<td>LEG0002</td>
+					<td>CP0001</td>
+					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+				</tr>
+				</tbody>
+			</table>
 
 			<div class="combo-footer" id="comboFooter">
 				<div class="combo-footer-left" id="weightSummary">当前权重总和：100.00%</div>
@@ -714,7 +714,7 @@
 
 	<!-- 入金弹窗 -->
 	<div class="modal-backdrop" id="modalDeposit">
-		<div class="modal modal--medium">
+		<div class="modal">
 			<div class="modal__title">组合入金</div>
 			<div class="modal__content">
 				<div class="modal__row">
@@ -731,7 +731,7 @@
 				</div>
 				<div class="form-field__error" id="depositError" style="margin-top:6px;display:none;">请输入大于 0 的入金金额</div>
 				<div style="font-size:12px;color:#9E9E9E;margin-top:8px;">
-					确认后：系统将增加组合总权益，并按当前权重比例同步更新各单腿权益，份额调整由结算系统计算。
+					确认后：系统将增加组合总权益与份额，并按当前权重比例同步更新各单腿权益，净值保持不变（示意）。
 				</div>
 			</div>
 			<div class="modal__footer">
@@ -776,36 +776,36 @@
 				</div>
 
 				<table class="strategy-table" id="strategyTable">
-	<thead>
-	<tr>
-		<th style="width:32px;"><input type="checkbox" id="strategyCheckAll" /></th>
-		<th>单腿品种</th>
-		<th>单腿产品ID</th>
-		<th>组合产品ID</th>
-		<th style="width:80px;text-align:center;">操作</th>
-	</tr>
-	</thead>
-	<tbody>
-	<tr data-strategy-row>
-		<td><input type="checkbox" class="strategy-check" /></td>
-		<td>燃料油 FU</td>
-		<td>LEG0001</td>
-		<td>CP0001</td>
-		<td style="text-align:center;">
-			<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-		</td>
-	</tr>
-	<tr data-strategy-row>
-		<td><input type="checkbox" class="strategy-check" /></td>
-		<td>焦炭 J</td>
-		<td>LEG0002</td>
-		<td>CP0001</td>
-		<td style="text-align:center;">
-			<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-		</td>
-	</tr>
-	</tbody>
-</table>
+					<thead>
+					<tr>
+						<th style="width:32px;"><input type="checkbox" id="strategyCheckAll" /></th>
+						<th>单腿品种</th>
+						<th>单腿产品ID</th>
+						<th>组合产品ID</th>
+						<th style="width:80px;text-align:center;">操作</th>
+					</tr>
+					</thead>
+					<tbody>
+					<tr data-strategy-row>
+						<td><input type="checkbox" class="strategy-check" /></td>
+						<td>燃料油 FU</td>
+						<td>LEG0001</td>
+						<td>CP0001</td>
+						<td style="text-align:center;">
+							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+						</td>
+					</tr>
+					<tr data-strategy-row>
+						<td><input type="checkbox" class="strategy-check" /></td>
+						<td>焦炭 J</td>
+						<td>LEG0002</td>
+						<td>CP0001</td>
+						<td style="text-align:center;">
+							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+						</td>
+					</tr>
+					</tbody>
+				</table>
 
 				<div id="strategyError" class="form-field__error" style="margin-top:8px;display:none;">
 					组合内至少需要保留 1 条策略，请勿全部删除。
@@ -1044,17 +1044,31 @@
 		}
 		errorEl.style.display = 'none';
 
-		// 简单模拟：增加总权益，按当前权重更新各单腿权益
+		// === 修正逻辑：入金时同时增加总权益与份额，净值保持不变（示意） ===
 		const totalEquityInput = document.getElementById('totalEquity');
+		const navInput = document.getElementById('nav');
+		const sharesInput = document.getElementById('shares');
+
 		let totalEquity = parseFloat(totalEquityInput.value || '0');
+		const nav = parseFloat(navInput.value || '1');
+		let shares = parseFloat(sharesInput.value || '0');
+
+		// 先增加总权益
 		totalEquity += value;
 		totalEquityInput.value = totalEquity.toFixed(2);
 
+		// 份额增加：按当前净值折算，新份额 = 旧份额 + 入金金额 / 当前净值
+		if (nav > 0) {
+			shares += value / nav;
+		}
+		sharesInput.value = shares.toFixed(4);
+
+		// 按最新总权益 + 当前权重，重新计算各单腿权益
 		const table = document.getElementById('comboTable');
 		const rows = table.querySelectorAll('tbody tr[data-row]');
 		rows.forEach(function (row) {
 			const weightInput = row.querySelector('input[data-weight]');
-			const equityInput = row.querySelector('td:nth-child(4) input');
+			const equityInput = row.querySelector('td:nth-child(4) input'); // 第 4 列为“权益（元）”
 			const weight = parseFloat(weightInput.value || '0');
 			if (!isNaN(weight)) {
 				const shareEquity = totalEquity * (weight / 100);
@@ -1063,174 +1077,173 @@
 		});
 
 		document.getElementById('modalDeposit').style.display = 'none';
-		alert('入金成功（模拟），组合总权益与各单腿权益已更新展示。');
+		alert('入金成功（模拟），组合总权益、份额与各单腿权益已更新展示。');
 		markDirty();
 	});
 
 	// ==== 策略编辑弹窗逻辑 ====
 	const modalStrategyEdit = document.getElementById('modalStrategyEdit');
-	const strategyTable = document.getElementById('strategyTable').querySelector('tbody');
+	const strategyTableBody = document.getElementById('strategyTable').querySelector('tbody');
 	const strategyCountLabel = document.getElementById('strategyCountLabel');
 	const strategyError = document.getElementById('strategyError');
 	const strategyCheckAll = document.getElementById('strategyCheckAll');
 
 	function updateStrategyCount() {
-		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
+		const rows = strategyTableBody.querySelectorAll('tr[data-strategy-row]');
 		strategyCountLabel.textContent = rows.length;
 	}
 
-	function syncStrategyFromCombo() {
-		// 将主页面组合详情表中的行同步到策略编辑弹窗
-		const comboRows = document.querySelectorAll('#comboTable tbody tr[data-row]');
-		strategyTable.innerHTML = '';
-		comboRows.forEach(function (row) {
-			const cells = row.querySelectorAll('td');
-			const tr = document.createElement('tr');
-			tr.setAttribute('data-strategy-row', '');
-
-			const legName = cells[0].textContent.trim();
-			const legId = cells[1].textContent.trim();
-			const cmbId = cells[2].textContent.trim();
-			const comboId = cells[3].textContent.trim();
-
-			tr.innerHTML = `
-				<td><input type="checkbox" class="strategy-check" /></td>
-				<td>${legName}</td>
-				<td>${legId}</td>
-				<td>${cmbId}</td>
-				<td>${comboId}</td>
-				<td style="text-align:center;">
-					<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-				</td>
-			`;
-			strategyTable.appendChild(tr);
-		});
-		updateStrategyCount();
-		strategyCheckAll.checked = false;
-		strategyError.style.display = 'none';
-	}
-
 	function syncStrategyToCombo() {
-		// 把策略弹窗里的列表回写到主页面组合详情表（保持样例里的权益与权重不变，只更新行结构和 ID 等）
-		const comboBody = document.querySelector('#comboTable tbody');
-		comboBody.innerHTML = '';
+		// 将策略弹窗中的列表同步回主页面组合详情（仅同步品种/ID/组合ID，保留原有权益和权重）
+		const comboTableBody = document.getElementById('comboTable').querySelector('tbody');
+		const oldRows = comboTableBody.querySelectorAll('tr[data-row]');
+		const oldWeights = [];
+		oldRows.forEach(function (row) {
+			const weightInput = row.querySelector('input[data-weight]');
+			oldWeights.push(weightInput ? weightInput.value : '0');
+		});
 
-		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
-		const totalEquity = parseFloat(document.getElementById('totalEquity').value || '0');
-		const count = rows.length || 1;
-		const perEquity = (totalEquity / count).toFixed(2);
-		const weightPer = (100 / count).toFixed(2);
+		// 清空组合详情
+		comboTableBody.innerHTML = '';
 
-		rows.forEach(function (row, index) {
+		const strategyRows = strategyTableBody.querySelectorAll('tr[data-strategy-row]');
+		strategyRows.forEach(function (row, index) {
 			const tds = row.querySelectorAll('td');
-			const legName = tds[1].textContent.trim();
+			const symbol = tds[1].textContent.trim();
 			const legId = tds[2].textContent.trim();
-			const cmbId = tds[3].textContent.trim();
-			const comboId = tds[4].textContent.trim();
+			const comboId = tds[3].textContent.trim();
 
 			const tr = document.createElement('tr');
 			tr.setAttribute('data-row', '');
-			tr.innerHTML = `
-				<td>${legName}</td>
-				<td>${legId}</td>
-				<td>${cmbId}</td>
-				<td>${comboId}</td>
-				<td><input type="number" step="0.01" value="${perEquity}" readonly /></td>
-				<td><input type="number" step="0.01" value="${weightPer}" data-weight /></td>
-			`;
-			comboBody.appendChild(tr);
+
+			// 单腿品种
+			const td1 = document.createElement('td');
+			td1.textContent = symbol;
+			// 单腿产品ID
+			const td2 = document.createElement('td');
+			td2.textContent = legId;
+			// 组合产品ID
+			const td3 = document.createElement('td');
+			td3.textContent = comboId;
+			// 权益（元）
+			const td4 = document.createElement('td');
+			const equityInput = document.createElement('input');
+			equityInput.type = 'number';
+			equityInput.step = '0.01';
+			equityInput.value = '0.00';
+			equityInput.readOnly = true;
+			td4.appendChild(equityInput);
+			// 品种权重比例（%）
+			const td5 = document.createElement('td');
+			const weightInput = document.createElement('input');
+			weightInput.type = 'number';
+			weightInput.step = '0.01';
+			weightInput.setAttribute('data-weight', '');
+			weightInput.value = oldWeights[index] || '0.00';
+			td5.appendChild(weightInput);
+
+			tr.appendChild(td1);
+			tr.appendChild(td2);
+			tr.appendChild(td3);
+			tr.appendChild(td4);
+			tr.appendChild(td5);
+
+			comboTableBody.appendChild(tr);
 		});
 
+		// 策略结构变动后，重新应用权重模式与汇总
 		updateWeightInputsState();
 	}
 
 	// 打开策略编辑弹窗
 	document.getElementById('btnEditLegs').addEventListener('click', function () {
-		syncStrategyFromCombo();
+		// 每次打开时，确保“全选”状态重置
+		strategyCheckAll.checked = false;
+		strategyError.style.display = 'none';
+		updateStrategyCount();
 		modalStrategyEdit.style.display = 'flex';
 	});
 
-	// 全选
-	strategyCheckAll.addEventListener('change', function () {
-		const checks = strategyTable.querySelectorAll('.strategy-check');
-		checks.forEach(function (c) {
-			c.checked = strategyCheckAll.checked;
-		});
+	// 关闭策略编辑弹窗（取消）
+	document.getElementById('btnStrategyCancel').addEventListener('click', function () {
+		modalStrategyEdit.style.display = 'none';
 	});
 
-	// 行内事件：删除单行
-	strategyTable.addEventListener('click', function (e) {
+	// 新增策略（简化示例：追加一条模拟数据）
+	document.getElementById('btnStrategyAdd').addEventListener('click', function () {
+		const index = strategyTableBody.querySelectorAll('tr[data-strategy-row]').length + 1;
+		const tr = document.createElement('tr');
+		tr.setAttribute('data-strategy-row', '');
+
+		tr.innerHTML = `
+			<td><input type="checkbox" class="strategy-check" /></td>
+			<td>示例品种 ${index}</td>
+			<td>LEG_NEW_${index}</td>
+			<td>CP0001</td>
+			<td style="text-align:center;">
+				<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+			</td>
+		`;
+		strategyTableBody.appendChild(tr);
+		updateStrategyCount();
+	});
+
+	// 单行删除
+	strategyTableBody.addEventListener('click', function (e) {
 		const btn = e.target.closest('button[data-action="delete-row"]');
 		if (!btn) return;
 		const row = btn.closest('tr[data-strategy-row]');
 		if (row) {
 			row.remove();
 			updateStrategyCount();
-			strategyCheckAll.checked = false;
 		}
 	});
 
 	// 批量删除
 	document.getElementById('btnStrategyBatchDelete').addEventListener('click', function () {
-		const checks = strategyTable.querySelectorAll('.strategy-check:checked');
+		const checks = strategyTableBody.querySelectorAll('.strategy-check:checked');
 		if (checks.length === 0) {
-			alert('请先选择要删除的策略。');
+			alert('请先勾选需要删除的策略。');
 			return;
 		}
-		if (!confirm('确认删除选中的 ' + checks.length + ' 条策略吗？')) {
+		if (!confirm('确认删除选中的策略吗？删除后将从组合中移除。')) {
 			return;
 		}
-		checks.forEach(function (c) {
-			const row = c.closest('tr[data-strategy-row]');
+		checks.forEach(function (ck) {
+			const row = ck.closest('tr[data-strategy-row]');
 			if (row) row.remove();
 		});
 		updateStrategyCount();
-		strategyCheckAll.checked = false;
 	});
 
-	// 新增策略（简单模拟：添加一条示例记录）
-	document.getElementById('btnStrategyAdd').addEventListener('click', function () {
-		const index = strategyTable.querySelectorAll('tr[data-strategy-row]').length + 1;
-		const tr = document.createElement('tr');
-		tr.setAttribute('data-strategy-row', '');
-		tr.innerHTML = `
-			<td><input type="checkbox" class="strategy-check" /></td>
-			<td>示例品种 ${index}</td>
-			<td>LEG9${String(index).padStart(3,'0')}</td>
-			<td>CMB9${String(index).padStart(3,'0')}</td>
-			<td>CP0001</td>
-			<td style="text-align:center;">
-				<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-			</td>
-		`;
-		strategyTable.appendChild(tr);
-		updateStrategyCount();
-		strategyCheckAll.checked = false;
+	// 全选 / 反选
+	strategyCheckAll.addEventListener('change', function () {
+		const checked = strategyCheckAll.checked;
+		const checks = strategyTableBody.querySelectorAll('.strategy-check');
+		checks.forEach(function (ck) {
+			ck.checked = checked;
+		});
 	});
 
-	// 策略弹窗取消
-	document.getElementById('btnStrategyCancel').addEventListener('click', function () {
-		// 简化：不做未保存校验，真实环境可增加“确认放弃修改”弹窗
-		modalStrategyEdit.style.display = 'none';
-	});
-
-	// 策略弹窗保存
+	// 策略保存
 	document.getElementById('btnStrategySave').addEventListener('click', function () {
-		const rows = strategyTable.querySelectorAll('tr[data-strategy-row]');
+		const rows = strategyTableBody.querySelectorAll('tr[data-strategy-row]');
 		if (rows.length === 0) {
 			strategyError.style.display = 'block';
 			return;
 		}
 		strategyError.style.display = 'none';
 
-		// 同步回主页面组合详情区
+		// 同步到主页面组合详情
 		syncStrategyToCombo();
 		markDirty();
 		modalStrategyEdit.style.display = 'none';
-		alert('策略列表已保存，并同步到组合详情（模拟）。');
+		alert('策略列表已保存并同步到组合详情（模拟）。');
 	});
 
-	// ==== 初始化 ====
+	// 打开/关闭“放弃修改”弹窗已在上面绑定
+
+	// 初始化
 	window.addEventListener('DOMContentLoaded', function () {
 		showSectionIfNeeded();      // 根据初始产品形式控制显示
 		updateWeightInputsState();  // 初始化权重输入状态
