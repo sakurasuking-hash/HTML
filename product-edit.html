@@ -662,35 +662,32 @@
 			</div>
 
 			<table class="combo-table" id="comboTable">
-				<thead>
-				<tr>
-					<th>单腿品种</th>
-					<th>单腿产品ID</th>
-					<th>Cmb_id</th>
-					<th>组合产品ID</th>
-					<th>权益（元）</th>
-					<th>品种权重比例（%）</th>
-				</tr>
-				</thead>
-				<tbody>
-				<tr data-row>
-					<td>燃料油 FU</td>
-					<td>LEG0001</td>
-					<td>CMB1001</td>
-					<td>CP0001</td>
-					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
-					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
-				</tr>
-				<tr data-row>
-					<td>焦炭 J</td>
-					<td>LEG0002</td>
-					<td>CMB1002</td>
-					<td>CP0001</td>
-					<td><input type="number" step="0.01" value="500000.00" readonly /></td>
-					<td><input type="number" step="0.01" value="50.00" data-weight /></td>
-				</tr>
-				</tbody>
-			</table>
+	<thead>
+	<tr>
+		<th>单腿品种</th>
+		<th>单腿产品ID</th>
+		<th>组合产品ID</th>
+		<th>权益（元）</th>
+		<th>品种权重比例（%）</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr data-row>
+		<td>燃料油 FU</td>
+		<td>LEG0001</td>
+		<td>CP0001</td>
+		<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+		<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+	</tr>
+	<tr data-row>
+		<td>焦炭 J</td>
+		<td>LEG0002</td>
+		<td>CP0001</td>
+		<td><input type="number" step="0.01" value="500000.00" readonly /></td>
+		<td><input type="number" step="0.01" value="50.00" data-weight /></td>
+	</tr>
+	</tbody>
+</table>
 
 			<div class="combo-footer" id="comboFooter">
 				<div class="combo-footer-left" id="weightSummary">当前权重总和：100.00%</div>
@@ -779,39 +776,36 @@
 				</div>
 
 				<table class="strategy-table" id="strategyTable">
-					<thead>
-					<tr>
-						<th style="width:32px;"><input type="checkbox" id="strategyCheckAll" /></th>
-						<th>单腿品种</th>
-						<th>单腿产品ID</th>
-						<th>Cmb_id</th>
-						<th>组合产品ID</th>
-						<th style="width:80px;text-align:center;">操作</th>
-					</tr>
-					</thead>
-					<tbody>
-					<tr data-strategy-row>
-						<td><input type="checkbox" class="strategy-check" /></td>
-						<td>燃料油 FU</td>
-						<td>LEG0001</td>
-						<td>CMB1001</td>
-						<td>CP0001</td>
-						<td style="text-align:center;">
-							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-						</td>
-					</tr>
-					<tr data-strategy-row>
-						<td><input type="checkbox" class="strategy-check" /></td>
-						<td>焦炭 J</td>
-						<td>LEG0002</td>
-						<td>CMB1002</td>
-						<td>CP0001</td>
-						<td style="text-align:center;">
-							<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
-						</td>
-					</tr>
-					</tbody>
-				</table>
+	<thead>
+	<tr>
+		<th style="width:32px;"><input type="checkbox" id="strategyCheckAll" /></th>
+		<th>单腿品种</th>
+		<th>单腿产品ID</th>
+		<th>组合产品ID</th>
+		<th style="width:80px;text-align:center;">操作</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr data-strategy-row>
+		<td><input type="checkbox" class="strategy-check" /></td>
+		<td>燃料油 FU</td>
+		<td>LEG0001</td>
+		<td>CP0001</td>
+		<td style="text-align:center;">
+			<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+		</td>
+	</tr>
+	<tr data-strategy-row>
+		<td><input type="checkbox" class="strategy-check" /></td>
+		<td>焦炭 J</td>
+		<td>LEG0002</td>
+		<td>CP0001</td>
+		<td style="text-align:center;">
+			<button class="btn btn--text btn--sm" type="button" data-action="delete-row">删除</button>
+		</td>
+	</tr>
+	</tbody>
+</table>
 
 				<div id="strategyError" class="form-field__error" style="margin-top:8px;display:none;">
 					组合内至少需要保留 1 条策略，请勿全部删除。
@@ -1060,7 +1054,7 @@
 		const rows = table.querySelectorAll('tbody tr[data-row]');
 		rows.forEach(function (row) {
 			const weightInput = row.querySelector('input[data-weight]');
-			const equityInput = row.querySelector('td:nth-child(5) input');
+			const equityInput = row.querySelector('td:nth-child(4) input');
 			const weight = parseFloat(weightInput.value || '0');
 			if (!isNaN(weight)) {
 				const shareEquity = totalEquity * (weight / 100);
