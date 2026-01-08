@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>问卷管理原型</title>
+<style>
+  body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background: #f5f7fa; color: #333; }
+  header { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
+  header h1 { margin: 0; font-size: 20px; }
+  .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
+  .page { display: none; }
+  .page.active { display: block; }
+  .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
+  .btn-primary { background: #3498db; color: white; }
+  .btn-success { background: #27ae60; color: white; }
+  .btn-danger { background: #e74c3c; color: white; }
+  .btn-small { padding: 4px 8px; font-size: 12px; }
+  table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
+  th { background: #ecf0f1; }
+  .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+  .question-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 6px; position: relative; }
+  .question-item.dragging { opacity: 0.5; }
+  .actions { margin-top: 10px; }
+  .condition-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
+  .condition-group select, .condition-group input { padding: 6px; }
+  .import-area { border: 2px dashed #ccc; padding: 40px; text-align: center; margin: 20px 0; border-radius: 8px; }
+  .import-area.dragover { border-color: #3498db; background: #ecf0f1; }
+  .hidden { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>问卷管理系统</h1>
+  <div>
+    <input type="text" id="searchInput" placeholder="搜索问卷..." style="padding:8px;">
+    <button class="btn btn-success" onclick="showPage('list'); createQuestionnaire()">创建新问卷</button>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- 页面1：问卷列表 -->
+  <div id="listPage" class="page active">
+    <h2>问卷列表</h2>
+    <table id="questionnaireTable">
+      <thead>
+        <tr>
+          <th>ID</th><th>名称</th><th>创建时间</th><th>状态</th><th>操作</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>1</td>
+          <td>客户满意度调查</td>
+          <td>2026-01-01</td>
+          <td><span class="status-on">开启</span></td>
+          <td>
+            <button class="btn btn-primary btn-small" onclick="editQuestionnaire(1)">编辑</button>
+            <button class="btn btn-primary btn-small" onclick="showDistribution(1)">分发规则</button>
+            <button class="btn btn-small" onclick="toggleStatus(this)">关闭</button>
+            <button class="btn btn-danger btn-small" onclick="deleteQuestionnaire(this)">删除</button>
+          </td>
+        </tr>
+        <tr>
+          <td>2</td>
+          <td>产品反馈问卷</td>
+          <td>2026-01-05</td>
+          <td><span class="status-off">关闭</span></td>
+          <td>
+            <button class="btn btn-primary btn-small" onclick="editQuestionnaire(2)">编辑</button>
+            <button class="btn btn-primary btn-small" onclick="showDistribution(2)">分发规则</button>
+            <button class="btn btn-small" onclick="toggleStatus(this)">开启</button>
+            <button class="btn btn-danger btn-small" onclick="deleteQuestionnaire(this)">删除</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- 页面2：问卷编辑页 -->
+  <div id="editPage" class="page">
+    <h2>问卷编辑 - <span id="editTitle">新问卷</span></h2>
+    <button class="btn btn-primary" onclick="showPage('list')">返回列表</button>
+    <button class="btn btn-success" style="margin-left:10px;" onclick="alert('保存成功！')">保存</button>
+    <button class="btn btn-primary" style="margin-left:10px;" onclick="alert('预览功能待实现')">预览</button>
+    <div class="card" style="margin-top:20px;">
+      <label>问卷名称：<input type="text" id="qTitle" style="width:100%;padding:8px;margin-top:5px;"></label><br><br>
+      <label>描述：<textarea id="qDesc" style="width:100%;height:80px;padding:8px;"></textarea></label>
+    </div>
+    <div class="card">
+      <h3>题目列表 <button class="btn btn-success btn-small" onclick="addQuestion()">添加题目</button></h3>
+      <div id="questionsContainer"></div>
+    </div>
+  </div>
+
+  <!-- 页面3：问卷分发规则编辑页 -->
+  <div id="distPage" class="page">
+    <h2>问卷分发规则 - <span id="distTitle">客户满意度调查</span></h2>
+    <button class="btn btn-primary" onclick="showPage('list')">返回列表</button>
+    <button class="btn btn-success" style="margin-left:10px;" onclick="alert('规则保存成功！')">保存规则</button>
+    <div class="card" style="margin-top:20px;">
+      <h3>人群筛选条件 <button class="btn btn-success btn-small" onclick="addCondition()">添加条件</button></h3>
+      <div id="conditionsContainer"></div>
+    </div>
+    <div class="card">
+      <h3>Excel 导入人群</h3>
+      <div id="importArea" class="import-area">
+        <p>拖拽 Excel 文件到此处，或 <button class="btn btn-primary btn-small">选择文件</button></p>
+        <input type="file" id="excelInput" style="display:none;" accept=".xlsx,.csv">
+      </div>
+      <div id="previewTable" class="hidden">
+        <h4>预览人群（共 <span id="count">0</span> 人）</h4>
+        <table id="peopleTable">
+          <thead><tr><th>ID</th><th>姓名</th><th>年龄</th><th>地域</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // 页面切换
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(pageId + 'Page').classList.add('active');
+  }
+
+  // 模拟数据
+  let currentQId = null;
+  const questionnaires = [
+    {id:1, name:'客户满意度调查', questions: [
+      {type:'single', title:'您对产品满意吗？', options:['非常满意','满意','一般','不满意']},
+      {type:'text', title:'请提出您的建议'}
+    ]},
+    {id:2, name:'产品反馈问卷', questions: []}
+  ];
+
+  // 进入问卷编辑页
+  function editQuestionnaire(id) {
+    const q = questionnaires.find(item => item.id === id) || {id:null,
