@@ -23,7 +23,6 @@
             padding: 20px;
         }
 
-        /* 通用按钮样式 */
         .btn {
             padding: 10px 20px;
             border: none;
@@ -62,7 +61,6 @@
             background: #c62828;
         }
 
-        /* 页面头部 */
         .page-header {
             display: flex;
             justify-content: space-between;
@@ -76,7 +74,6 @@
             color: #1976d2;
         }
 
-        /* 搜索筛选区 */
         .search-filter {
             background: white;
             padding: 20px;
@@ -117,7 +114,6 @@
             font-size: 14px;
         }
 
-        /* 问卷卡片 */
         .questionnaire-card {
             background: white;
             padding: 20px;
@@ -220,7 +216,6 @@
             color: #666;
         }
 
-        /* 空状态 */
         .empty-state {
             text-align: center;
             padding: 60px 20px;
@@ -239,7 +234,6 @@
             margin-bottom: 20px;
         }
 
-        /* 模态框 */
         .modal {
             display: none;
             position: fixed;
@@ -269,7 +263,7 @@
         .modal-header {
             font-size: 18px;
             font-weight: bold;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         .modal-body {
@@ -285,7 +279,6 @@
             gap: 10px;
         }
 
-        /* Toast 提示 */
         .toast {
             position: fixed;
             top: 20px;
@@ -306,12 +299,11 @@
             transform: translateY(0);
         }
 
-        /* 问卷编辑页 */
-        .edit-page {
+        .edit-page, .distribution-page {
             display: none;
         }
 
-        .edit-page.active {
+        .edit-page.active, .distribution-page.active {
             display: block;
         }
 
@@ -353,6 +345,12 @@
         .nav-actions {
             display: flex;
             gap: 10px;
+            align-items: center;
+        }
+
+        .save-status {
+            font-size: 12px;
+            color: #4caf50;
         }
 
         .question-info {
@@ -375,6 +373,11 @@
             color: #333;
         }
 
+        .form-label .required {
+            color: #d32f2f;
+            margin-left: 3px;
+        }
+
         .form-input {
             width: 100%;
             padding: 10px 15px;
@@ -388,12 +391,6 @@
             min-height: 80px;
         }
 
-        .checkbox-group {
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
         .checkbox-label {
             display: flex;
             align-items: center;
@@ -402,7 +399,15 @@
             cursor: pointer;
         }
 
-        /* 题目卡片 */
+        .deadline-picker {
+            margin-top: 10px;
+            display: none;
+        }
+
+        .deadline-picker.show {
+            display: block;
+        }
+
         .question-card {
             background: white;
             padding: 20px;
@@ -503,15 +508,6 @@
             flex-wrap: wrap;
         }
 
-        /* 分发规则页 */
-        .distribution-page {
-            display: none;
-        }
-
-        .distribution-page.active {
-            display: block;
-        }
-
         .tabs {
             display: flex;
             gap: 0;
@@ -558,7 +554,6 @@
             display: block;
         }
 
-        /* 空状态（条件筛选） */
         .coming-soon {
             text-align: center;
             padding: 80px 20px;
@@ -580,7 +575,6 @@
             color: #999;
         }
 
-        /* 上传区域 */
         .upload-zone {
             border: 2px dashed #ccc;
             border-radius: 8px;
@@ -625,7 +619,6 @@
             text-decoration: underline;
         }
 
-        /* 数据表格 */
         .data-table {
             width: 100%;
             border-collapse: collapse;
@@ -665,7 +658,6 @@
             color: #c62828;
         }
 
-        /* 通知配置 */
         .notification-config {
             background: white;
             padding: 25px;
@@ -679,6 +671,13 @@
             font-weight: bold;
             margin-bottom: 20px;
             color: #333;
+        }
+
+        .checkbox-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
         }
 
         .radio-group {
@@ -708,6 +707,7 @@
             font-size: 12px;
             color: #999;
             margin-top: 5px;
+            margin-left: 24px;
         }
 
         .more-menu {
@@ -758,15 +758,38 @@
             color: #d32f2f;
         }
 
-        .save-status {
+        .upload-result {
+            margin-top: 20px;
+        }
+
+        .success-message {
+            padding: 15px;
+            background: #e8f5e9;
+            border-radius: 4px;
+            color: #2e7d32;
+            margin-bottom: 15px;
+        }
+
+        .error-input {
+            border-color: #d32f2f !important;
+        }
+
+        .error-message {
+            color: #d32f2f;
             font-size: 12px;
-            color: #4caf50;
-            margin-left: 10px;
+            margin-top: 5px;
+        }
+
+        .scheduled-time-wrapper {
+            display: none;
+        }
+
+        .scheduled-time-wrapper.show {
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <!-- Toast 提示 -->
     <div class="toast" id="toast"></div>
 
     <!-- 问卷列表页 -->
@@ -790,17 +813,13 @@
             </div>
         </div>
 
-        <div id="questionnaireList">
-            <!-- 问卷卡片将动态插入这里 -->
-        </div>
+        <div id="questionnaireList"></div>
     </div>
 
     <!-- 问卷编辑页 -->
     <div class="container edit-page" id="editPage">
         <div class="nav-bar">
-            <button class="back-btn" onclick="backToList()">
-                ← 返回问卷列表
-            </button>
+            <button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
             <input type="text" class="title-input" id="editTitle" placeholder="输入问卷名称">
             <div class="nav-actions">
                 <span class="save-status" id="saveStatus">已保存</span>
@@ -820,42 +839,30 @@
             </div>
             <div class="form-group">
                 <label class="form-label">基础设置</label>
-                <div class="checkbox-group">
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="allowAnonymous">
-                        <span>允许匿名填写</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="limitTimes">
-                        <span>限制填写次数</span>
-                    </label>
-                    <label class="checkbox-label">
-                        <input type="checkbox" id="setDeadline">
-                        <span>设置截止时间</span>
-                    </label>
+                <label class="checkbox-label">
+                    <input type="checkbox" id="setDeadline" onchange="toggleDeadline()">
+                    <span>设置截止时间</span>
+                </label>
+                <div class="deadline-picker" id="deadlinePicker">
+                    <label class="form-label" style="margin-top: 10px;">截止时间</label>
+                    <input type="datetime-local" class="form-input" id="deadlineTime">
                 </div>
             </div>
         </div>
 
-        <div id="questionsList">
-            <!-- 题目卡片将动态插入这里 -->
-        </div>
+        <div id="questionsList"></div>
 
         <div class="add-question-zone">
             <button class="btn btn-secondary" onclick="addQuestion('single')">+ 单选题</button>
             <button class="btn btn-secondary" onclick="addQuestion('multiple')">+ 多选题</button>
             <button class="btn btn-secondary" onclick="addQuestion('text')">+ 填空题</button>
-            <button class="btn btn-secondary" onclick="addQuestion('rating')">+ 量表题</button>
-            <button class="btn btn-secondary" onclick="addQuestion('matrix')">+ 矩阵题</button>
         </div>
     </div>
 
     <!-- 分发规则页 -->
     <div class="container distribution-page" id="distributionPage">
         <div class="nav-bar">
-            <button class="back-btn" onclick="backToList()">
-                ← 返回问卷列表
-            </button>
+            <button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
             <h2 style="flex: 1; margin: 0 20px; font-size: 18px;">分发规则配置 - <span id="distQuestionnaireTitle">问卷名称</span></h2>
             <button class="btn btn-primary" onclick="saveDistribution()">保存规则</button>
         </div>
@@ -866,7 +873,6 @@
         </div>
 
         <div class="tab-content">
-            <!-- Tab 1: 条件筛选 -->
             <div class="tab-panel active" id="tabPanel0">
                 <div class="coming-soon">
                     <div class="coming-soon-icon">🚧</div>
@@ -875,9 +881,8 @@
                 </div>
             </div>
 
-            <!-- Tab 2: 导入名单 -->
             <div class="tab-panel" id="tabPanel1">
-                <a href="#" class="template-link" onclick="downloadTemplate()">📥 下载模板</a>
+                <a href="#" class="template-link" onclick="downloadTemplate(); return false;">📥 下载模板</a>
                 
                 <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
                     <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileUpload(event)">
@@ -886,10 +891,9 @@
                     <div class="upload-hint">支持格式：.xlsx、.xls，最大 10MB</div>
                 </div>
 
-                <div id="uploadResult" style="display: none;">
-                    <div style="margin-bottom: 15px; padding: 15px; background: #e8f5e9; border-radius: 4px; color: #2e7d32;">
-                        ✓ 解析成功，共导入 <span id="totalCount">0</span> 条数据
-                        （有效数据 <span id="validCount">0</span> 条）
+                <div id="uploadResult" class="upload-result" style="display: none;">
+                    <div class="success-message">
+                        ✓ 解析成功，共导入 <span id="totalCount">0</span> 条数据（有效数据 <span id="validCount">0</span> 条）
                     </div>
 
                     <table class="data-table">
@@ -903,15 +907,12 @@
                                 <th>操作</th>
                             </tr>
                         </thead>
-                        <tbody id="dataTableBody">
-                            <!-- 数据行将动态插入这里 -->
-                        </tbody>
+                        <tbody id="dataTableBody"></tbody>
                     </table>
                 </div>
             </div>
         </div>
 
-        <!-- 通知方式配置 -->
         <div class="notification-config">
             <div class="section-title">通知方式配置</div>
             
@@ -922,28 +923,52 @@
                         <input type="checkbox" id="notifyApp" checked>
                         <span>APP消息通知</span>
                     </label>
+                    <div class="help-text">用户登录APP后可在消息中心查看</div>
                     <label class="checkbox-label">
                         <input type="checkbox" id="notifySms">
                         <span>短信通知</span>
                     </label>
+                    <div class="help-text">将发送到客户手机号（需确保已导入客户手机号）</div>
                 </div>
-                <div class="help-text">APP消息通知：用户登录APP后可在消息中心查看</div>
-                <div class="help-text">短信通知：将发送到客户手机号（需确保已导入客户手机号）</div>
             </div>
 
             <div class="form-group">
                 <label class="form-label">通知时间</label>
                 <div class="radio-group">
                     <label class="radio-label">
-                        <input type="radio" name="notifyTime" value="now" checked>
+                        <input type="radio" name="notifyTime" value="now" checked onchange="toggleScheduledTime()">
                         <span>立即发送</span>
                     </label>
                     <label class="radio-label">
-                        <input type="radio" name="notifyTime" value="scheduled">
+                        <input type="radio" name="notifyTime" value="scheduled" onchange="toggleScheduledTime()">
                         <span>定时发送</span>
-                        <input type="datetime-local" class="datetime-input" id="scheduledTime">
+                        <span class="scheduled-time-wrapper" id="scheduledTimeWrapper">
+                            <input type="datetime-local" class="datetime-input" id="scheduledTime">
+                        </span>
                     </label>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 创建问卷弹窗 -->
+    <div class="modal" id="createModal">
+        <div class="modal-content">
+            <div class="modal-header">创建问卷</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">问卷标题<span class="required">*</span></label>
+                    <input type="text" class="form-input" id="createTitle" placeholder="请输入问卷标题">
+                    <div class="error-message" id="createTitleError" style="display: none;">请输入问卷标题</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">问卷描述</label>
+                    <textarea class="form-input" id="createDesc" placeholder="请输入问卷描述和填写说明"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeCreateModal()">取消</button>
+                <button class="btn btn-primary" onclick="createQuestionnaire()">创建</button>
             </div>
         </div>
     </div>
@@ -961,7 +986,6 @@
     </div>
 
     <script>
-        // 全局数据
         let questionnaires = [
             {
                 id: 1,
@@ -990,12 +1014,10 @@
         let questionCounter = 0;
         let importedData = [];
 
-        // 初始化
         function init() {
             renderQuestionnaireList();
         }
 
-        // 渲染问卷列表
         function renderQuestionnaireList() {
             const listContainer = document.getElementById('questionnaireList');
             
@@ -1046,27 +1068,44 @@
             `).join('');
         }
 
-        // 显示创建问卷弹窗
         function showCreateModal() {
-            const name = prompt('请输入问卷名称：');
-            if (name) {
-                const newQ = {
-                    id: Date.now(),
-                    name: name,
-                    desc: '',
-                    createTime: new Date().toISOString().split('T')[0],
-                    updateTime: new Date().toISOString().split('T')[0],
-                    questionCount: 0,
-                    distributionCount: 0,
-                    enabled: false
-                };
-                questionnaires.push(newQ);
-                renderQuestionnaireList();
-                showToast('问卷创建成功！');
-            }
+            document.getElementById('createTitle').value = '';
+            document.getElementById('createDesc').value = '';
+            document.getElementById('createTitle').classList.remove('error-input');
+            document.getElementById('createTitleError').style.display = 'none';
+            document.getElementById('createModal').classList.add('show');
         }
 
-        // 切换问卷状态
+        function closeCreateModal() {
+            document.getElementById('createModal').classList.remove('show');
+        }
+
+        function createQuestionnaire() {
+            const title = document.getElementById('createTitle').value.trim();
+            const desc = document.getElementById('createDesc').value.trim();
+            
+            if (!title) {
+                document.getElementById('createTitle').classList.add('error-input');
+                document.getElementById('createTitleError').style.display = 'block';
+                return;
+            }
+            
+            const newQ = {
+                id: Date.now(),
+                name: title,
+                desc: desc,
+                createTime: new Date().toISOString().split('T')[0],
+                updateTime: new Date().toISOString().split('T')[0],
+                questionCount: 0,
+                distributionCount: 0,
+                enabled: false
+            };
+            questionnaires.push(newQ);
+            closeCreateModal();
+            renderQuestionnaireList();
+            showToast('问卷创建成功！');
+        }
+
         function toggleStatus(id) {
             const q = questionnaires.find(item => item.id === id);
             const action = q.enabled ? 'disable' : 'enable';
@@ -1084,17 +1123,16 @@
             );
         }
 
-        // 编辑问卷
         function editQuestionnaire(id) {
             currentQuestionnaire = questionnaires.find(q => q.id === id);
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('editPage').classList.add('active');
             document.getElementById('editTitle').value = currentQuestionnaire.name;
             document.getElementById('questionnaireTitle').value = currentQuestionnaire.name;
+            document.getElementById('questionnaireDesc').value = currentQuestionnaire.desc;
             loadQuestions();
         }
 
-        // 返回列表
         function backToList() {
             document.getElementById('listPage').style.display = 'block';
             document.getElementById('editPage').classList.remove('active');
@@ -1102,15 +1140,23 @@
             renderQuestionnaireList();
         }
 
-        // 加载题目
         function loadQuestions() {
             const container = document.getElementById('questionsList');
-            // 这里可以加载已有的题目，示例中为空
             container.innerHTML = '';
             questionCounter = 0;
         }
 
-        // 添加题目
+        function toggleDeadline() {
+            const checkbox = document.getElementById('setDeadline');
+            const picker = document.getElementById('deadlinePicker');
+            if (checkbox.checked) {
+                picker.classList.add('show');
+            } else {
+                picker.classList.remove('show');
+                document.getElementById('deadlineTime').value = '';
+            }
+        }
+
         function addQuestion(type) {
             questionCounter++;
             const container = document.getElementById('questionsList');
@@ -1145,22 +1191,30 @@
                         </select>
                     </div>
                     <div class="form-group">
+                        <label class="form-label">最大字数限制</label>
+                        <input type="number" class="form-input" placeholder="请输入最大字数">
+                    </div>
+                    <div class="form-group">
                         <label class="form-label">提示文字</label>
                         <input type="text" class="form-input" placeholder="请输入提示文字">
                     </div>
                 `;
             }
             
+            const typeMap = {
+                'single': '单选题',
+                'multiple': '多选题',
+                'text': '填空题'
+            };
+            
             questionCard.innerHTML = `
                 <div class="question-header">
                     <span class="question-number">题目 ${questionCounter}</span>
                     <div>
-                        <select class="question-type-select" onchange="changeQuestionType(this)">
+                        <select class="question-type-select" onchange="changeQuestionType(this, ${questionCounter})">
                             <option value="single" ${type === 'single' ? 'selected' : ''}>单选题</option>
                             <option value="multiple" ${type === 'multiple' ? 'selected' : ''}>多选题</option>
                             <option value="text" ${type === 'text' ? 'selected' : ''}>填空题</option>
-                            <option value="rating" ${type === 'rating' ? 'selected' : ''}>量表题</option>
-                            <option value="matrix" ${type === 'matrix' ? 'selected' : ''}>矩阵题</option>
                         </select>
                         <button class="delete-question-btn" onclick="deleteQuestion(${questionCounter})">🗑️</button>
                     </div>
@@ -1174,7 +1228,24 @@
             container.appendChild(questionCard);
         }
 
-        // 删除题目
+        function changeQuestionType(select, id) {
+            showConfirmModal(
+                '确认切换',
+                '切换题型会清空当前选项配置，确定要切换吗？',
+                () => {
+                    const newType = select.value;
+                    const card = document.getElementById(`question-${id}`);
+                    const title = card.querySelector('.question-title-input').value;
+                    card.remove();
+                    questionCounter--;
+                    addQuestion(newType);
+                    const newCard = document.getElementById(`question-${questionCounter}`);
+                    newCard.id = `question-${id}`;
+                    newCard.querySelector('.question-title-input').value = title;
+                }
+            );
+        }
+
         function deleteQuestion(id) {
             showConfirmModal(
                 '确认删除',
@@ -1186,7 +1257,6 @@
             );
         }
 
-        // 添加选项
         function addOption(btn) {
             const optionsContainer = btn.parentElement;
             const options = optionsContainer.querySelectorAll('.option-item');
@@ -1203,12 +1273,10 @@
             btn.parentElement.insertBefore(newOption, btn);
         }
 
-        // 删除选项
         function deleteOption(btn) {
             btn.parentElement.remove();
         }
 
-        // 保存问卷
         function saveQuestionnaire() {
             document.getElementById('saveStatus').textContent = '保存中...';
             setTimeout(() => {
@@ -1217,20 +1285,22 @@
             }, 500);
         }
 
-        // 预览问卷
         function previewQuestionnaire() {
             showToast('预览功能开发中...');
         }
 
-        // 编辑分发规则
         function editDistribution(id) {
             currentQuestionnaire = questionnaires.find(q => q.id === id);
             document.getElementById('listPage').style.display = 'none';
             document.getElementById('distributionPage').classList.add('active');
             document.getElementById('distQuestionnaireTitle').textContent = currentQuestionnaire.name;
+            
+            // 重置状态
+            importedData = [];
+            document.getElementById('uploadResult').style.display = 'none';
+            document.getElementById('fileInput').value = '';
         }
 
-        // 切换Tab
         function switchTab(index) {
             document.querySelectorAll('.tab').forEach((tab, i) => {
                 tab.classList.toggle('active', i === index);
@@ -1240,13 +1310,10 @@
             });
         }
 
-        // 下载模板
         function downloadTemplate() {
             showToast('模板下载中...');
-            // 实际应用中这里应该触发文件下载
         }
 
-        // 处理文件上传
         function handleFileUpload(event) {
             const file = event.target.files[0];
             if (!file) return;
@@ -1256,12 +1323,14 @@
                 return;
             }
             
-            // 模拟文件解析
+            showToast('正在解析文件...');
+            
             setTimeout(() => {
                 importedData = [
                     { name: '张三', account: '1234567890', phone: '13800138000', idCard: '110101199001011234', status: 'success' },
                     { name: '李四', account: '1234567891', phone: '13800138001', idCard: '110101199001011235', status: 'success' },
-                    { name: '王五', account: '1234567892', phone: '13800138002', idCard: '110101199001011236', status: 'success' }
+                    { name: '王五', account: '1234567892', phone: '13800138002', idCard: '110101199001011236', status: 'success' },
+                    { name: '赵六', account: '1234567893', phone: '13800138003', idCard: '110101199001011237', status: 'success' }
                 ];
                 
                 document.getElementById('totalCount').textContent = importedData.length;
@@ -1273,7 +1342,6 @@
             }, 1000);
         }
 
-        // 渲染数据表格
         function renderDataTable() {
             const tbody = document.getElementById('dataTableBody');
             tbody.innerHTML = importedData.map((data, index) => `
@@ -1283,29 +1351,44 @@
                     <td>${data.phone}</td>
                     <td>${data.idCard}</td>
                     <td><span class="status-badge status-${data.status}">${data.status === 'success' ? '有效' : '无效'}</span></td>
-                    <td><button class="btn btn-secondary" onclick="deleteRow(${index})">删除</button></td>
+                    <td><button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="deleteRow(${index})">删除</button></td>
                 </tr>
             `).join('');
         }
 
-        // 删除行
         function deleteRow(index) {
             importedData.splice(index, 1);
             renderDataTable();
             document.getElementById('totalCount').textContent = importedData.length;
             document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+            
+            if (importedData.length === 0) {
+                document.getElementById('uploadResult').style.display = 'none';
+            }
+            
             showToast('数据已删除');
         }
 
-        // 保存分发规则
+        function toggleScheduledTime() {
+            const scheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+            const wrapper = document.getElementById('scheduledTimeWrapper');
+            if (scheduled) {
+                wrapper.classList.add('show');
+            } else {
+                wrapper.classList.remove('show');
+            }
+        }
+
         function saveDistribution() {
-            const activeTab = document.querySelector('.tab.active').textContent;
+            const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
             
-            if (activeTab === '导入名单' && importedData.length === 0) {
+            // 验证导入名单
+            if (activeTabIndex === 1 && importedData.length === 0) {
                 showToast('请先导入用户名单');
                 return;
             }
             
+            // 验证通知方式
             const notifyApp = document.getElementById('notifyApp').checked;
             const notifySms = document.getElementById('notifySms').checked;
             
@@ -1314,13 +1397,42 @@
                 return;
             }
             
-            showToast('分发规则保存成功！');
-            setTimeout(() => {
-                backToList();
-            }, 1000);
+            // 验证定时发送时间
+            const isScheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+            if (isScheduled) {
+                const scheduledTime = document.getElementById('scheduledTime').value;
+                if (!scheduledTime) {
+                    showToast('请设置发送时间');
+                    return;
+                }
+                const selectedTime = new Date(scheduledTime);
+                const now = new Date();
+                if (selectedTime <= now) {
+                    showToast('发送时间必须晚于当前时间');
+                    return;
+                }
+            }
+            
+            // 立即发送逻辑
+            const isImmediate = document.querySelector('input[name="notifyTime"][value="now"]').checked;
+            if (isImmediate) {
+                // 模拟立即发送
+                showToast('正在推送通知...');
+                setTimeout(() => {
+                    showToast('分发规则保存成功！通知已发送');
+                    setTimeout(() => {
+                        backToList();
+                    }, 1000);
+                }, 500);
+            } else {
+                // 定时发送
+                showToast('分发规则保存成功！将在设定时间发送');
+                setTimeout(() => {
+                    backToList();
+                }, 1000);
+            }
         }
 
-        // 复制问卷
         function copyQuestionnaire(id) {
             const original = questionnaires.find(q => q.id === id);
             const copy = {
@@ -1335,7 +1447,6 @@
             showToast('问卷复制成功！');
         }
 
-        // 删除问卷
         function deleteQuestionnaire(id) {
             showConfirmModal(
                 '确认删除',
@@ -1349,7 +1460,6 @@
             );
         }
 
-        // 切换更多菜单
         function toggleMoreMenu(event, id) {
             event.stopPropagation();
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
@@ -1360,14 +1470,12 @@
             document.getElementById(`menu-${id}`).classList.toggle('show');
         }
 
-        // 点击外部关闭菜单
         document.addEventListener('click', () => {
             document.querySelectorAll('.dropdown-menu').forEach(menu => {
                 menu.classList.remove('show');
             });
         });
 
-        // 显示确认弹窗
         function showConfirmModal(title, body, callback, isDanger = false) {
             document.getElementById('modalTitle').textContent = title;
             document.getElementById('modalBody').textContent = body;
@@ -1377,13 +1485,11 @@
             document.getElementById('confirmModal').classList.add('show');
         }
 
-        // 关闭弹窗
         function closeModal() {
             document.getElementById('confirmModal').classList.remove('show');
             currentAction = null;
         }
 
-        // 确认操作
         function confirmAction() {
             if (currentAction) {
                 currentAction();
@@ -1391,7 +1497,6 @@
             closeModal();
         }
 
-        // 显示Toast
         function showToast(message) {
             const toast = document.getElementById('toast');
             toast.textContent = message;
@@ -1401,19 +1506,6 @@
             }, 3000);
         }
 
-        // 搜索功能
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const keyword = e.target.value.toLowerCase();
-            // 这里可以实现搜索过滤逻辑
-        });
-
-        // 状态筛选
-        document.getElementById('statusFilter').addEventListener('change', function(e) {
-            const status = e.target.value;
-            // 这里可以实现状态筛选逻辑
-        });
-
-        // 页面加载时初始化
         init();
     </script>
 </body>
