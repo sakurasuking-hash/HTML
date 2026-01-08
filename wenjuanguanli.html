@@ -1,538 +1,1420 @@
-```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-  <meta charset="UTF-8">
-  <title>问卷管理原型 - Material Design</title>
-  <!-- Materialize CSS -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
-  <!-- Material Icons -->
-  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
-  <style>
-    body { background: #f5f5f5; }
-    .container { max-width: 1200px; }
-    .question-item { cursor: move; }
-    .question-item.dragging { opacity: 0.5; }
-    .condition-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-    .import-area { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; }
-    .import-area.dragover { border-color: #2196f3; background: #e3f2fd; }
-    .status-chip { padding: 4px 12px; border-radius: 16px; font-size: 12px; }
-    .status-on { background: #4caf50; color: white; }
-    .status-off { background: #f44336; color: white; }
-    /* Modal styles already handled by Materialize */
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>问卷管理系统</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* 通用按钮样式 */
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #1976d2;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1565c0;
+            box-shadow: 0 2px 8px rgba(25, 118, 210, 0.3);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: #1976d2;
+            border: 1px solid #1976d2;
+        }
+
+        .btn-secondary:hover {
+            background: #e3f2fd;
+        }
+
+        .btn-danger {
+            background: #d32f2f;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c62828;
+        }
+
+        /* 页面头部 */
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .page-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        /* 搜索筛选区 */
+        .search-filter {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .filter-group {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .filter-label {
+            font-size: 14px;
+            color: #666;
+        }
+
+        select {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        /* 问卷卡片 */
+        .questionnaire-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .questionnaire-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .card-left {
+            flex: 1;
+        }
+
+        .card-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .card-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 8px;
+            cursor: pointer;
+            color: #1976d2;
+        }
+
+        .card-title:hover {
+            text-decoration: underline;
+        }
+
+        .card-desc {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-meta {
+            font-size: 12px;
+            color: #999;
+            display: flex;
+            gap: 15px;
+        }
+
+        .card-right {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: flex-end;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .toggle-switch {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: #ccc;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .toggle-switch.active {
+            background: #4caf50;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s;
+        }
+
+        .toggle-switch.active .toggle-slider {
+            transform: translateX(26px);
+        }
+
+        .toggle-label {
+            font-size: 12px;
+            margin-top: 5px;
+            color: #666;
+        }
+
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .empty-text {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        /* 模态框 */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.show {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+
+        .modal-header {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .modal-body {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        .modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        /* Toast 提示 */
+        .toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #323232;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            z-index: 2000;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* 问卷编辑页 */
+        .edit-page {
+            display: none;
+        }
+
+        .edit-page.active {
+            display: block;
+        }
+
+        .nav-bar {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: #1976d2;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .back-btn:hover {
+            text-decoration: underline;
+        }
+
+        .title-input {
+            flex: 1;
+            margin: 0 20px;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        .nav-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .question-info {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #333;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        textarea.form-input {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .checkbox-group {
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        /* 题目卡片 */
+        .question-card {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .question-number {
+            font-size: 14px;
+            font-weight: bold;
+            color: #1976d2;
+        }
+
+        .question-type-select {
+            padding: 6px 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .delete-question-btn {
+            background: none;
+            border: none;
+            color: #d32f2f;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .question-title-input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .option-label {
+            min-width: 30px;
+            font-weight: 500;
+        }
+
+        .option-input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .delete-option-btn {
+            background: none;
+            border: none;
+            color: #d32f2f;
+            cursor: pointer;
+            font-size: 18px;
+        }
+
+        .add-option-btn {
+            background: none;
+            border: 1px dashed #1976d2;
+            color: #1976d2;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+
+        .add-option-btn:hover {
+            background: #e3f2fd;
+        }
+
+        .add-question-zone {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* 分发规则页 */
+        .distribution-page {
+            display: none;
+        }
+
+        .distribution-page.active {
+            display: block;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 0;
+            background: white;
+            border-radius: 8px 8px 0 0;
+            overflow: hidden;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px 20px;
+            background: white;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s;
+        }
+
+        .tab:hover {
+            background: #f5f5f5;
+        }
+
+        .tab.active {
+            border-bottom-color: #1976d2;
+            color: #1976d2;
+            font-weight: bold;
+        }
+
+        .tab-content {
+            background: white;
+            padding: 30px;
+            border-radius: 0 0 8px 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+
+        .tab-panel {
+            display: none;
+        }
+
+        .tab-panel.active {
+            display: block;
+        }
+
+        /* 空状态（条件筛选） */
+        .coming-soon {
+            text-align: center;
+            padding: 80px 20px;
+        }
+
+        .coming-soon-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .coming-soon-text {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .coming-soon-desc {
+            font-size: 14px;
+            color: #999;
+        }
+
+        /* 上传区域 */
+        .upload-zone {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+        }
+
+        .upload-zone:hover {
+            border-color: #1976d2;
+            background: #f5f9ff;
+        }
+
+        .upload-icon {
+            font-size: 48px;
+            color: #1976d2;
+            margin-bottom: 15px;
+        }
+
+        .upload-text {
+            font-size: 14px;
+            color: #666;
+            margin-bottom: 10px;
+        }
+
+        .upload-hint {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .template-link {
+            color: #1976d2;
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 20px;
+            display: inline-block;
+        }
+
+        .template-link:hover {
+            text-decoration: underline;
+        }
+
+        /* 数据表格 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table th {
+            background: #f5f5f5;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .data-table td {
+            font-size: 14px;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .status-success {
+            background: #e8f5e9;
+            color: #2e7d32;
+        }
+
+        .status-error {
+            background: #ffebee;
+            color: #c62828;
+        }
+
+        /* 通知配置 */
+        .notification-config {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .datetime-input {
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            margin-left: 10px;
+        }
+
+        .help-text {
+            font-size: 12px;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .more-menu {
+            position: relative;
+            display: inline-block;
+        }
+
+        .more-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 5px;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            top: 100%;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            min-width: 120px;
+            z-index: 100;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+        }
+
+        .dropdown-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+        }
+
+        .dropdown-item:hover {
+            background: #f5f5f5;
+        }
+
+        .dropdown-item.danger {
+            color: #d32f2f;
+        }
+
+        .save-status {
+            font-size: 12px;
+            color: #4caf50;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
+    <!-- Toast 提示 -->
+    <div class="toast" id="toast"></div>
 
-<!-- 导航栏 -->
-<nav class="blue darken-3">
-  <div class="nav-wrapper container">
-    <a href="#" class="brand-logo">问卷管理系统</a>
-    <ul class="right hide-on-med-and-down">
-      <li><input type="text" id="searchInput" placeholder="搜索问卷..." class="white-text" style="width:200px; margin-top:15px;"></li>
-      <li><a class="waves-effect waves-light btn green" onclick="createQuestionnaire()"><i class="material-icons left">add</i>创建新问卷</a></li>
-    </ul>
-  </div>
-</nav>
-
-<div class="container">
-
-  <!-- 页面1：问卷列表 -->
-  <div id="listPage" class="page">
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">问卷列表</span>
-        <table id="questionnaireTable" class="highlight">
-          <thead>
-            <tr>
-              <th>ID</th><th>名称</th><th>创建时间</th><th>状态</th><th>操作</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- 数据将在JS中填充 -->
-          </tbody>
-        </table>
-      </div>
-    </div>
-  </div>
-
-  <!-- 页面2：问卷编辑页 -->
-  <div id="editPage" class="page" style="display:none;">
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">问卷编辑 - <span id="editTitle">新问卷</span></span>
-        <a class="waves-effect waves-light btn blue" onclick="showPage('list')"><i class="material-icons left">arrow_back</i>返回列表</a>
-        <a class="waves-effect waves-light btn green" style="margin-left:10px;" onclick="saveQuestionnaire()"><i class="material-icons left">save</i>保存</a>
-        <a class="waves-effect waves-light btn blue" style="margin-left:10px;" onclick="previewQuestionnaire()"><i class="material-icons left">visibility</i>预览</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">基本信息</span>
-        <div class="input-field">
-          <input id="qTitle" type="text">
-          <label for="qTitle">问卷名称</label>
+    <!-- 问卷列表页 -->
+    <div class="container" id="listPage">
+        <div class="page-header">
+            <h1 class="page-title">问卷管理</h1>
+            <button class="btn btn-primary" onclick="showCreateModal()">+ 创建问卷</button>
         </div>
-        <div class="input-field">
-          <textarea id="qDesc" class="materialize-textarea"></textarea>
-          <label for="qDesc">描述</label>
+
+        <div class="search-filter">
+            <div class="search-box">
+                <input type="text" class="search-input" placeholder="搜索问卷名称..." id="searchInput">
+            </div>
+            <div class="filter-group">
+                <span class="filter-label">状态：</span>
+                <select id="statusFilter">
+                    <option value="all">全部</option>
+                    <option value="enabled">已启用</option>
+                    <option value="disabled">已禁用</option>
+                </select>
+            </div>
         </div>
-        <div class="input-field">
-          <textarea id="qWelcome" class="materialize-textarea"></textarea>
-          <label for="qWelcome">欢迎语</label>
+
+        <div id="questionnaireList">
+            <!-- 问卷卡片将动态插入这里 -->
         </div>
-        <div class="input-field">
-          <textarea id="qEnd" class="materialize-textarea"></textarea>
-          <label for="qEnd">结束语</label>
+    </div>
+
+    <!-- 问卷编辑页 -->
+    <div class="container edit-page" id="editPage">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="backToList()">
+                ← 返回问卷列表
+            </button>
+            <input type="text" class="title-input" id="editTitle" placeholder="输入问卷名称">
+            <div class="nav-actions">
+                <span class="save-status" id="saveStatus">已保存</span>
+                <button class="btn btn-secondary" onclick="previewQuestionnaire()">预览</button>
+                <button class="btn btn-primary" onclick="saveQuestionnaire()">保存</button>
+            </div>
         </div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">题目列表 <a class="waves-effect waves-light btn-small green" onclick="addQuestion()"><i class="material-icons left">add</i>添加题目</a></span>
-        <div id="questionsContainer" class="collection"></div>
-      </div>
-    </div>
-  </div>
 
-  <!-- 页面3：问卷分发规则编辑页 -->
-  <div id="distPage" class="page" style="display:none;">
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">问卷分发规则 - <span id="distTitle">新问卷</span></span>
-        <a class="waves-effect waves-light btn blue" onclick="showPage('list')"><i class="material-icons left">arrow_back</i>返回列表</a>
-        <a class="waves-effect waves-light btn green" style="margin-left:10px;" onclick="saveDistribution()"><i class="material-icons left">save</i>保存规则</a>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">人群筛选条件 <a class="waves-effect waves-light btn-small green" onclick="addCondition()"><i class="material-icons left">add</i>添加条件</a></span>
-        <div id="conditionsContainer"></div>
-      </div>
-    </div>
-    <div class="card">
-      <div class="card-content">
-        <span class="card-title">Excel 导入人群</span>
-        <div id="importArea" class="import-area">
-          <p>拖拽 Excel 文件到此处，或</p>
-          <a class="waves-effect waves-light btn blue"><i class="material-icons left">file_upload</i>选择文件</a>
-          <input type="file" id="excelInput" style="display:none;" accept=".xlsx,.csv">
+        <div class="question-info">
+            <div class="form-group">
+                <label class="form-label">问卷标题</label>
+                <input type="text" class="form-input" id="questionnaireTitle" placeholder="请输入问卷标题">
+            </div>
+            <div class="form-group">
+                <label class="form-label">问卷描述</label>
+                <textarea class="form-input" id="questionnaireDesc" placeholder="请输入问卷描述和填写说明"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">基础设置</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="allowAnonymous">
+                        <span>允许匿名填写</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="limitTimes">
+                        <span>限制填写次数</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="setDeadline">
+                        <span>设置截止时间</span>
+                    </label>
+                </div>
+            </div>
         </div>
-        <div id="previewTable" style="display:none;">
-          <span class="card-title">预览人群（共 <span id="count">0</span> 人）</span>
-          <table class="highlight" id="peopleTable">
-            <thead><tr><th>ID</th><th>姓名</th><th>年龄</th><th>地域</th></tr></thead>
-            <tbody></tbody>
-          </table>
-          <a class="waves-effect waves-light btn blue" onclick="exportPreview()"><i class="material-icons left">file_download</i>导出预览</a>
+
+        <div id="questionsList">
+            <!-- 题目卡片将动态插入这里 -->
         </div>
-      </div>
-    </div>
-  </div>
 
-</div>
-
-<!-- 模态框：通用确认 -->
-<div id="confirmModal" class="modal">
-  <div class="modal-content">
-    <h4>确认操作</h4>
-    <p id="confirmMessage"></p>
-  </div>
-  <div class="modal-footer">
-    <a class="modal-close waves-effect waves-green btn-flat">取消</a>
-    <a id="confirmBtn" class="modal-close waves-effect waves-red btn-flat">确认</a>
-  </div>
-</div>
-
-<!-- 模态框：添加/编辑题目 -->
-<div id="questionModal" class="modal">
-  <div class="modal-content">
-    <h4 id="questionModalTitle">添加题目</h4>
-    <div class="input-field">
-      <select id="qType">
-        <option value="single">单选题</option>
-        <option value="multi">多选题</option>
-        <option value="text">文本题</option>
-        <option value="score">评分题</option>
-      </select>
-      <label>题型</label>
-    </div>
-    <div class="input-field">
-      <input id="qStem" type="text">
-      <label for="qStem">题干</label>
-    </div>
-    <div id="optionsContainer">
-      <span>选项：</span>
-      <div id="optionsList"></div>
-      <a class="waves-effect waves-light btn-small blue" onclick="addOption()"><i class="material-icons left">add</i>添加选项</a>
-    </div>
-  </div>
-  <div class="modal-footer">
-    <a class="modal-close waves-effect waves-green btn-flat">取消</a>
-    <a id="saveQuestionBtn" class="waves-effect waves-red btn-flat">保存</a>
-  </div>
-</div>
-
-<!-- Materialize JS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    M.AutoInit(); // 初始化所有组件
-    M.FormSelect.init(document.querySelectorAll('select'));
-  });
-
-  // 模拟数据
-  let nextId = 3;
-  let currentQId = null;
-  let currentQuestionIndex = -1;
-  const questionnaires = [
-    {id:1, name:'客户满意度调查', createTime:'2026-01-01', status:'开启', questions: [
-      {type:'single', stem:'您对产品满意吗？', options:['非常满意','满意','一般','不满意']},
-      {type:'text', stem:'请提出您的建议', options:[]}
-    ], rules: []},
-    {id:2, name:'产品反馈问卷', createTime:'2026-01-05', status:'关闭', questions: [], rules: []}
-  ];
-
-  // 渲染问卷列表
-  function renderList() {
-    const tbody = document.querySelector('#questionnaireTable tbody');
-    tbody.innerHTML = '';
-    questionnaires.forEach(q => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${q.id}</td>
-        <td>${q.name}</td>
-        <td>${q.createTime}</td>
-        <td><span class="status-chip ${q.status === '开启' ? 'status-on' : 'status-off'}">${q.status}</span></td>
-        <td>
-          <a class="btn-small blue" onclick="editQuestionnaire(${q.id})"><i class="material-icons">edit</i></a>
-          <a class="btn-small blue" onclick="showDistribution(${q.id})"><i class="material-icons">settings</i></a>
-          <a class="btn-small ${q.status === '开启' ? 'red' : 'green'}" onclick="toggleStatus(this, ${q.id})"><i class="material-icons">${q.status === '开启' ? 'pause' : 'play_arrow'}</i></a>
-          <a class="btn-small red" onclick="deleteQuestionnaire(${q.id})"><i class="material-icons">delete</i></a>
-        </td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-  renderList();
-
-  // 页面切换
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
-    document.getElementById(pageId + 'Page').style.display = 'block';
-  }
-
-  // 创建新问卷
-  function createQuestionnaire() {
-    currentQId = nextId++;
-    questionnaires.push({id: currentQId, name:'新问卷', createTime: new Date().toISOString().split('T')[0], status:'关闭', questions: [], rules: []});
-    editQuestionnaire(currentQId);
-    renderList();
-  }
-
-  // 编辑问卷
-  function editQuestionnaire(id) {
-    const q = questionnaires.find(item => item.id === id);
-    currentQId = id;
-    document.getElementById('editTitle').textContent = q.name;
-    document.getElementById('qTitle').value = q.name;
-    document.getElementById('qDesc').value = q.desc || '';
-    document.getElementById('qWelcome').value = q.welcome || '';
-    document.getElementById('qEnd').value = q.end || '';
-    renderQuestions(q.questions);
-    showPage('edit');
-  }
-
-  // 保存问卷
-  function saveQuestionnaire() {
-    const q = questionnaires.find(item => item.id === currentQId);
-    q.name = document.getElementById('qTitle').value;
-    q.desc = document.getElementById('qDesc').value;
-    q.welcome = document.getElementById('qWelcome').value;
-    q.end = document.getElementById('qEnd').value;
-    M.toast({html: '保存成功！'});
-    renderList();
-  }
-
-  // 预览问卷
-  function previewQuestionnaire() {
-    M.toast({html: '预览功能：模拟用户填写视图（待实现）'});
-  }
-
-  // 渲染题目
-  function renderQuestions(questions) {
-    const container = document.getElementById('questionsContainer');
-    container.innerHTML = '';
-    questions.forEach((q, i) => {
-      const item = document.createElement('a');
-      item.className = 'collection-item question-item';
-      item.draggable = true;
-      item.dataset.index = i;
-      item.innerHTML = `
-        <strong>题目 ${i+1}：${getTypeLabel(q.type)}</strong><br>
-        ${q.stem}<br>
-        ${q.options.length ? q.options.join(', ') : '（无选项）'}
-        <div class="secondary-content">
-          <a class="blue-text" onclick="editQuestion(${i})"><i class="material-icons">edit</i></a>
-          <a class="red-text" onclick="deleteQuestion(${i})"><i class="material-icons">delete</i></a>
+        <div class="add-question-zone">
+            <button class="btn btn-secondary" onclick="addQuestion('single')">+ 单选题</button>
+            <button class="btn btn-secondary" onclick="addQuestion('multiple')">+ 多选题</button>
+            <button class="btn btn-secondary" onclick="addQuestion('text')">+ 填空题</button>
+            <button class="btn btn-secondary" onclick="addQuestion('rating')">+ 量表题</button>
+            <button class="btn btn-secondary" onclick="addQuestion('matrix')">+ 矩阵题</button>
         </div>
-      `;
-      container.appendChild(item);
-    });
-    addDragSupport();
-  }
+    </div>
 
-  function getTypeLabel(type) {
-    const labels = {single: '单选题', multi: '多选题', text: '文本题', score: '评分题'};
-    return labels[type] || type;
-  }
+    <!-- 分发规则页 -->
+    <div class="container distribution-page" id="distributionPage">
+        <div class="nav-bar">
+            <button class="back-btn" onclick="backToList()">
+                ← 返回问卷列表
+            </button>
+            <h2 style="flex: 1; margin: 0 20px; font-size: 18px;">分发规则配置 - <span id="distQuestionnaireTitle">问卷名称</span></h2>
+            <button class="btn btn-primary" onclick="saveDistribution()">保存规则</button>
+        </div>
 
-  // 添加题目
-  function addQuestion() {
-    currentQuestionIndex = -1;
-    document.getElementById('questionModalTitle').textContent = '添加题目';
-    document.getElementById('qType').value = 'single';
-    document.getElementById('qStem').value = '';
-    renderOptions([]);
-    M.FormSelect.init(document.querySelector('#qType'));
-    M.Modal.getInstance(document.getElementById('questionModal')).open();
-  }
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab(0)">条件筛选</button>
+            <button class="tab" onclick="switchTab(1)">导入名单</button>
+        </div>
 
-  // 编辑题目
-  function editQuestion(index) {
-    const q = questionnaires.find(item => item.id === currentQId).questions[index];
-    currentQuestionIndex = index;
-    document.getElementById('questionModalTitle').textContent = '编辑题目';
-    document.getElementById('qType').value = q.type;
-    document.getElementById('qStem').value = q.stem;
-    renderOptions(q.options);
-    M.FormSelect.init(document.querySelector('#qType'));
-    M.Modal.getInstance(document.getElementById('questionModal')).open();
-  }
+        <div class="tab-content">
+            <!-- Tab 1: 条件筛选 -->
+            <div class="tab-panel active" id="tabPanel0">
+                <div class="coming-soon">
+                    <div class="coming-soon-icon">🚧</div>
+                    <div class="coming-soon-text">条件筛选功能开发中，敬请期待～</div>
+                    <div class="coming-soon-desc">您可以使用"导入名单"功能进行问卷分发</div>
+                </div>
+            </div>
 
-  // 渲染选项
-  function renderOptions(options) {
-    const container = document.getElementById('optionsList');
-    container.innerHTML = '';
-    options.forEach((opt, i) => {
-      const div = document.createElement('div');
-      div.className = 'input-field';
-      div.innerHTML = `
-        <input type="text" value="${opt}">
-        <a class="red-text" onclick="removeOption(${i})"><i class="material-icons">delete</i></a>
-      `;
-      container.appendChild(div);
-    });
-  }
+            <!-- Tab 2: 导入名单 -->
+            <div class="tab-panel" id="tabPanel1">
+                <a href="#" class="template-link" onclick="downloadTemplate()">📥 下载模板</a>
+                
+                <div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+                    <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileUpload(event)">
+                    <div class="upload-icon">☁️</div>
+                    <div class="upload-text">拖拽 Excel 文件到此处，或点击选择文件</div>
+                    <div class="upload-hint">支持格式：.xlsx、.xls，最大 10MB</div>
+                </div>
 
-  // 添加选项
-  function addOption() {
-    const container = document.getElementById('optionsList');
-    const div = document.createElement('div');
-    div.className = 'input-field';
-    div.innerHTML = `
-      <input type="text" value="新选项">
-      <a class="red-text" onclick="this.parentElement.remove()"><i class="material-icons">delete</i></a>
-    `;
-    container.appendChild(div);
-  }
+                <div id="uploadResult" style="display: none;">
+                    <div style="margin-bottom: 15px; padding: 15px; background: #e8f5e9; border-radius: 4px; color: #2e7d32;">
+                        ✓ 解析成功，共导入 <span id="totalCount">0</span> 条数据
+                        （有效数据 <span id="validCount">0</span> 条）
+                    </div>
 
-  // 删除选项
-  function removeOption(i) {
-    document.querySelectorAll('#optionsList .input-field')[i].remove();
-  }
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>客户姓名</th>
+                                <th>资金账号</th>
+                                <th>客户手机号</th>
+                                <th>客户身份证</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dataTableBody">
+                            <!-- 数据行将动态插入这里 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
 
-  // 保存题目
-  document.getElementById('saveQuestionBtn').onclick = function() {
-    const questions = questionnaires.find(item => item.id === currentQId).questions;
-    const type = document.getElementById('qType').value;
-    const stem = document.getElementById('qStem').value;
-    const options = Array.from(document.querySelectorAll('#optionsList input')).map(input => input.value).filter(v => v);
-    const qData = {type, stem, options};
-    if (currentQuestionIndex === -1) {
-      questions.push(qData);
-    } else {
-      questions[currentQuestionIndex] = qData;
-    }
-    renderQuestions(questions);
-    M.Modal.getInstance(document.getElementById('questionModal')).close();
-  };
+        <!-- 通知方式配置 -->
+        <div class="notification-config">
+            <div class="section-title">通知方式配置</div>
+            
+            <div class="form-group">
+                <label class="form-label">通知渠道</label>
+                <div class="checkbox-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="notifyApp" checked>
+                        <span>APP消息通知</span>
+                    </label>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="notifySms">
+                        <span>短信通知</span>
+                    </label>
+                </div>
+                <div class="help-text">APP消息通知：用户登录APP后可在消息中心查看</div>
+                <div class="help-text">短信通知：将发送到客户手机号（需确保已导入客户手机号）</div>
+            </div>
 
-  // 删除题目
-  function deleteQuestion(index) {
-    showConfirm('确认删除此题目？', () => {
-      const questions = questionnaires.find(item => item.id === currentQId).questions;
-      questions.splice(index, 1);
-      renderQuestions(questions);
-    });
-  }
+            <div class="form-group">
+                <label class="form-label">通知时间</label>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="notifyTime" value="now" checked>
+                        <span>立即发送</span>
+                    </label>
+                    <label class="radio-label">
+                        <input type="radio" name="notifyTime" value="scheduled">
+                        <span>定时发送</span>
+                        <input type="datetime-local" class="datetime-input" id="scheduledTime">
+                    </label>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  // 拖拽支持
-  function addDragSupport() {
-    const container = document.getElementById('questionsContainer');
-    container.addEventListener('dragstart', e => {
-      if (e.target.classList.contains('question-item')) {
-        e.dataTransfer.setData('text/plain', e.target.dataset.index);
-        e.target.classList.add('dragging');
-      }
-    });
-    container.addEventListener('dragend', e => e.target.classList.remove('dragging'));
-    container.addEventListener('dragover', e => e.preventDefault());
-    container.addEventListener('drop', e => {
-      e.preventDefault();
-      const from = e.dataTransfer.getData('text/plain');
-      const toItem = e.target.closest('.question-item');
-      if (toItem && from !== toItem.dataset.index) {
-        const questions = questionnaires.find(item => item.id === currentQId).questions;
-        const [moved] = questions.splice(from, 1);
-        const to = parseInt(toItem.dataset.index);
-        questions.splice(to, 0, moved);
-        renderQuestions(questions);
-      }
-    });
-  }
+    <!-- 确认弹窗 -->
+    <div class="modal" id="confirmModal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">确认操作</div>
+            <div class="modal-body" id="modalBody">确定要执行此操作吗？</div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal()">取消</button>
+                <button class="btn btn-primary" id="confirmBtn" onclick="confirmAction()">确认</button>
+            </div>
+        </div>
+    </div>
 
-  // 显示分发规则
-  function showDistribution(id) {
-    const q = questionnaires.find(item => item.id === id);
-    currentQId = id;
-    document.getElementById('distTitle').textContent = q.name;
-    renderConditions(q.rules);
-    document.getElementById('previewTable').style.display = 'none';
-    showPage('dist');
-  }
+    <script>
+        // 全局数据
+        let questionnaires = [
+            {
+                id: 1,
+                name: '客户满意度调查问卷',
+                desc: '本问卷旨在了解客户对我们服务的满意度，帮助我们改进服务质量。',
+                createTime: '2026-01-01',
+                updateTime: '2026-01-08',
+                questionCount: 10,
+                distributionCount: 256,
+                enabled: true
+            },
+            {
+                id: 2,
+                name: '产品体验反馈问卷',
+                desc: '收集用户对新产品功能的使用体验和改进建议。',
+                createTime: '2026-01-05',
+                updateTime: '2026-01-07',
+                questionCount: 8,
+                distributionCount: 128,
+                enabled: false
+            }
+        ];
 
-  // 渲染筛选条件
-  function renderConditions(rules) {
-    const container = document.getElementById('conditionsContainer');
-    container.innerHTML = '';
-    rules.forEach((rule, i) => {
-      const div = document.createElement('div');
-      div.className = 'condition-group';
-      div.innerHTML = `
-        <select class="browser-default">
-          <option ${rule.dim === '年龄' ? 'selected' : ''}>年龄</option>
-          <option ${rule.dim === '性别' ? 'selected' : ''}>性别</option>
-          <option ${rule.dim === '地域' ? 'selected' : ''}>地域</option>
-          <option ${rule.dim === '职业' ? 'selected' : ''}>职业</option>
-        </select>
-        <select class="browser-default">
-          <option ${rule.op === '=' ? 'selected' : ''}>=</option>
-          <option ${rule.op === '>' ? 'selected' : ''}>></option>
-          <option ${rule.op === '<' ? 'selected' : ''}><</option>
-          <option ${rule.op === '包含' ? 'selected' : ''}>包含</option>
-        </select>
-        <input type="text" value="${rule.value}" placeholder="值">
-        <select class="browser-default">
-          <option ${rule.logic === 'AND' ? 'selected' : ''}>AND</option>
-          <option ${rule.logic === 'OR' ? 'selected' : ''}>OR</option>
-        </select>
-        <a class="btn-small red" onclick="deleteCondition(${i})"><i class="material-icons">delete</i></a>
-      `;
-      container.appendChild(div);
-    });
-  }
+        let currentQuestionnaire = null;
+        let currentAction = null;
+        let questionCounter = 0;
+        let importedData = [];
 
-  // 添加筛选条件
-  function addCondition() {
-    const rules = questionnaires.find(item => item.id === currentQId).rules;
-    rules.push({dim: '年龄', op: '>', value: '18', logic: 'AND'});
-    renderConditions(rules);
-  }
+        // 初始化
+        function init() {
+            renderQuestionnaireList();
+        }
 
-  // 删除筛选条件
-  function deleteCondition(i) {
-    const rules = questionnaires.find(item => item.id === currentQId).rules;
-    rules.splice(i, 1);
-    renderConditions(rules);
-  }
+        // 渲染问卷列表
+        function renderQuestionnaireList() {
+            const listContainer = document.getElementById('questionnaireList');
+            
+            if (questionnaires.length === 0) {
+                listContainer.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">📋</div>
+                        <div class="empty-text">还没有创建问卷哦～点击右上角按钮创建第一份问卷吧！</div>
+                        <button class="btn btn-primary" onclick="showCreateModal()">立即创建</button>
+                    </div>
+                `;
+                return;
+            }
 
-  // 保存分发规则
-  function saveDistribution() {
-    const rules = questionnaires.find(item => item.id === currentQId).rules;
-    rules.length = 0; // 清空并重新收集
-    document.querySelectorAll('#conditionsContainer .condition-group').forEach(group => {
-      const selects = group.querySelectorAll('select');
-      const input = group.querySelector('input');
-      rules.push({
-        dim: selects[0].value,
-        op: selects[1].value,
-        value: input.value,
-        logic: selects[2].value
-      });
-    });
-    M.toast({html: '规则保存成功！'});
-  }
+            listContainer.innerHTML = questionnaires.map(q => `
+                <div class="questionnaire-card">
+                    <div class="card-left">
+                        <div class="card-icon">📋</div>
+                        <div class="card-title" onclick="editQuestionnaire(${q.id})">${q.name}</div>
+                        <div class="card-desc">${q.desc}</div>
+                        <div class="card-meta">
+                            <span>创建时间：${q.createTime}</span>
+                            <span>最后修改：${q.updateTime}</span>
+                            <span>题目数：${q.questionCount}</span>
+                            <span>分发人数：${q.distributionCount}</span>
+                        </div>
+                    </div>
+                    <div class="card-right">
+                        <div class="more-menu">
+                            <button class="more-btn" onclick="toggleMoreMenu(event, ${q.id})">⋮</button>
+                            <div class="dropdown-menu" id="menu-${q.id}">
+                                <button class="dropdown-item" onclick="copyQuestionnaire(${q.id})">复制问卷</button>
+                                <button class="dropdown-item danger" onclick="deleteQuestionnaire(${q.id})">删除问卷</button>
+                            </div>
+                        </div>
+                        <div class="card-actions">
+                            <button class="btn btn-secondary" onclick="editQuestionnaire(${q.id})">✏️ 编辑问卷</button>
+                            <button class="btn btn-secondary" onclick="editDistribution(${q.id})">👥 分发规则</button>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 10px;">
+                            <div class="toggle-switch ${q.enabled ? 'active' : ''}" onclick="toggleStatus(${q.id})">
+                                <div class="toggle-slider"></div>
+                            </div>
+                            <span class="toggle-label">${q.enabled ? '已启用' : '已禁用'}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
 
-  // Excel 导入
-  const importArea = document.getElementById('importArea');
-  importArea.addEventListener('click', () => document.getElementById('excelInput').click());
-  importArea.addEventListener('dragover', e => { e.preventDefault(); importArea.classList.add('dragover'); });
-  importArea.addEventListener('dragleave', () => importArea.classList.remove('dragover'));
-  importArea.addEventListener('drop', e => {
-    e.preventDefault();
-    importArea.classList.remove('dragover');
-    handleFile(e.dataTransfer.files[0]);
-  });
-  document.getElementById('excelInput').addEventListener('change', e => handleFile(e.target.files[0]));
+        // 显示创建问卷弹窗
+        function showCreateModal() {
+            const name = prompt('请输入问卷名称：');
+            if (name) {
+                const newQ = {
+                    id: Date.now(),
+                    name: name,
+                    desc: '',
+                    createTime: new Date().toISOString().split('T')[0],
+                    updateTime: new Date().toISOString().split('T')[0],
+                    questionCount: 0,
+                    distributionCount: 0,
+                    enabled: false
+                };
+                questionnaires.push(newQ);
+                renderQuestionnaireList();
+                showToast('问卷创建成功！');
+            }
+        }
 
-  function handleFile(file) {
-    if (file) {
-      // 模拟解析（实际需使用xlsx库或后端）
-      M.toast({html: `已导入文件: ${file.name}`});
-      const tbody = document.querySelector('#peopleTable tbody');
-      tbody.innerHTML = `
-        <tr><td>1</td><td>张三</td><td>28</td><td>香港</td></tr>
-        <tr><td>2</td><td>李四</td><td>35</td><td>深圳</td></tr>
-        <tr><td>3</td><td>王五</td><td>22</td><td>北京</td></tr>
-      `;
-      document.getElementById('count').textContent = '3';
-      document.getElementById('previewTable').style.display = 'block';
-    }
-  }
+        // 切换问卷状态
+        function toggleStatus(id) {
+            const q = questionnaires.find(item => item.id === id);
+            const action = q.enabled ? 'disable' : 'enable';
+            
+            showConfirmModal(
+                '确认操作',
+                action === 'enable' 
+                    ? '确定要启用该问卷吗？启用后，符合分发规则的用户将收到问卷。'
+                    : '确定要禁用该问卷吗？禁用后，用户将无法填写该问卷。',
+                () => {
+                    q.enabled = !q.enabled;
+                    renderQuestionnaireList();
+                    showToast(q.enabled ? '问卷已启用' : '问卷已禁用');
+                }
+            );
+        }
 
-  // 导出预览（模拟）
-  function exportPreview() {
-    M.toast({html: '导出成功！（模拟）'});
-  }
+        // 编辑问卷
+        function editQuestionnaire(id) {
+            currentQuestionnaire = questionnaires.find(q => q.id === id);
+            document.getElementById('listPage').style.display = 'none';
+            document.getElementById('editPage').classList.add('active');
+            document.getElementById('editTitle').value = currentQuestionnaire.name;
+            document.getElementById('questionnaireTitle').value = currentQuestionnaire.name;
+            loadQuestions();
+        }
 
-  // 开关状态
-  function toggleStatus(btn, id) {
-    const q = questionnaires.find(item => item.id === id);
-    const newStatus = q.status === '开启' ? '关闭' : '开启';
-    showConfirm(`确认${newStatus}问卷？此操作将影响分发。`, () => {
-      q.status = newStatus;
-      renderList();
-    });
-  }
+        // 返回列表
+        function backToList() {
+            document.getElementById('listPage').style.display = 'block';
+            document.getElementById('editPage').classList.remove('active');
+            document.getElementById('distributionPage').classList.remove('active');
+            renderQuestionnaireList();
+        }
 
-  // 删除问卷
-  function deleteQuestionnaire(id) {
-    showConfirm('确认删除此问卷？操作不可恢复！', () => {
-      const index = questionnaires.findIndex(item => item.id === id);
-      questionnaires.splice(index, 1);
-      renderList();
-    });
-  }
+        // 加载题目
+        function loadQuestions() {
+            const container = document.getElementById('questionsList');
+            // 这里可以加载已有的题目，示例中为空
+            container.innerHTML = '';
+            questionCounter = 0;
+        }
 
-  // 显示确认模态
-  function showConfirm(message, callback) {
-    document.getElementById('confirmMessage').textContent = message;
-    const confirmBtn = document.getElementById('confirmBtn');
-    confirmBtn.onclick = callback;
-    M.Modal.getInstance(document.getElementById('confirmModal')).open();
-  }
+        // 添加题目
+        function addQuestion(type) {
+            questionCounter++;
+            const container = document.getElementById('questionsList');
+            const questionCard = document.createElement('div');
+            questionCard.className = 'question-card';
+            questionCard.id = `question-${questionCounter}`;
+            
+            let optionsHtml = '';
+            if (type === 'single' || type === 'multiple') {
+                optionsHtml = `
+                    <div class="option-item">
+                        <span class="option-label">A</span>
+                        <input type="text" class="option-input" placeholder="选项内容">
+                        <button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+                    </div>
+                    <div class="option-item">
+                        <span class="option-label">B</span>
+                        <input type="text" class="option-input" placeholder="选项内容">
+                        <button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+                    </div>
+                    <button class="add-option-btn" onclick="addOption(this)">+ 添加选项</button>
+                `;
+            } else if (type === 'text') {
+                optionsHtml = `
+                    <div class="form-group">
+                        <label class="form-label">答案类型</label>
+                        <select class="form-input">
+                            <option>文本</option>
+                            <option>数字</option>
+                            <option>邮箱</option>
+                            <option>手机号</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">提示文字</label>
+                        <input type="text" class="form-input" placeholder="请输入提示文字">
+                    </div>
+                `;
+            }
+            
+            questionCard.innerHTML = `
+                <div class="question-header">
+                    <span class="question-number">题目 ${questionCounter}</span>
+                    <div>
+                        <select class="question-type-select" onchange="changeQuestionType(this)">
+                            <option value="single" ${type === 'single' ? 'selected' : ''}>单选题</option>
+                            <option value="multiple" ${type === 'multiple' ? 'selected' : ''}>多选题</option>
+                            <option value="text" ${type === 'text' ? 'selected' : ''}>填空题</option>
+                            <option value="rating" ${type === 'rating' ? 'selected' : ''}>量表题</option>
+                            <option value="matrix" ${type === 'matrix' ? 'selected' : ''}>矩阵题</option>
+                        </select>
+                        <button class="delete-question-btn" onclick="deleteQuestion(${questionCounter})">🗑️</button>
+                    </div>
+                </div>
+                <input type="text" class="question-title-input" placeholder="请输入题目标题">
+                <div class="question-options">
+                    ${optionsHtml}
+                </div>
+            `;
+            
+            container.appendChild(questionCard);
+        }
 
-  // 搜索过滤（简单实现）
-  document.getElementById('searchInput').addEventListener('input', e => {
-    const query = e.target.value.toLowerCase();
-    const rows = document.querySelectorAll('#questionnaireTable tbody tr');
-    rows.forEach(row => {
-      row.style.display = row.querySelector('td:nth-child(2)').textContent.toLowerCase().includes(query) ? '' : 'none';
-    });
-  });
-</script>
+        // 删除题目
+        function deleteQuestion(id) {
+            showConfirmModal(
+                '确认删除',
+                '确定要删除这个题目吗？',
+                () => {
+                    document.getElementById(`question-${id}`).remove();
+                    showToast('题目已删除');
+                }
+            );
+        }
 
+        // 添加选项
+        function addOption(btn) {
+            const optionsContainer = btn.parentElement;
+            const options = optionsContainer.querySelectorAll('.option-item');
+            const newLabel = String.fromCharCode(65 + options.length);
+            
+            const newOption = document.createElement('div');
+            newOption.className = 'option-item';
+            newOption.innerHTML = `
+                <span class="option-label">${newLabel}</span>
+                <input type="text" class="option-input" placeholder="选项内容">
+                <button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+            `;
+            
+            btn.parentElement.insertBefore(newOption, btn);
+        }
+
+        // 删除选项
+        function deleteOption(btn) {
+            btn.parentElement.remove();
+        }
+
+        // 保存问卷
+        function saveQuestionnaire() {
+            document.getElementById('saveStatus').textContent = '保存中...';
+            setTimeout(() => {
+                document.getElementById('saveStatus').textContent = '已保存';
+                showToast('问卷保存成功！');
+            }, 500);
+        }
+
+        // 预览问卷
+        function previewQuestionnaire() {
+            showToast('预览功能开发中...');
+        }
+
+        // 编辑分发规则
+        function editDistribution(id) {
+            currentQuestionnaire = questionnaires.find(q => q.id === id);
+            document.getElementById('listPage').style.display = 'none';
+            document.getElementById('distributionPage').classList.add('active');
+            document.getElementById('distQuestionnaireTitle').textContent = currentQuestionnaire.name;
+        }
+
+        // 切换Tab
+        function switchTab(index) {
+            document.querySelectorAll('.tab').forEach((tab, i) => {
+                tab.classList.toggle('active', i === index);
+            });
+            document.querySelectorAll('.tab-panel').forEach((panel, i) => {
+                panel.classList.toggle('active', i === index);
+            });
+        }
+
+        // 下载模板
+        function downloadTemplate() {
+            showToast('模板下载中...');
+            // 实际应用中这里应该触发文件下载
+        }
+
+        // 处理文件上传
+        function handleFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            if (file.size > 10 * 1024 * 1024) {
+                showToast('文件大小超过限制，请压缩后重新上传');
+                return;
+            }
+            
+            // 模拟文件解析
+            setTimeout(() => {
+                importedData = [
+                    { name: '张三', account: '1234567890', phone: '13800138000', idCard: '110101199001011234', status: 'success' },
+                    { name: '李四', account: '1234567891', phone: '13800138001', idCard: '110101199001011235', status: 'success' },
+                    { name: '王五', account: '1234567892', phone: '13800138002', idCard: '110101199001011236', status: 'success' }
+                ];
+                
+                document.getElementById('totalCount').textContent = importedData.length;
+                document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+                document.getElementById('uploadResult').style.display = 'block';
+                
+                renderDataTable();
+                showToast('文件解析成功！');
+            }, 1000);
+        }
+
+        // 渲染数据表格
+        function renderDataTable() {
+            const tbody = document.getElementById('dataTableBody');
+            tbody.innerHTML = importedData.map((data, index) => `
+                <tr>
+                    <td>${data.name}</td>
+                    <td>${data.account}</td>
+                    <td>${data.phone}</td>
+                    <td>${data.idCard}</td>
+                    <td><span class="status-badge status-${data.status}">${data.status === 'success' ? '有效' : '无效'}</span></td>
+                    <td><button class="btn btn-secondary" onclick="deleteRow(${index})">删除</button></td>
+                </tr>
+            `).join('');
+        }
+
+        // 删除行
+        function deleteRow(index) {
+            importedData.splice(index, 1);
+            renderDataTable();
+            document.getElementById('totalCount').textContent = importedData.length;
+            document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+            showToast('数据已删除');
+        }
+
+        // 保存分发规则
+        function saveDistribution() {
+            const activeTab = document.querySelector('.tab.active').textContent;
+            
+            if (activeTab === '导入名单' && importedData.length === 0) {
+                showToast('请先导入用户名单');
+                return;
+            }
+            
+            const notifyApp = document.getElementById('notifyApp').checked;
+            const notifySms = document.getElementById('notifySms').checked;
+            
+            if (!notifyApp && !notifySms) {
+                showToast('请至少选择一种通知方式');
+                return;
+            }
+            
+            showToast('分发规则保存成功！');
+            setTimeout(() => {
+                backToList();
+            }, 1000);
+        }
+
+        // 复制问卷
+        function copyQuestionnaire(id) {
+            const original = questionnaires.find(q => q.id === id);
+            const copy = {
+                ...original,
+                id: Date.now(),
+                name: original.name + ' (副本)',
+                createTime: new Date().toISOString().split('T')[0],
+                updateTime: new Date().toISOString().split('T')[0]
+            };
+            questionnaires.push(copy);
+            renderQuestionnaireList();
+            showToast('问卷复制成功！');
+        }
+
+        // 删除问卷
+        function deleteQuestionnaire(id) {
+            showConfirmModal(
+                '确认删除',
+                '确定要删除该问卷吗？删除后无法恢复。',
+                () => {
+                    questionnaires = questionnaires.filter(q => q.id !== id);
+                    renderQuestionnaireList();
+                    showToast('问卷已删除');
+                },
+                true
+            );
+        }
+
+        // 切换更多菜单
+        function toggleMoreMenu(event, id) {
+            event.stopPropagation();
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                if (menu.id !== `menu-${id}`) {
+                    menu.classList.remove('show');
+                }
+            });
+            document.getElementById(`menu-${id}`).classList.toggle('show');
+        }
+
+        // 点击外部关闭菜单
+        document.addEventListener('click', () => {
+            document.querySelectorAll('.dropdown-menu').forEach(menu => {
+                menu.classList.remove('show');
+            });
+        });
+
+        // 显示确认弹窗
+        function showConfirmModal(title, body, callback, isDanger = false) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalBody').textContent = body;
+            const confirmBtn = document.getElementById('confirmBtn');
+            confirmBtn.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+            currentAction = callback;
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        // 关闭弹窗
+        function closeModal() {
+            document.getElementById('confirmModal').classList.remove('show');
+            currentAction = null;
+        }
+
+        // 确认操作
+        function confirmAction() {
+            if (currentAction) {
+                currentAction();
+            }
+            closeModal();
+        }
+
+        // 显示Toast
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // 搜索功能
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const keyword = e.target.value.toLowerCase();
+            // 这里可以实现搜索过滤逻辑
+        });
+
+        // 状态筛选
+        document.getElementById('statusFilter').addEventListener('change', function(e) {
+            const status = e.target.value;
+            // 这里可以实现状态筛选逻辑
+        });
+
+        // 页面加载时初始化
+        init();
+    </script>
 </body>
 </html>
-```
