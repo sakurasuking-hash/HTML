@@ -1,144 +1,538 @@
+```html
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
-<meta charset="UTF-8">
-<title>问卷管理原型</title>
-<style>
-  body { font-family: Arial, Helvetica, sans-serif; margin: 0; padding: 0; background: #f5f7fa; color: #333; }
-  header { background: #2c3e50; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; }
-  header h1 { margin: 0; font-size: 20px; }
-  .container { max-width: 1200px; margin: 20px auto; padding: 0 20px; }
-  .page { display: none; }
-  .page.active { display: block; }
-  .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
-  .btn-primary { background: #3498db; color: white; }
-  .btn-success { background: #27ae60; color: white; }
-  .btn-danger { background: #e74c3c; color: white; }
-  .btn-small { padding: 4px 8px; font-size: 12px; }
-  table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; }
-  th { background: #ecf0f1; }
-  .card { background: white; padding: 20px; margin-bottom: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-  .question-item { border: 1px solid #ddd; padding: 15px; margin-bottom: 15px; border-radius: 6px; position: relative; }
-  .question-item.dragging { opacity: 0.5; }
-  .actions { margin-top: 10px; }
-  .condition-group { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; flex-wrap: wrap; }
-  .condition-group select, .condition-group input { padding: 6px; }
-  .import-area { border: 2px dashed #ccc; padding: 40px; text-align: center; margin: 20px 0; border-radius: 8px; }
-  .import-area.dragover { border-color: #3498db; background: #ecf0f1; }
-  .hidden { display: none; }
-</style>
+  <meta charset="UTF-8">
+  <title>问卷管理原型 - Material Design</title>
+  <!-- Materialize CSS -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <!-- Material Icons -->
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    body { background: #f5f5f5; }
+    .container { max-width: 1200px; }
+    .question-item { cursor: move; }
+    .question-item.dragging { opacity: 0.5; }
+    .condition-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .import-area { border: 2px dashed #ccc; padding: 40px; text-align: center; border-radius: 8px; }
+    .import-area.dragover { border-color: #2196f3; background: #e3f2fd; }
+    .status-chip { padding: 4px 12px; border-radius: 16px; font-size: 12px; }
+    .status-on { background: #4caf50; color: white; }
+    .status-off { background: #f44336; color: white; }
+    /* Modal styles already handled by Materialize */
+  </style>
 </head>
 <body>
 
-<header>
-  <h1>问卷管理系统</h1>
-  <div>
-    <input type="text" id="searchInput" placeholder="搜索问卷..." style="padding:8px;">
-    <button class="btn btn-success" onclick="showPage('list'); createQuestionnaire()">创建新问卷</button>
+<!-- 导航栏 -->
+<nav class="blue darken-3">
+  <div class="nav-wrapper container">
+    <a href="#" class="brand-logo">问卷管理系统</a>
+    <ul class="right hide-on-med-and-down">
+      <li><input type="text" id="searchInput" placeholder="搜索问卷..." class="white-text" style="width:200px; margin-top:15px;"></li>
+      <li><a class="waves-effect waves-light btn green" onclick="createQuestionnaire()"><i class="material-icons left">add</i>创建新问卷</a></li>
+    </ul>
   </div>
-</header>
+</nav>
 
 <div class="container">
 
   <!-- 页面1：问卷列表 -->
-  <div id="listPage" class="page active">
-    <h2>问卷列表</h2>
-    <table id="questionnaireTable">
-      <thead>
-        <tr>
-          <th>ID</th><th>名称</th><th>创建时间</th><th>状态</th><th>操作</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>1</td>
-          <td>客户满意度调查</td>
-          <td>2026-01-01</td>
-          <td><span class="status-on">开启</span></td>
-          <td>
-            <button class="btn btn-primary btn-small" onclick="editQuestionnaire(1)">编辑</button>
-            <button class="btn btn-primary btn-small" onclick="showDistribution(1)">分发规则</button>
-            <button class="btn btn-small" onclick="toggleStatus(this)">关闭</button>
-            <button class="btn btn-danger btn-small" onclick="deleteQuestionnaire(this)">删除</button>
-          </td>
-        </tr>
-        <tr>
-          <td>2</td>
-          <td>产品反馈问卷</td>
-          <td>2026-01-05</td>
-          <td><span class="status-off">关闭</span></td>
-          <td>
-            <button class="btn btn-primary btn-small" onclick="editQuestionnaire(2)">编辑</button>
-            <button class="btn btn-primary btn-small" onclick="showDistribution(2)">分发规则</button>
-            <button class="btn btn-small" onclick="toggleStatus(this)">开启</button>
-            <button class="btn btn-danger btn-small" onclick="deleteQuestionnaire(this)">删除</button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div id="listPage" class="page">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">问卷列表</span>
+        <table id="questionnaireTable" class="highlight">
+          <thead>
+            <tr>
+              <th>ID</th><th>名称</th><th>创建时间</th><th>状态</th><th>操作</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- 数据将在JS中填充 -->
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
 
   <!-- 页面2：问卷编辑页 -->
-  <div id="editPage" class="page">
-    <h2>问卷编辑 - <span id="editTitle">新问卷</span></h2>
-    <button class="btn btn-primary" onclick="showPage('list')">返回列表</button>
-    <button class="btn btn-success" style="margin-left:10px;" onclick="alert('保存成功！')">保存</button>
-    <button class="btn btn-primary" style="margin-left:10px;" onclick="alert('预览功能待实现')">预览</button>
-    <div class="card" style="margin-top:20px;">
-      <label>问卷名称：<input type="text" id="qTitle" style="width:100%;padding:8px;margin-top:5px;"></label><br><br>
-      <label>描述：<textarea id="qDesc" style="width:100%;height:80px;padding:8px;"></textarea></label>
+  <div id="editPage" class="page" style="display:none;">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">问卷编辑 - <span id="editTitle">新问卷</span></span>
+        <a class="waves-effect waves-light btn blue" onclick="showPage('list')"><i class="material-icons left">arrow_back</i>返回列表</a>
+        <a class="waves-effect waves-light btn green" style="margin-left:10px;" onclick="saveQuestionnaire()"><i class="material-icons left">save</i>保存</a>
+        <a class="waves-effect waves-light btn blue" style="margin-left:10px;" onclick="previewQuestionnaire()"><i class="material-icons left">visibility</i>预览</a>
+      </div>
     </div>
     <div class="card">
-      <h3>题目列表 <button class="btn btn-success btn-small" onclick="addQuestion()">添加题目</button></h3>
-      <div id="questionsContainer"></div>
+      <div class="card-content">
+        <span class="card-title">基本信息</span>
+        <div class="input-field">
+          <input id="qTitle" type="text">
+          <label for="qTitle">问卷名称</label>
+        </div>
+        <div class="input-field">
+          <textarea id="qDesc" class="materialize-textarea"></textarea>
+          <label for="qDesc">描述</label>
+        </div>
+        <div class="input-field">
+          <textarea id="qWelcome" class="materialize-textarea"></textarea>
+          <label for="qWelcome">欢迎语</label>
+        </div>
+        <div class="input-field">
+          <textarea id="qEnd" class="materialize-textarea"></textarea>
+          <label for="qEnd">结束语</label>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">题目列表 <a class="waves-effect waves-light btn-small green" onclick="addQuestion()"><i class="material-icons left">add</i>添加题目</a></span>
+        <div id="questionsContainer" class="collection"></div>
+      </div>
     </div>
   </div>
 
   <!-- 页面3：问卷分发规则编辑页 -->
-  <div id="distPage" class="page">
-    <h2>问卷分发规则 - <span id="distTitle">客户满意度调查</span></h2>
-    <button class="btn btn-primary" onclick="showPage('list')">返回列表</button>
-    <button class="btn btn-success" style="margin-left:10px;" onclick="alert('规则保存成功！')">保存规则</button>
-    <div class="card" style="margin-top:20px;">
-      <h3>人群筛选条件 <button class="btn btn-success btn-small" onclick="addCondition()">添加条件</button></h3>
-      <div id="conditionsContainer"></div>
+  <div id="distPage" class="page" style="display:none;">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">问卷分发规则 - <span id="distTitle">新问卷</span></span>
+        <a class="waves-effect waves-light btn blue" onclick="showPage('list')"><i class="material-icons left">arrow_back</i>返回列表</a>
+        <a class="waves-effect waves-light btn green" style="margin-left:10px;" onclick="saveDistribution()"><i class="material-icons left">save</i>保存规则</a>
+      </div>
     </div>
     <div class="card">
-      <h3>Excel 导入人群</h3>
-      <div id="importArea" class="import-area">
-        <p>拖拽 Excel 文件到此处，或 <button class="btn btn-primary btn-small">选择文件</button></p>
-        <input type="file" id="excelInput" style="display:none;" accept=".xlsx,.csv">
+      <div class="card-content">
+        <span class="card-title">人群筛选条件 <a class="waves-effect waves-light btn-small green" onclick="addCondition()"><i class="material-icons left">add</i>添加条件</a></span>
+        <div id="conditionsContainer"></div>
       </div>
-      <div id="previewTable" class="hidden">
-        <h4>预览人群（共 <span id="count">0</span> 人）</h4>
-        <table id="peopleTable">
-          <thead><tr><th>ID</th><th>姓名</th><th>年龄</th><th>地域</th></tr></thead>
-          <tbody></tbody>
-        </table>
+    </div>
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Excel 导入人群</span>
+        <div id="importArea" class="import-area">
+          <p>拖拽 Excel 文件到此处，或</p>
+          <a class="waves-effect waves-light btn blue"><i class="material-icons left">file_upload</i>选择文件</a>
+          <input type="file" id="excelInput" style="display:none;" accept=".xlsx,.csv">
+        </div>
+        <div id="previewTable" style="display:none;">
+          <span class="card-title">预览人群（共 <span id="count">0</span> 人）</span>
+          <table class="highlight" id="peopleTable">
+            <thead><tr><th>ID</th><th>姓名</th><th>年龄</th><th>地域</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <a class="waves-effect waves-light btn blue" onclick="exportPreview()"><i class="material-icons left">file_download</i>导出预览</a>
+        </div>
       </div>
     </div>
   </div>
 
 </div>
 
+<!-- 模态框：通用确认 -->
+<div id="confirmModal" class="modal">
+  <div class="modal-content">
+    <h4>确认操作</h4>
+    <p id="confirmMessage"></p>
+  </div>
+  <div class="modal-footer">
+    <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+    <a id="confirmBtn" class="modal-close waves-effect waves-red btn-flat">确认</a>
+  </div>
+</div>
+
+<!-- 模态框：添加/编辑题目 -->
+<div id="questionModal" class="modal">
+  <div class="modal-content">
+    <h4 id="questionModalTitle">添加题目</h4>
+    <div class="input-field">
+      <select id="qType">
+        <option value="single">单选题</option>
+        <option value="multi">多选题</option>
+        <option value="text">文本题</option>
+        <option value="score">评分题</option>
+      </select>
+      <label>题型</label>
+    </div>
+    <div class="input-field">
+      <input id="qStem" type="text">
+      <label for="qStem">题干</label>
+    </div>
+    <div id="optionsContainer">
+      <span>选项：</span>
+      <div id="optionsList"></div>
+      <a class="waves-effect waves-light btn-small blue" onclick="addOption()"><i class="material-icons left">add</i>添加选项</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <a class="modal-close waves-effect waves-green btn-flat">取消</a>
+    <a id="saveQuestionBtn" class="waves-effect waves-red btn-flat">保存</a>
+  </div>
+</div>
+
+<!-- Materialize JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
 <script>
-  // 页面切换
-  function showPage(pageId) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(pageId + 'Page').classList.add('active');
-  }
+  document.addEventListener('DOMContentLoaded', function() {
+    M.AutoInit(); // 初始化所有组件
+    M.FormSelect.init(document.querySelectorAll('select'));
+  });
 
   // 模拟数据
+  let nextId = 3;
   let currentQId = null;
+  let currentQuestionIndex = -1;
   const questionnaires = [
-    {id:1, name:'客户满意度调查', questions: [
-      {type:'single', title:'您对产品满意吗？', options:['非常满意','满意','一般','不满意']},
-      {type:'text', title:'请提出您的建议'}
-    ]},
-    {id:2, name:'产品反馈问卷', questions: []}
+    {id:1, name:'客户满意度调查', createTime:'2026-01-01', status:'开启', questions: [
+      {type:'single', stem:'您对产品满意吗？', options:['非常满意','满意','一般','不满意']},
+      {type:'text', stem:'请提出您的建议', options:[]}
+    ], rules: []},
+    {id:2, name:'产品反馈问卷', createTime:'2026-01-05', status:'关闭', questions: [], rules: []}
   ];
 
-  // 进入问卷编辑页
+  // 渲染问卷列表
+  function renderList() {
+    const tbody = document.querySelector('#questionnaireTable tbody');
+    tbody.innerHTML = '';
+    questionnaires.forEach(q => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${q.id}</td>
+        <td>${q.name}</td>
+        <td>${q.createTime}</td>
+        <td><span class="status-chip ${q.status === '开启' ? 'status-on' : 'status-off'}">${q.status}</span></td>
+        <td>
+          <a class="btn-small blue" onclick="editQuestionnaire(${q.id})"><i class="material-icons">edit</i></a>
+          <a class="btn-small blue" onclick="showDistribution(${q.id})"><i class="material-icons">settings</i></a>
+          <a class="btn-small ${q.status === '开启' ? 'red' : 'green'}" onclick="toggleStatus(this, ${q.id})"><i class="material-icons">${q.status === '开启' ? 'pause' : 'play_arrow'}</i></a>
+          <a class="btn-small red" onclick="deleteQuestionnaire(${q.id})"><i class="material-icons">delete</i></a>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+  renderList();
+
+  // 页面切换
+  function showPage(pageId) {
+    document.querySelectorAll('.page').forEach(p => p.style.display = 'none');
+    document.getElementById(pageId + 'Page').style.display = 'block';
+  }
+
+  // 创建新问卷
+  function createQuestionnaire() {
+    currentQId = nextId++;
+    questionnaires.push({id: currentQId, name:'新问卷', createTime: new Date().toISOString().split('T')[0], status:'关闭', questions: [], rules: []});
+    editQuestionnaire(currentQId);
+    renderList();
+  }
+
+  // 编辑问卷
   function editQuestionnaire(id) {
-    const q = questionnaires.find(item => item.id === id) || {id:null,
+    const q = questionnaires.find(item => item.id === id);
+    currentQId = id;
+    document.getElementById('editTitle').textContent = q.name;
+    document.getElementById('qTitle').value = q.name;
+    document.getElementById('qDesc').value = q.desc || '';
+    document.getElementById('qWelcome').value = q.welcome || '';
+    document.getElementById('qEnd').value = q.end || '';
+    renderQuestions(q.questions);
+    showPage('edit');
+  }
+
+  // 保存问卷
+  function saveQuestionnaire() {
+    const q = questionnaires.find(item => item.id === currentQId);
+    q.name = document.getElementById('qTitle').value;
+    q.desc = document.getElementById('qDesc').value;
+    q.welcome = document.getElementById('qWelcome').value;
+    q.end = document.getElementById('qEnd').value;
+    M.toast({html: '保存成功！'});
+    renderList();
+  }
+
+  // 预览问卷
+  function previewQuestionnaire() {
+    M.toast({html: '预览功能：模拟用户填写视图（待实现）'});
+  }
+
+  // 渲染题目
+  function renderQuestions(questions) {
+    const container = document.getElementById('questionsContainer');
+    container.innerHTML = '';
+    questions.forEach((q, i) => {
+      const item = document.createElement('a');
+      item.className = 'collection-item question-item';
+      item.draggable = true;
+      item.dataset.index = i;
+      item.innerHTML = `
+        <strong>题目 ${i+1}：${getTypeLabel(q.type)}</strong><br>
+        ${q.stem}<br>
+        ${q.options.length ? q.options.join(', ') : '（无选项）'}
+        <div class="secondary-content">
+          <a class="blue-text" onclick="editQuestion(${i})"><i class="material-icons">edit</i></a>
+          <a class="red-text" onclick="deleteQuestion(${i})"><i class="material-icons">delete</i></a>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+    addDragSupport();
+  }
+
+  function getTypeLabel(type) {
+    const labels = {single: '单选题', multi: '多选题', text: '文本题', score: '评分题'};
+    return labels[type] || type;
+  }
+
+  // 添加题目
+  function addQuestion() {
+    currentQuestionIndex = -1;
+    document.getElementById('questionModalTitle').textContent = '添加题目';
+    document.getElementById('qType').value = 'single';
+    document.getElementById('qStem').value = '';
+    renderOptions([]);
+    M.FormSelect.init(document.querySelector('#qType'));
+    M.Modal.getInstance(document.getElementById('questionModal')).open();
+  }
+
+  // 编辑题目
+  function editQuestion(index) {
+    const q = questionnaires.find(item => item.id === currentQId).questions[index];
+    currentQuestionIndex = index;
+    document.getElementById('questionModalTitle').textContent = '编辑题目';
+    document.getElementById('qType').value = q.type;
+    document.getElementById('qStem').value = q.stem;
+    renderOptions(q.options);
+    M.FormSelect.init(document.querySelector('#qType'));
+    M.Modal.getInstance(document.getElementById('questionModal')).open();
+  }
+
+  // 渲染选项
+  function renderOptions(options) {
+    const container = document.getElementById('optionsList');
+    container.innerHTML = '';
+    options.forEach((opt, i) => {
+      const div = document.createElement('div');
+      div.className = 'input-field';
+      div.innerHTML = `
+        <input type="text" value="${opt}">
+        <a class="red-text" onclick="removeOption(${i})"><i class="material-icons">delete</i></a>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // 添加选项
+  function addOption() {
+    const container = document.getElementById('optionsList');
+    const div = document.createElement('div');
+    div.className = 'input-field';
+    div.innerHTML = `
+      <input type="text" value="新选项">
+      <a class="red-text" onclick="this.parentElement.remove()"><i class="material-icons">delete</i></a>
+    `;
+    container.appendChild(div);
+  }
+
+  // 删除选项
+  function removeOption(i) {
+    document.querySelectorAll('#optionsList .input-field')[i].remove();
+  }
+
+  // 保存题目
+  document.getElementById('saveQuestionBtn').onclick = function() {
+    const questions = questionnaires.find(item => item.id === currentQId).questions;
+    const type = document.getElementById('qType').value;
+    const stem = document.getElementById('qStem').value;
+    const options = Array.from(document.querySelectorAll('#optionsList input')).map(input => input.value).filter(v => v);
+    const qData = {type, stem, options};
+    if (currentQuestionIndex === -1) {
+      questions.push(qData);
+    } else {
+      questions[currentQuestionIndex] = qData;
+    }
+    renderQuestions(questions);
+    M.Modal.getInstance(document.getElementById('questionModal')).close();
+  };
+
+  // 删除题目
+  function deleteQuestion(index) {
+    showConfirm('确认删除此题目？', () => {
+      const questions = questionnaires.find(item => item.id === currentQId).questions;
+      questions.splice(index, 1);
+      renderQuestions(questions);
+    });
+  }
+
+  // 拖拽支持
+  function addDragSupport() {
+    const container = document.getElementById('questionsContainer');
+    container.addEventListener('dragstart', e => {
+      if (e.target.classList.contains('question-item')) {
+        e.dataTransfer.setData('text/plain', e.target.dataset.index);
+        e.target.classList.add('dragging');
+      }
+    });
+    container.addEventListener('dragend', e => e.target.classList.remove('dragging'));
+    container.addEventListener('dragover', e => e.preventDefault());
+    container.addEventListener('drop', e => {
+      e.preventDefault();
+      const from = e.dataTransfer.getData('text/plain');
+      const toItem = e.target.closest('.question-item');
+      if (toItem && from !== toItem.dataset.index) {
+        const questions = questionnaires.find(item => item.id === currentQId).questions;
+        const [moved] = questions.splice(from, 1);
+        const to = parseInt(toItem.dataset.index);
+        questions.splice(to, 0, moved);
+        renderQuestions(questions);
+      }
+    });
+  }
+
+  // 显示分发规则
+  function showDistribution(id) {
+    const q = questionnaires.find(item => item.id === id);
+    currentQId = id;
+    document.getElementById('distTitle').textContent = q.name;
+    renderConditions(q.rules);
+    document.getElementById('previewTable').style.display = 'none';
+    showPage('dist');
+  }
+
+  // 渲染筛选条件
+  function renderConditions(rules) {
+    const container = document.getElementById('conditionsContainer');
+    container.innerHTML = '';
+    rules.forEach((rule, i) => {
+      const div = document.createElement('div');
+      div.className = 'condition-group';
+      div.innerHTML = `
+        <select class="browser-default">
+          <option ${rule.dim === '年龄' ? 'selected' : ''}>年龄</option>
+          <option ${rule.dim === '性别' ? 'selected' : ''}>性别</option>
+          <option ${rule.dim === '地域' ? 'selected' : ''}>地域</option>
+          <option ${rule.dim === '职业' ? 'selected' : ''}>职业</option>
+        </select>
+        <select class="browser-default">
+          <option ${rule.op === '=' ? 'selected' : ''}>=</option>
+          <option ${rule.op === '>' ? 'selected' : ''}>></option>
+          <option ${rule.op === '<' ? 'selected' : ''}><</option>
+          <option ${rule.op === '包含' ? 'selected' : ''}>包含</option>
+        </select>
+        <input type="text" value="${rule.value}" placeholder="值">
+        <select class="browser-default">
+          <option ${rule.logic === 'AND' ? 'selected' : ''}>AND</option>
+          <option ${rule.logic === 'OR' ? 'selected' : ''}>OR</option>
+        </select>
+        <a class="btn-small red" onclick="deleteCondition(${i})"><i class="material-icons">delete</i></a>
+      `;
+      container.appendChild(div);
+    });
+  }
+
+  // 添加筛选条件
+  function addCondition() {
+    const rules = questionnaires.find(item => item.id === currentQId).rules;
+    rules.push({dim: '年龄', op: '>', value: '18', logic: 'AND'});
+    renderConditions(rules);
+  }
+
+  // 删除筛选条件
+  function deleteCondition(i) {
+    const rules = questionnaires.find(item => item.id === currentQId).rules;
+    rules.splice(i, 1);
+    renderConditions(rules);
+  }
+
+  // 保存分发规则
+  function saveDistribution() {
+    const rules = questionnaires.find(item => item.id === currentQId).rules;
+    rules.length = 0; // 清空并重新收集
+    document.querySelectorAll('#conditionsContainer .condition-group').forEach(group => {
+      const selects = group.querySelectorAll('select');
+      const input = group.querySelector('input');
+      rules.push({
+        dim: selects[0].value,
+        op: selects[1].value,
+        value: input.value,
+        logic: selects[2].value
+      });
+    });
+    M.toast({html: '规则保存成功！'});
+  }
+
+  // Excel 导入
+  const importArea = document.getElementById('importArea');
+  importArea.addEventListener('click', () => document.getElementById('excelInput').click());
+  importArea.addEventListener('dragover', e => { e.preventDefault(); importArea.classList.add('dragover'); });
+  importArea.addEventListener('dragleave', () => importArea.classList.remove('dragover'));
+  importArea.addEventListener('drop', e => {
+    e.preventDefault();
+    importArea.classList.remove('dragover');
+    handleFile(e.dataTransfer.files[0]);
+  });
+  document.getElementById('excelInput').addEventListener('change', e => handleFile(e.target.files[0]));
+
+  function handleFile(file) {
+    if (file) {
+      // 模拟解析（实际需使用xlsx库或后端）
+      M.toast({html: `已导入文件: ${file.name}`});
+      const tbody = document.querySelector('#peopleTable tbody');
+      tbody.innerHTML = `
+        <tr><td>1</td><td>张三</td><td>28</td><td>香港</td></tr>
+        <tr><td>2</td><td>李四</td><td>35</td><td>深圳</td></tr>
+        <tr><td>3</td><td>王五</td><td>22</td><td>北京</td></tr>
+      `;
+      document.getElementById('count').textContent = '3';
+      document.getElementById('previewTable').style.display = 'block';
+    }
+  }
+
+  // 导出预览（模拟）
+  function exportPreview() {
+    M.toast({html: '导出成功！（模拟）'});
+  }
+
+  // 开关状态
+  function toggleStatus(btn, id) {
+    const q = questionnaires.find(item => item.id === id);
+    const newStatus = q.status === '开启' ? '关闭' : '开启';
+    showConfirm(`确认${newStatus}问卷？此操作将影响分发。`, () => {
+      q.status = newStatus;
+      renderList();
+    });
+  }
+
+  // 删除问卷
+  function deleteQuestionnaire(id) {
+    showConfirm('确认删除此问卷？操作不可恢复！', () => {
+      const index = questionnaires.findIndex(item => item.id === id);
+      questionnaires.splice(index, 1);
+      renderList();
+    });
+  }
+
+  // 显示确认模态
+  function showConfirm(message, callback) {
+    document.getElementById('confirmMessage').textContent = message;
+    const confirmBtn = document.getElementById('confirmBtn');
+    confirmBtn.onclick = callback;
+    M.Modal.getInstance(document.getElementById('confirmModal')).open();
+  }
+
+  // 搜索过滤（简单实现）
+  document.getElementById('searchInput').addEventListener('input', e => {
+    const query = e.target.value.toLowerCase();
+    const rows = document.querySelectorAll('#questionnaireTable tbody tr');
+    rows.forEach(row => {
+      row.style.display = row.querySelector('td:nth-child(2)').textContent.toLowerCase().includes(query) ? '' : 'none';
+    });
+  });
+</script>
+
+</body>
+</html>
+```
