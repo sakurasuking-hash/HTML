@@ -269,13 +269,6 @@ width: 90%;
 box-shadow: 0 4px 20px rgba(0,0,0,0.3);
 }
 
-.modal-content-large {
-max-width: 1200px;
-width: 95%;
-max-height: 90vh;
-overflow-y: auto;
-}
-
 .modal-header {
 font-size: 18px;
 font-weight: bold;
@@ -856,7 +849,6 @@ background: #f9f9f9;
 <body>
 <div class="toast" id="toast"></div>
 
-<!-- 问卷列表页 -->
 <div class="container" id="listPage">
 <div class="page-header">
 <h1 class="page-title">问卷管理</h1>
@@ -880,7 +872,6 @@ background: #f9f9f9;
 <div id="questionnaireList"></div>
 </div>
 
-<!-- 问卷编辑页 -->
 <div class="container edit-page" id="editPage">
 <div class="nav-bar">
 <button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
@@ -931,7 +922,6 @@ background: #f9f9f9;
 </div>
 </div>
 
-<!-- 分发规则页 -->
 <div class="container distribution-page" id="distributionPage">
 <div class="nav-bar">
 <button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
@@ -1023,7 +1013,6 @@ background: #f9f9f9;
 </div>
 </div>
 
-<!-- 问卷结果回收页 -->
 <div class="container results-page" id="resultsPage">
 <div class="nav-bar">
 <button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
@@ -1050,7 +1039,6 @@ background: #f9f9f9;
 </div>
 </div>
 
-<!-- 创建问卷弹窗 -->
 <div class="modal" id="createModal">
 <div class="modal-content">
 <div class="modal-header">创建问卷</div>
@@ -1072,7 +1060,6 @@ background: #f9f9f9;
 </div>
 </div>
 
-<!-- 确认弹窗 -->
 <div class="modal" id="confirmModal">
 <div class="modal-content">
 <div class="modal-header" id="modalTitle">确认操作</div>
@@ -1085,7 +1072,7 @@ background: #f9f9f9;
 </div>
 
 <script>
-let questionnaires = [
+var questionnaires = [
 {
 id: 1,
 name: '客户满意度调查问卷',
@@ -1117,11 +1104,11 @@ questions: [
 }
 ];
 
-let currentQuestionnaire = null;
-let currentAction = null;
-let questionCounter = 0;
-let importedData = [];
-let resultsData = [];
+var currentQuestionnaire = null;
+var currentAction = null;
+var questionCounter = 0;
+var importedData = [];
+var resultsData = [];
 
 function init() {
 renderQuestionnaireList();
@@ -1129,7 +1116,6 @@ generateMockResults();
 }
 
 function generateMockResults() {
-// 模拟问卷回收数据
 resultsData = [
 {
 name: '张三',
@@ -1175,54 +1161,46 @@ answers: {
 }
 
 function renderQuestionnaireList() {
-const listContainer = document.getElementById('questionnaireList');
+var listContainer = document.getElementById('questionnaireList');
 
 if (questionnaires.length === 0) {
-listContainer.innerHTML = `
-<div class="empty-state">
-<div class="empty-icon">📋</div>
-<div class="empty-text">还没有创建问卷哦～点击右上角按钮创建第一份问卷吧！</div>
-<button class="btn btn-primary" onclick="showCreateModal()">立即创建</button>
-</div>
-`;
+listContainer.innerHTML = '<div class="empty-state"><div class="empty-icon">📋</div><div class="empty-text">还没有创建问卷哦～点击右上角按钮创建第一份问卷吧！</div><button class="btn btn-primary" onclick="showCreateModal()">立即创建</button></div>';
 return;
 }
 
-listContainer.innerHTML = questionnaires.map(q => `
-<div class="questionnaire-card">
-<div class="card-left">
-<div class="card-icon">📋</div>
-<div class="card-title" onclick="editQuestionnaire(${q.id})">${q.name}</div>
-<div class="card-desc">${q.desc}</div>
-<div class="card-meta">
-<span>创建时间：${q.createTime}</span>
-<span>最后修改：${q.updateTime}</span>
-<span>题目数：${q.questionCount}</span>
-<span>分发人数：${q.distributionCount}</span>
-</div>
-</div>
-<div class="card-right">
-<div class="more-menu">
-<button class="more-btn" onclick="toggleMoreMenu(event, ${q.id})">⋮</button>
-<div class="dropdown-menu" id="menu-${q.id}">
-<button class="dropdown-item" onclick="copyQuestionnaire(${q.id})">复制问卷</button>
-<button class="dropdown-item danger" onclick="deleteQuestionnaire(${q.id})">删除问卷</button>
-</div>
-</div>
-<div class="card-actions">
-<button class="btn btn-secondary" onclick="editQuestionnaire(${q.id})">✏️ 编辑问卷</button>
-<button class="btn btn-secondary" onclick="editDistribution(${q.id})">👥 分发规则</button>
-<button class="btn btn-success" onclick="viewResults(${q.id})">📊 回收结果</button>
-</div>
-<div style="display: flex; align-items: center; gap: 10px;">
-<div class="toggle-switch ${q.enabled ? 'active' : ''}" onclick="toggleStatus(${q.id})">
-<div class="toggle-slider"></div>
-</div>
-<span class="toggle-label">${q.enabled ? '已启用' : '已禁用'}</span>
-</div>
-</div>
-</div>
-`).join('');
+var html = '';
+for (var i = 0; i < questionnaires.length; i++) {
+var q = questionnaires[i];
+html += '<div class="questionnaire-card">';
+html += '<div class="card-left">';
+html += '<div class="card-icon">📋</div>';
+html += '<div class="card-title" onclick="editQuestionnaire(' + q.id + ')">' + q.name + '</div>';
+html += '<div class="card-desc">' + q.desc + '</div>';
+html += '<div class="card-meta">';
+html += '<span>创建时间：' + q.createTime + '</span>';
+html += '<span>最后修改：' + q.updateTime + '</span>';
+html += '<span>题目数：' + q.questionCount + '</span>';
+html += '<span>分发人数：' + q.distributionCount + '</span>';
+html += '</div></div>';
+html += '<div class="card-right">';
+html += '<div class="more-menu">';
+html += '<button class="more-btn" onclick="toggleMoreMenu(event, ' + q.id + ')">⋮</button>';
+html += '<div class="dropdown-menu" id="menu-' + q.id + '">';
+html += '<button class="dropdown-item" onclick="copyQuestionnaire(' + q.id + ')">复制问卷</button>';
+html += '<button class="dropdown-item danger" onclick="deleteQuestionnaire(' + q.id + ')">删除问卷</button>';
+html += '</div></div>';
+html += '<div class="card-actions">';
+html += '<button class="btn btn-secondary" onclick="editQuestionnaire(' + q.id + ')">✏️ 编辑问卷</button>';
+html += '<button class="btn btn-secondary" onclick="editDistribution(' + q.id + ')">👥 分发规则</button>';
+html += '<button class="btn btn-success" onclick="viewResults(' + q.id + ')">📊 回收结果</button>';
+html += '</div>';
+html += '<div style="display: flex; align-items: center; gap: 10px;">';
+html += '<div class="toggle-switch ' + (q.enabled ? 'active' : '') + '" onclick="toggleStatus(' + q.id + ')">';
+html += '<div class="toggle-slider"></div></div>';
+html += '<span class="toggle-label">' + (q.enabled ? '已启用' : '已禁用') + '</span>';
+html += '</div></div></div>';
+}
+listContainer.innerHTML = html;
 }
 
 function showCreateModal() {
@@ -1238,8 +1216,8 @@ document.getElementById('createModal').classList.remove('show');
 }
 
 function createQuestionnaire() {
-const title = document.getElementById('createTitle').value.trim();
-const desc = document.getElementById('createDesc').value.trim();
+var title = document.getElementById('createTitle').value.trim();
+var desc = document.getElementById('createDesc').value.trim();
 
 if (!title) {
 document.getElementById('createTitle').classList.add('error-input');
@@ -1247,7 +1225,7 @@ document.getElementById('createTitleError').style.display = 'block';
 return;
 }
 
-const newQ = {
+var newQ = {
 id: Date.now(),
 name: title,
 desc: desc,
@@ -1265,15 +1243,19 @@ showToast('问卷创建成功！');
 }
 
 function toggleStatus(id) {
-const q = questionnaires.find(item => item.id === id);
-const action = q.enabled ? 'disable' : 'enable';
+var q = null;
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id === id) {
+q = questionnaires[i];
+break;
+}
+}
+var action = q.enabled ? 'disable' : 'enable';
 
 showConfirmModal(
 '确认操作',
-action === 'enable'
-? '确定要启用该问卷吗？启用后，符合分发规则的用户将收到问卷。'
-: '确定要禁用该问卷吗？禁用后,用户将无法填写该问卷。',
-() => {
+action === 'enable' ? '确定要启用该问卷吗？启用后，符合分发规则的用户将收到问卷。' : '确定要禁用该问卷吗？禁用后，用户将无法填写该问卷。',
+function() {
 q.enabled = !q.enabled;
 renderQuestionnaireList();
 showToast(q.enabled ? '问卷已启用' : '问卷已禁用');
@@ -1282,7 +1264,12 @@ showToast(q.enabled ? '问卷已启用' : '问卷已禁用');
 }
 
 function editQuestionnaire(id) {
-currentQuestionnaire = questionnaires.find(q => q.id === id);
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id === id) {
+currentQuestionnaire = questionnaires[i];
+break;
+}
+}
 document.getElementById('listPage').style.display = 'none';
 document.getElementById('editPage').classList.add('active');
 document.getElementById('editTitle').value = currentQuestionnaire.name;
@@ -1300,14 +1287,14 @@ renderQuestionnaireList();
 }
 
 function loadQuestions() {
-const container = document.getElementById('questionsList');
+var container = document.getElementById('questionsList');
 container.innerHTML = '';
 questionCounter = 0;
 }
 
 function toggleDeadline() {
-const checkbox = document.getElementById('setDeadline');
-const picker = document.getElementById('deadlinePicker');
+var checkbox = document.getElementById('setDeadline');
+var picker = document.getElementById('deadlinePicker');
 if (checkbox.checked) {
 picker.classList.add('show');
 } else {
@@ -1317,8 +1304,8 @@ document.getElementById('deadlineTime').value = '';
 }
 
 function toggleWelcome() {
-const checkbox = document.getElementById('setWelcome');
-const wrapper = document.getElementById('welcomeInputWrapper');
+var checkbox = document.getElementById('setWelcome');
+var wrapper = document.getElementById('welcomeInputWrapper');
 if (checkbox.checked) {
 wrapper.classList.add('show');
 } else {
@@ -1329,71 +1316,23 @@ document.getElementById('welcomeText').value = '';
 
 function addQuestion(type) {
 questionCounter++;
-const container = document.getElementById('questionsList');
-const questionCard = document.createElement('div');
+var container = document.getElementById('questionsList');
+var questionCard = document.createElement('div');
 questionCard.className = 'question-card';
-questionCard.id = `question-${questionCounter}`;
+questionCard.id = 'question-' + questionCounter;
 
-let optionsHtml = '';
+var optionsHtml = '';
 if (type === 'single' || type === 'multiple') {
-optionsHtml = `
-<div class="option-item">
-<span class="option-label">A</span>
-<input type="text" class="option-input" placeholder="选项内容">
-<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
-</div>
-<div class="option-item">
-<span class="option-label">B</span>
-<input type="text" class="option-input" placeholder="选项内容">
-<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
-</div>
-<button class="add-option-btn" onclick="addOption(this)">+ 添加选项</button>
-`;
+optionsHtml = '<div class="option-item"><span class="option-label">A</span><input type="text" class="option-input" placeholder="选项内容"><button class="delete-option-btn" onclick="deleteOption(this)">×</button></div>';
+optionsHtml += '<div class="option-item"><span class="option-label">B</span><input type="text" class="option-input" placeholder="选项内容"><button class="delete-option-btn" onclick="deleteOption(this)">×</button></div>';
+optionsHtml += '<button class="add-option-btn" onclick="addOption(this)">+ 添加选项</button>';
 } else if (type === 'text') {
-optionsHtml = `
-<div class="form-group">
-<label class="form-label">答案类型</label>
-<select class="form-input">
-<option>文本</option>
-<option>数字</option>
-<option>邮箱</option>
-<option>手机号</option>
-</select>
-</div>
-<div class="form-group">
-<label class="form-label">最大字数限制</label>
-<input type="number" class="form-input" placeholder="请输入最大字数">
-</div>
-<div class="form-group">
-<label class="form-label">提示文字</label>
-<input type="text" class="form-input" placeholder="请输入提示文字">
-</div>
-`;
+optionsHtml = '<div class="form-group"><label class="form-label">答案类型</label><select class="form-input"><option>文本</option><option>数字</option><option>邮箱</option><option>手机号</option></select></div>';
+optionsHtml += '<div class="form-group"><label class="form-label">最大字数限制</label><input type="number" class="form-input" placeholder="请输入最大字数"></div>';
+optionsHtml += '<div class="form-group"><label class="form-label">提示文字</label><input type="text" class="form-input" placeholder="请输入提示文字"></div>';
 }
 
-const typeMap = {
-'single': '单选题',
-'multiple': '多选题',
-'text': '填空题'
-};
-
-questionCard.innerHTML = `
-<div class="question-header">
-<span class="question-number">题目 ${questionCounter}</span>
-<div>
-<select class="question-type-select" onchange="changeQuestionType(this, ${questionCounter})">
-<option value="single" ${type === 'single' ? 'selected' : ''}>单选题</option>
-<option value="multiple" ${type === 'multiple' ? 'selected' : ''}>多选题</option>
-<option value="text" ${type === 'text' ? 'selected' : ''}>填空题</option>
-</select>
-<button class="delete-question-btn" onclick="deleteQuestion(${questionCounter})">🗑️</button>
-</div>
-</div>
-<input type="text" class="question-title-input" placeholder="请输入题目标题">
-<div class="question-options">
-${optionsHtml}
-</div>
-`;
+questionCard.innerHTML = '<div class="question-header"><span class="question-number">题目 ' + questionCounter + '</span><div><select class="question-type-select" onchange="changeQuestionType(this, ' + questionCounter + ')"><option value="single" ' + (type === 'single' ? 'selected' : '') + '>单选题</option><option value="multiple" ' + (type === 'multiple' ? 'selected' : '') + '>多选题</option><option value="text" ' + (type === 'text' ? 'selected' : '') + '>填空题</option></select><button class="delete-question-btn" onclick="deleteQuestion(' + questionCounter + ')">🗑️</button></div></div><input type="text" class="question-title-input" placeholder="请输入题目标题"><div class="question-options">' + optionsHtml + '</div>';
 
 container.appendChild(questionCard);
 }
@@ -1402,15 +1341,15 @@ function changeQuestionType(select, id) {
 showConfirmModal(
 '确认切换',
 '切换题型会清空当前选项配置，确定要切换吗？',
-() => {
-const newType = select.value;
-const card = document.getElementById(`question-${id}`);
-const title = card.querySelector('.question-title-input').value;
+function() {
+var newType = select.value;
+var card = document.getElementById('question-' + id);
+var title = card.querySelector('.question-title-input').value;
 card.remove();
 questionCounter--;
 addQuestion(newType);
-const newCard = document.getElementById(`question-${questionCounter}`);
-newCard.id = `question-${id}`;
+var newCard = document.getElementById('question-' + questionCounter);
+newCard.id = 'question-' + id;
 newCard.querySelector('.question-title-input').value = title;
 }
 );
@@ -1420,25 +1359,21 @@ function deleteQuestion(id) {
 showConfirmModal(
 '确认删除',
 '确定要删除这个题目吗？',
-() => {
-document.getElementById(`question-${id}`).remove();
+function() {
+document.getElementById('question-' + id).remove();
 showToast('题目已删除');
 }
 );
 }
 
 function addOption(btn) {
-const optionsContainer = btn.parentElement;
-const options = optionsContainer.querySelectorAll('.option-item');
-const newLabel = String.fromCharCode(65 + options.length);
+var optionsContainer = btn.parentElement;
+var options = optionsContainer.querySelectorAll('.option-item');
+var newLabel = String.fromCharCode(65 + options.length);
 
-const newOption = document.createElement('div');
+var newOption = document.createElement('div');
 newOption.className = 'option-item';
-newOption.innerHTML = `
-<span class="option-label">${newLabel}</span>
-<input type="text" class="option-input" placeholder="选项内容">
-<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
-`;
+newOption.innerHTML = '<span class="option-label">' + newLabel + '</span><input type="text" class="option-input" placeholder="选项内容"><button class="delete-option-btn" onclick="deleteOption(this)">×</button>';
 
 btn.parentElement.insertBefore(newOption, btn);
 }
@@ -1449,7 +1384,7 @@ btn.parentElement.remove();
 
 function saveQuestionnaire() {
 document.getElementById('saveStatus').textContent = '保存中...';
-setTimeout(() => {
+setTimeout(function() {
 document.getElementById('saveStatus').textContent = '已保存';
 showToast('问卷保存成功！');
 }, 500);
@@ -1460,19 +1395,28 @@ showToast('预览功能开发中...');
 }
 
 function editDistribution(id) {
-currentQuestionnaire = questionnaires.find(q => q.id === id);
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id === id) {
+currentQuestionnaire = questionnaires[i];
+break;
+}
+}
 document.getElementById('listPage').style.display = 'none';
 document.getElementById('distributionPage').classList.add('active');
 document.getElementById('distQuestionnaireTitle').textContent = currentQuestionnaire.name;
 
-// 重置状态
 importedData = [];
 document.getElementById('uploadResult').style.display = 'none';
 document.getElementById('fileInput').value = '';
 }
 
 function viewResults(id) {
-currentQuestionnaire = questionnaires.find(q => q.id === id);
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id === id) {
+currentQuestionnaire = questionnaires[i];
+break;
+}
+}
 document.getElementById('listPage').style.display = 'none';
 document.getElementById('resultsPage').classList.add('active');
 document.getElementById('resultsQuestionnaireTitle').textContent = currentQuestionnaire.name;
@@ -1485,75 +1429,77 @@ showToast('该问卷暂无题目信息');
 return;
 }
 
-const headerRow = document.getElementById('resultsTableHeader');
-const tbody = document.getElementById('resultsTableBody');
+var headerRow = document.getElementById('resultsTableHeader');
+var tbody = document.getElementById('resultsTableBody');
 
-// 构建表头
-let headerHTML = '<th>客户姓名</th><th>资金账号</th><th>手机账号</th>';
-currentQuestionnaire.questions.forEach(q => {
-headerHTML += `<th>第${q.id}题题目</th><th>第${q.id}题答案</th>`;
-});
+var headerHTML = '<th>客户姓名</th><th>资金账号</th><th>手机账号</th>';
+for (var i = 0; i < currentQuestionnaire.questions.length; i++) {
+var q = currentQuestionnaire.questions[i];
+headerHTML += '<th>第' + q.id + '题题目</th><th>第' + q.id + '题答案</th>';
+}
 headerRow.innerHTML = headerHTML;
 
-// 构建表格内容
-tbody.innerHTML = resultsData.map(data => {
-let rowHTML = `
-<td>${data.name}</td>
-<td>${data.account}</td>
-<td>${data.phone}</td>
-`;
+var bodyHTML = '';
+for (var i = 0; i < resultsData.length; i++) {
+var data = resultsData[i];
+var rowHTML = '<td>' + data.name + '</td><td>' + data.account + '</td><td>' + data.phone + '</td>';
 
-currentQuestionnaire.questions.forEach(q => {
-rowHTML += `<td>${q.title}</td><td>${data.answers[q.id] || '-'}</td>`;
-});
+for (var j = 0; j < currentQuestionnaire.questions.length; j++) {
+var q = currentQuestionnaire.questions[j];
+rowHTML += '<td>' + q.title + '</td><td>' + (data.answers[q.id] || '-') + '</td>';
+}
 
-return `<tr>${rowHTML}</tr>`;
-}).join('');
+bodyHTML += '<tr>' + rowHTML + '</tr>';
+}
+tbody.innerHTML = bodyHTML;
 }
 
 function searchResults() {
-const searchValue = document.getElementById('resultsSearchInput').value.trim().toLowerCase();
+var searchValue = document.getElementById('resultsSearchInput').value.trim().toLowerCase();
 if (!searchValue) {
 renderResultsTable();
 return;
 }
 
-const tbody = document.getElementById('resultsTableBody');
-const filteredData = resultsData.filter(data => 
-data.name.toLowerCase().includes(searchValue) ||
-data.account.includes(searchValue) ||
-data.phone.includes(searchValue)
-);
+var tbody = document.getElementById('resultsTableBody');
+var filteredData = [];
+for (var i = 0; i < resultsData.length; i++) {
+var data = resultsData[i];
+if (data.name.toLowerCase().indexOf(searchValue) >= 0 || 
+    data.account.indexOf(searchValue) >= 0 || 
+    data.phone.indexOf(searchValue) >= 0) {
+filteredData.push(data);
+}
+}
 
-tbody.innerHTML = filteredData.map(data => {
-let rowHTML = `
-<td>${data.name}</td>
-<td>${data.account}</td>
-<td>${data.phone}</td>
-`;
+var bodyHTML = '';
+for (var i = 0; i < filteredData.length; i++) {
+var data = filteredData[i];
+var rowHTML = '<td>' + data.name + '</td><td>' + data.account + '</td><td>' + data.phone + '</td>';
 
-currentQuestionnaire.questions.forEach(q => {
-rowHTML += `<td>${q.title}</td><td>${data.answers[q.id] || '-'}</td>`;
-});
+for (var j = 0; j < currentQuestionnaire.questions.length; j++) {
+var q = currentQuestionnaire.questions[j];
+rowHTML += '<td>' + q.title + '</td><td>' + (data.answers[q.id] || '-') + '</td>';
+}
 
-return `<tr>${rowHTML}</tr>`;
-}).join('');
+bodyHTML += '<tr>' + rowHTML + '</tr>';
+}
 
 if (filteredData.length === 0) {
-tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; color: #999;">未找到匹配的结果</td></tr>';
+bodyHTML = '<tr><td colspan="100" style="text-align: center; color: #999;">未找到匹配的结果</td></tr>';
 }
+tbody.innerHTML = bodyHTML;
 }
 
 function exportResults() {
 showToast('正在导出数据...');
-setTimeout(() => {
-// 模拟导出功能
-const csvContent = generateCSV();
-const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
-const link = document.createElement('a');
-const url = URL.createObjectURL(blob);
+setTimeout(function() {
+var csvContent = generateCSV();
+var blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+var link = document.createElement('a');
+var url = URL.createObjectURL(blob);
 link.setAttribute('href', url);
-link.setAttribute('download', `${currentQuestionnaire.name}_回收结果_${new Date().toISOString().split('T')[0]}.csv`);
+link.setAttribute('download', currentQuestionnaire.name + '_回收结果_' + new Date().toISOString().split('T')[0] + '.csv');
 link.style.visibility = 'hidden';
 document.body.appendChild(link);
 link.click();
@@ -1563,30 +1509,38 @@ showToast('导出成功！');
 }
 
 function generateCSV() {
-let csv = '客户姓名,资金账号,手机账号';
-currentQuestionnaire.questions.forEach(q => {
-csv += `,第${q.id}题题目,第${q.id}题答案`;
-});
+var csv = '客户姓名,资金账号,手机账号';
+for (var i = 0; i < currentQuestionnaire.questions.length; i++) {
+var q = currentQuestionnaire.questions[i];
+csv += ',第' + q.id + '题题目,第' + q.id + '题答案';
+}
 csv += '\n';
 
-resultsData.forEach(data => {
-csv += `${data.name},${data.account},${data.phone}`;
-currentQuestionnaire.questions.forEach(q => {
-csv += `,"${q.title}","${data.answers[q.id] || '-'}"`;
-});
+for (var i = 0; i < resultsData.length; i++) {
+var data = resultsData[i];
+csv += data.name + ',' + data.account + ',' + data.phone;
+for (var j = 0; j < currentQuestionnaire.questions.length; j++) {
+var q = currentQuestionnaire.questions[j];
+csv += ',"' + q.title + '","' + (data.answers[q.id] || '-') + '"';
+}
 csv += '\n';
-});
+}
 
 return csv;
 }
 
 function switchTab(index) {
-document.querySelectorAll('.tab').forEach((tab, i) => {
-tab.classList.toggle('active', i === index);
-});
-document.querySelectorAll('.tab-panel').forEach((panel, i) => {
-panel.classList.toggle('active', i === index);
-});
+var tabs = document.querySelectorAll('.tab');
+var panels = document.querySelectorAll('.tab-panel');
+for (var i = 0; i < tabs.length; i++) {
+if (i === index) {
+tabs[i].classList.add('active');
+panels[i].classList.add('active');
+} else {
+tabs[i].classList.remove('active');
+panels[i].classList.remove('active');
+}
+}
 }
 
 function downloadTemplate() {
@@ -1594,7 +1548,7 @@ showToast('模板下载中...');
 }
 
 function handleFileUpload(event) {
-const file = event.target.files[0];
+var file = event.target.files[0];
 if (!file) return;
 
 if (file.size > 10 * 1024 * 1024) {
@@ -1604,7 +1558,7 @@ return;
 
 showToast('正在解析文件...');
 
-setTimeout(() => {
+setTimeout(function() {
 importedData = [
 { name: '张三', account: '1234567890', phone: '13800138000', idCard: '110101199001011234', status: 'success' },
 { name: '李四', account: '1234567891', phone: '13800138001', idCard: '110101199001011235', status: 'success' },
@@ -1613,7 +1567,7 @@ importedData = [
 ];
 
 document.getElementById('totalCount').textContent = importedData.length;
-document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+document.getElementById('validCount').textContent = importedData.filter(function(d) { return d.status === 'success'; }).length;
 document.getElementById('uploadResult').style.display = 'block';
 
 renderDataTable();
@@ -1622,24 +1576,20 @@ showToast('文件解析成功！');
 }
 
 function renderDataTable() {
-const tbody = document.getElementById('dataTableBody');
-tbody.innerHTML = importedData.map((data, index) => `
-<tr>
-<td>${data.name}</td>
-<td>${data.account}</td>
-<td>${data.phone}</td>
-<td>${data.idCard}</td>
-<td><span class="status-badge status-${data.status}">${data.status === 'success' ? '有效' : '无效'}</span></td>
-<td><button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="deleteRow(${index})">删除</button></td>
-</tr>
-`).join('');
+var tbody = document.getElementById('dataTableBody');
+var html = '';
+for (var i = 0; i < importedData.length; i++) {
+var data = importedData[i];
+html += '<tr><td>' + data.name + '</td><td>' + data.account + '</td><td>' + data.phone + '</td><td>' + data.idCard + '</td><td><span class="status-badge status-' + data.status + '">' + (data.status === 'success' ? '有效' : '无效') + '</span></td><td><button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="deleteRow(' + i + ')">删除</button></td></tr>';
+}
+tbody.innerHTML = html;
 }
 
 function deleteRow(index) {
 importedData.splice(index, 1);
 renderDataTable();
 document.getElementById('totalCount').textContent = importedData.length;
-document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+document.getElementById('validCount').textContent = importedData.filter(function(d) { return d.status === 'success'; }).length;
 
 if (importedData.length === 0) {
 document.getElementById('uploadResult').style.display = 'none';
@@ -1649,8 +1599,8 @@ showToast('数据已删除');
 }
 
 function toggleScheduledTime() {
-const scheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
-const wrapper = document.getElementById('scheduledTimeWrapper');
+var scheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+var wrapper = document.getElementById('scheduledTimeWrapper');
 if (scheduled) {
 wrapper.classList.add('show');
 } else {
@@ -1659,67 +1609,78 @@ wrapper.classList.remove('show');
 }
 
 function saveDistribution() {
-const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+var tabs = document.querySelectorAll('.tab');
+var activeTabIndex = -1;
+for (var i = 0; i < tabs.length; i++) {
+if (tabs[i].classList.contains('active')) {
+activeTabIndex = i;
+break;
+}
+}
 
-// 验证导入名单
 if (activeTabIndex === 1 && importedData.length === 0) {
 showToast('请先导入用户名单');
 return;
 }
 
-// 验证通知方式
-const notifyApp = document.getElementById('notifyApp').checked;
-const notifySms = document.getElementById('notifySms').checked;
+var notifyApp = document.getElementById('notifyApp').checked;
+var notifySms = document.getElementById('notifySms').checked;
 
 if (!notifyApp && !notifySms) {
 showToast('请至少选择一种通知方式');
 return;
 }
 
-// 验证定时发送时间
-const isScheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+var isScheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
 if (isScheduled) {
-const scheduledTime = document.getElementById('scheduledTime').value;
+var scheduledTime = document.getElementById('scheduledTime').value;
 if (!scheduledTime) {
 showToast('请设置发送时间');
 return;
 }
-const selectedTime = new Date(scheduledTime);
-const now = new Date();
+var selectedTime = new Date(scheduledTime);
+var now = new Date();
 if (selectedTime <= now) {
 showToast('发送时间必须晚于当前时间');
 return;
 }
 }
 
-// 立即发送逻辑
-const isImmediate = document.querySelector('input[name="notifyTime"][value="now"]').checked;
+var isImmediate = document.querySelector('input[name="notifyTime"][value="now"]').checked;
 if (isImmediate) {
-// 模拟立即发送
 showToast('正在推送通知...');
-setTimeout(() => {
+setTimeout(function() {
 showToast('分发规则保存成功！通知已发送');
-setTimeout(() => {
+setTimeout(function() {
 backToList();
 }, 1000);
 }, 500);
 } else {
-// 定时发送
 showToast('分发规则保存成功！将在设定时间发送');
-setTimeout(() => {
+setTimeout(function() {
 backToList();
 }, 1000);
 }
 }
 
 function copyQuestionnaire(id) {
-const original = questionnaires.find(q => q.id === id);
-const copy = {
-...original,
+var original = null;
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id === id) {
+original = questionnaires[i];
+break;
+}
+}
+var copy = {
 id: Date.now(),
 name: original.name + ' (副本)',
+desc: original.desc,
 createTime: new Date().toISOString().split('T')[0],
-updateTime: new Date().toISOString().split('T')[0]
+updateTime: new Date().toISOString().split('T')[0],
+questionCount: original.questionCount,
+distributionCount: 0,
+enabled: false,
+questions: original.questions
 };
 questionnaires.push(copy);
 renderQuestionnaireList();
@@ -1730,8 +1691,14 @@ function deleteQuestionnaire(id) {
 showConfirmModal(
 '确认删除',
 '确定要删除该问卷吗？删除后无法恢复。',
-() => {
-questionnaires = questionnaires.filter(q => q.id !== id);
+function() {
+var newList = [];
+for (var i = 0; i < questionnaires.length; i++) {
+if (questionnaires[i].id !== id) {
+newList.push(questionnaires[i]);
+}
+}
+questionnaires = newList;
 renderQuestionnaireList();
 showToast('问卷已删除');
 },
@@ -1741,24 +1708,26 @@ true
 
 function toggleMoreMenu(event, id) {
 event.stopPropagation();
-document.querySelectorAll('.dropdown-menu').forEach(menu => {
-if (menu.id !== `menu-${id}`) {
-menu.classList.remove('show');
+var menus = document.querySelectorAll('.dropdown-menu');
+for (var i = 0; i < menus.length; i++) {
+if (menus[i].id !== 'menu-' + id) {
+menus[i].classList.remove('show');
 }
-});
-document.getElementById(`menu-${id}`).classList.toggle('show');
+}
+document.getElementById('menu-' + id).classList.toggle('show');
 }
 
-document.addEventListener('click', () => {
-document.querySelectorAll('.dropdown-menu').forEach(menu => {
-menu.classList.remove('show');
-});
+document.addEventListener('click', function() {
+var menus = document.querySelectorAll('.dropdown-menu');
+for (var i = 0; i < menus.length; i++) {
+menus[i].classList.remove('show');
+}
 });
 
-function showConfirmModal(title, body, callback, isDanger = false) {
+function showConfirmModal(title, body, callback, isDanger) {
 document.getElementById('modalTitle').textContent = title;
 document.getElementById('modalBody').textContent = body;
-const confirmBtn = document.getElementById('confirmBtn');
+var confirmBtn = document.getElementById('confirmBtn');
 confirmBtn.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
 currentAction = callback;
 document.getElementById('confirmModal').classList.add('show');
@@ -1777,10 +1746,10 @@ closeModal();
 }
 
 function showToast(message) {
-const toast = document.getElementById('toast');
+var toast = document.getElementById('toast');
 toast.textContent = message;
 toast.classList.add('show');
-setTimeout(() => {
+setTimeout(function() {
 toast.classList.remove('show');
 }, 3000);
 }
