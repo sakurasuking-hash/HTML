@@ -726,4 +726,1066 @@ margin-top: 5px;
 margin-left: 24px;
 }
 
-.more-menu
+.more-menu {
+position: relative;
+display: inline-block;
+}
+
+.more-btn {
+background: none;
+border: none;
+cursor: pointer;
+font-size: 20px;
+padding: 5px;
+}
+
+.dropdown-menu {
+display: none;
+position: absolute;
+right: 0;
+top: 100%;
+background: white;
+border: 1px solid #ddd;
+border-radius: 4px;
+box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+min-width: 120px;
+z-index: 100;
+}
+
+.dropdown-menu.show {
+display: block;
+}
+
+.dropdown-item {
+padding: 10px 15px;
+cursor: pointer;
+font-size: 14px;
+border: none;
+background: none;
+width: 100%;
+text-align: left;
+}
+
+.dropdown-item:hover {
+background: #f5f5f5;
+}
+
+.dropdown-item.danger {
+color: #d32f2f;
+}
+
+.upload-result {
+margin-top: 20px;
+}
+
+.success-message {
+padding: 15px;
+background: #e8f5e9;
+border-radius: 4px;
+color: #2e7d32;
+margin-bottom: 15px;
+}
+
+.error-input {
+border-color: #d32f2f !important;
+}
+
+.error-message {
+color: #d32f2f;
+font-size: 12px;
+margin-top: 5px;
+}
+
+.scheduled-time-wrapper {
+display: none;
+}
+
+.scheduled-time-wrapper.show {
+display: inline-block;
+}
+
+.results-search-bar {
+background: white;
+padding: 20px;
+border-radius: 8px;
+margin-bottom: 20px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+display: flex;
+gap: 10px;
+align-items: center;
+}
+
+.results-search-bar .search-input {
+flex: 1;
+}
+
+.results-table-container {
+background: white;
+padding: 20px;
+border-radius: 8px;
+box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+overflow-x: auto;
+}
+
+.results-table {
+width: 100%;
+border-collapse: collapse;
+min-width: 800px;
+}
+
+.results-table th,
+.results-table td {
+padding: 12px;
+text-align: left;
+border-bottom: 1px solid #eee;
+font-size: 14px;
+}
+
+.results-table th {
+background: #f5f5f5;
+font-weight: 500;
+position: sticky;
+top: 0;
+}
+
+.results-table tbody tr:hover {
+background: #f9f9f9;
+}
+</style>
+</head>
+<body>
+<div class="toast" id="toast"></div>
+
+<!-- 问卷列表页 -->
+<div class="container" id="listPage">
+<div class="page-header">
+<h1 class="page-title">问卷管理</h1>
+<button class="btn btn-primary" onclick="showCreateModal()">+ 创建问卷</button>
+</div>
+
+<div class="search-filter">
+<div class="search-box">
+<input type="text" class="search-input" placeholder="搜索问卷名称..." id="searchInput">
+</div>
+<div class="filter-group">
+<span class="filter-label">状态：</span>
+<select id="statusFilter">
+<option value="all">全部</option>
+<option value="enabled">已启用</option>
+<option value="disabled">已禁用</option>
+</select>
+</div>
+</div>
+
+<div id="questionnaireList"></div>
+</div>
+
+<!-- 问卷编辑页 -->
+<div class="container edit-page" id="editPage">
+<div class="nav-bar">
+<button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
+<input type="text" class="title-input" id="editTitle" placeholder="输入问卷名称">
+<div class="nav-actions">
+<span class="save-status" id="saveStatus">已保存</span>
+<button class="btn btn-secondary" onclick="previewQuestionnaire()">预览</button>
+<button class="btn btn-primary" onclick="saveQuestionnaire()">保存</button>
+</div>
+</div>
+
+<div class="question-info">
+<div class="form-group">
+<label class="form-label">问卷标题</label>
+<input type="text" class="form-input" id="questionnaireTitle" placeholder="请输入问卷标题">
+</div>
+<div class="form-group">
+<label class="form-label">问卷描述</label>
+<textarea class="form-input" id="questionnaireDesc" placeholder="请输入问卷描述和填写说明"></textarea>
+</div>
+<div class="form-group">
+<label class="form-label">基础设置</label>
+<label class="checkbox-label">
+<input type="checkbox" id="setDeadline" onchange="toggleDeadline()">
+<span>设置截止时间</span>
+</label>
+<div class="deadline-picker" id="deadlinePicker">
+<label class="form-label" style="margin-top: 10px;">截止时间</label>
+<input type="datetime-local" class="form-input" id="deadlineTime">
+</div>
+<label class="checkbox-label" style="margin-top: 10px;">
+<input type="checkbox" id="setWelcome" onchange="toggleWelcome()">
+<span>问卷欢迎语</span>
+</label>
+<div class="welcome-input-wrapper" id="welcomeInputWrapper">
+<label class="form-label" style="margin-top: 10px;">欢迎语内容</label>
+<textarea class="form-input" id="welcomeText" placeholder="请输入问卷欢迎语，将在用户打开问卷时显示"></textarea>
+</div>
+</div>
+</div>
+
+<div id="questionsList"></div>
+
+<div class="add-question-zone">
+<button class="btn btn-secondary" onclick="addQuestion('single')">+ 单选题</button>
+<button class="btn btn-secondary" onclick="addQuestion('multiple')">+ 多选题</button>
+<button class="btn btn-secondary" onclick="addQuestion('text')">+ 填空题</button>
+</div>
+</div>
+
+<!-- 分发规则页 -->
+<div class="container distribution-page" id="distributionPage">
+<div class="nav-bar">
+<button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
+<h2 style="flex: 1; margin: 0 20px; font-size: 18px;">分发规则配置 - <span id="distQuestionnaireTitle">问卷名称</span></h2>
+<button class="btn btn-primary" onclick="saveDistribution()">保存规则</button>
+</div>
+
+<div class="tabs">
+<button class="tab active" onclick="switchTab(0)">条件筛选</button>
+<button class="tab" onclick="switchTab(1)">导入名单</button>
+</div>
+
+<div class="tab-content">
+<div class="tab-panel active" id="tabPanel0">
+<div class="coming-soon">
+<div class="coming-soon-icon">🚧</div>
+<div class="coming-soon-text">条件筛选功能开发中，敬请期待～</div>
+<div class="coming-soon-desc">您可以使用"导入名单"功能进行问卷分发</div>
+</div>
+</div>
+
+<div class="tab-panel" id="tabPanel1">
+<a href="#" class="template-link" onclick="downloadTemplate(); return false;">📥 下载模板</a>
+
+<div class="upload-zone" onclick="document.getElementById('fileInput').click()">
+<input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;" onchange="handleFileUpload(event)">
+<div class="upload-icon">☁️</div>
+<div class="upload-text">拖拽 Excel 文件到此处，或点击选择文件</div>
+<div class="upload-hint">支持格式：.xlsx、.xls，最大 10MB</div>
+</div>
+
+<div id="uploadResult" class="upload-result" style="display: none;">
+<div class="success-message">
+✓ 解析成功，共导入 <span id="totalCount">0</span> 条数据（有效数据 <span id="validCount">0</span> 条）
+</div>
+
+<table class="data-table">
+<thead>
+<tr>
+<th>客户姓名</th>
+<th>资金账号</th>
+<th>客户手机号</th>
+<th>客户身份证</th>
+<th>状态</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody id="dataTableBody"></tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div class="notification-config">
+<div class="section-title">通知方式配置</div>
+
+<div class="form-group">
+<label class="form-label">通知渠道</label>
+<div class="checkbox-group">
+<label class="checkbox-label">
+<input type="checkbox" id="notifyApp" checked>
+<span>APP消息通知</span>
+</label>
+<div class="help-text">用户登录APP后可在消息中心查看</div>
+<label class="checkbox-label">
+<input type="checkbox" id="notifySms">
+<span>短信通知</span>
+</label>
+<div class="help-text">将发送到客户手机号（需确保已导入客户手机号）</div>
+</div>
+</div>
+
+<div class="form-group">
+<label class="form-label">通知时间</label>
+<div class="radio-group">
+<label class="radio-label">
+<input type="radio" name="notifyTime" value="now" checked onchange="toggleScheduledTime()">
+<span>立即发送</span>
+</label>
+<label class="radio-label">
+<input type="radio" name="notifyTime" value="scheduled" onchange="toggleScheduledTime()">
+<span>定时发送</span>
+<span class="scheduled-time-wrapper" id="scheduledTimeWrapper">
+<input type="datetime-local" class="datetime-input" id="scheduledTime">
+</span>
+</label>
+</div>
+</div>
+</div>
+</div>
+
+<!-- 问卷结果回收页 -->
+<div class="container results-page" id="resultsPage">
+<div class="nav-bar">
+<button class="back-btn" onclick="backToList()">← 返回问卷列表</button>
+<h2 style="flex: 1; margin: 0 20px; font-size: 18px;">问卷结果回收 - <span id="resultsQuestionnaireTitle">问卷名称</span></h2>
+<button class="btn btn-success" onclick="exportResults()">📥 导出数据</button>
+</div>
+
+<div class="results-search-bar">
+<input type="text" class="search-input" id="resultsSearchInput" placeholder="搜索客户姓名、资金账号或手机账号...">
+<button class="btn btn-primary" onclick="searchResults()">搜索</button>
+</div>
+
+<div class="results-table-container">
+<table class="results-table" id="resultsTable">
+<thead>
+<tr id="resultsTableHeader">
+<th>客户姓名</th>
+<th>资金账号</th>
+<th>手机账号</th>
+</tr>
+</thead>
+<tbody id="resultsTableBody"></tbody>
+</table>
+</div>
+</div>
+
+<!-- 创建问卷弹窗 -->
+<div class="modal" id="createModal">
+<div class="modal-content">
+<div class="modal-header">创建问卷</div>
+<div class="modal-body">
+<div class="form-group">
+<label class="form-label">问卷标题<span class="required">*</span></label>
+<input type="text" class="form-input" id="createTitle" placeholder="请输入问卷标题">
+<div class="error-message" id="createTitleError" style="display: none;">请输入问卷标题</div>
+</div>
+<div class="form-group">
+<label class="form-label">问卷描述</label>
+<textarea class="form-input" id="createDesc" placeholder="请输入问卷描述和填写说明"></textarea>
+</div>
+</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeCreateModal()">取消</button>
+<button class="btn btn-primary" onclick="createQuestionnaire()">创建</button>
+</div>
+</div>
+</div>
+
+<!-- 确认弹窗 -->
+<div class="modal" id="confirmModal">
+<div class="modal-content">
+<div class="modal-header" id="modalTitle">确认操作</div>
+<div class="modal-body" id="modalBody">确定要执行此操作吗？</div>
+<div class="modal-footer">
+<button class="btn btn-secondary" onclick="closeModal()">取消</button>
+<button class="btn btn-primary" id="confirmBtn" onclick="confirmAction()">确认</button>
+</div>
+</div>
+</div>
+
+<script>
+let questionnaires = [
+{
+id: 1,
+name: '客户满意度调查问卷',
+desc: '本问卷旨在了解客户对我们服务的满意度，帮助我们改进服务质量。',
+createTime: '2026-01-01',
+updateTime: '2026-01-08',
+questionCount: 10,
+distributionCount: 256,
+enabled: true,
+questions: [
+{ id: 1, title: '您对我们的服务总体满意度如何？', type: 'single', options: ['非常满意', '满意', '一般', '不满意', '非常不满意'] },
+{ id: 2, title: '您最看重的服务方面是？', type: 'multiple', options: ['响应速度', '专业能力', '服务态度', '价格合理性'] },
+{ id: 3, title: '您还有什么建议吗？', type: 'text' }
+]
+},
+{
+id: 2,
+name: '产品体验反馈问卷',
+desc: '收集用户对新产品功能的使用体验和改进建议。',
+createTime: '2026-01-05',
+updateTime: '2026-01-07',
+questionCount: 8,
+distributionCount: 128,
+enabled: false,
+questions: [
+{ id: 1, title: '您觉得产品易用性如何？', type: 'single', options: ['非常好', '较好', '一般', '较差'] },
+{ id: 2, title: '您希望增加哪些功能？', type: 'text' }
+]
+}
+];
+
+let currentQuestionnaire = null;
+let currentAction = null;
+let questionCounter = 0;
+let importedData = [];
+let resultsData = [];
+
+function init() {
+renderQuestionnaireList();
+generateMockResults();
+}
+
+function generateMockResults() {
+// 模拟问卷回收数据
+resultsData = [
+{
+name: '张三',
+account: '1234567890',
+phone: '13800138000',
+answers: {
+1: '满意',
+2: '响应速度,专业能力',
+3: '希望能够提供更多的自助服务功能'
+}
+},
+{
+name: '李四',
+account: '1234567891',
+phone: '13800138001',
+answers: {
+1: '非常满意',
+2: '服务态度',
+3: '非常好，继续保持'
+}
+},
+{
+name: '王五',
+account: '1234567892',
+phone: '13800138002',
+answers: {
+1: '一般',
+2: '价格合理性,响应速度',
+3: '价格可以更优惠一些'
+}
+},
+{
+name: '赵六',
+account: '1234567893',
+phone: '13800138003',
+answers: {
+1: '满意',
+2: '专业能力,服务态度',
+3: '整体不错'
+}
+}
+];
+}
+
+function renderQuestionnaireList() {
+const listContainer = document.getElementById('questionnaireList');
+
+if (questionnaires.length === 0) {
+listContainer.innerHTML = `
+<div class="empty-state">
+<div class="empty-icon">📋</div>
+<div class="empty-text">还没有创建问卷哦～点击右上角按钮创建第一份问卷吧！</div>
+<button class="btn btn-primary" onclick="showCreateModal()">立即创建</button>
+</div>
+`;
+return;
+}
+
+listContainer.innerHTML = questionnaires.map(q => `
+<div class="questionnaire-card">
+<div class="card-left">
+<div class="card-icon">📋</div>
+<div class="card-title" onclick="editQuestionnaire(${q.id})">${q.name}</div>
+<div class="card-desc">${q.desc}</div>
+<div class="card-meta">
+<span>创建时间：${q.createTime}</span>
+<span>最后修改：${q.updateTime}</span>
+<span>题目数：${q.questionCount}</span>
+<span>分发人数：${q.distributionCount}</span>
+</div>
+</div>
+<div class="card-right">
+<div class="more-menu">
+<button class="more-btn" onclick="toggleMoreMenu(event, ${q.id})">⋮</button>
+<div class="dropdown-menu" id="menu-${q.id}">
+<button class="dropdown-item" onclick="copyQuestionnaire(${q.id})">复制问卷</button>
+<button class="dropdown-item danger" onclick="deleteQuestionnaire(${q.id})">删除问卷</button>
+</div>
+</div>
+<div class="card-actions">
+<button class="btn btn-secondary" onclick="editQuestionnaire(${q.id})">✏️ 编辑问卷</button>
+<button class="btn btn-secondary" onclick="editDistribution(${q.id})">👥 分发规则</button>
+<button class="btn btn-success" onclick="viewResults(${q.id})">📊 回收结果</button>
+</div>
+<div style="display: flex; align-items: center; gap: 10px;">
+<div class="toggle-switch ${q.enabled ? 'active' : ''}" onclick="toggleStatus(${q.id})">
+<div class="toggle-slider"></div>
+</div>
+<span class="toggle-label">${q.enabled ? '已启用' : '已禁用'}</span>
+</div>
+</div>
+</div>
+`).join('');
+}
+
+function showCreateModal() {
+document.getElementById('createTitle').value = '';
+document.getElementById('createDesc').value = '';
+document.getElementById('createTitle').classList.remove('error-input');
+document.getElementById('createTitleError').style.display = 'none';
+document.getElementById('createModal').classList.add('show');
+}
+
+function closeCreateModal() {
+document.getElementById('createModal').classList.remove('show');
+}
+
+function createQuestionnaire() {
+const title = document.getElementById('createTitle').value.trim();
+const desc = document.getElementById('createDesc').value.trim();
+
+if (!title) {
+document.getElementById('createTitle').classList.add('error-input');
+document.getElementById('createTitleError').style.display = 'block';
+return;
+}
+
+const newQ = {
+id: Date.now(),
+name: title,
+desc: desc,
+createTime: new Date().toISOString().split('T')[0],
+updateTime: new Date().toISOString().split('T')[0],
+questionCount: 0,
+distributionCount: 0,
+enabled: false,
+questions: []
+};
+questionnaires.push(newQ);
+closeCreateModal();
+renderQuestionnaireList();
+showToast('问卷创建成功！');
+}
+
+function toggleStatus(id) {
+const q = questionnaires.find(item => item.id === id);
+const action = q.enabled ? 'disable' : 'enable';
+
+showConfirmModal(
+'确认操作',
+action === 'enable'
+? '确定要启用该问卷吗？启用后，符合分发规则的用户将收到问卷。'
+: '确定要禁用该问卷吗？禁用后,用户将无法填写该问卷。',
+() => {
+q.enabled = !q.enabled;
+renderQuestionnaireList();
+showToast(q.enabled ? '问卷已启用' : '问卷已禁用');
+}
+);
+}
+
+function editQuestionnaire(id) {
+currentQuestionnaire = questionnaires.find(q => q.id === id);
+document.getElementById('listPage').style.display = 'none';
+document.getElementById('editPage').classList.add('active');
+document.getElementById('editTitle').value = currentQuestionnaire.name;
+document.getElementById('questionnaireTitle').value = currentQuestionnaire.name;
+document.getElementById('questionnaireDesc').value = currentQuestionnaire.desc;
+loadQuestions();
+}
+
+function backToList() {
+document.getElementById('listPage').style.display = 'block';
+document.getElementById('editPage').classList.remove('active');
+document.getElementById('distributionPage').classList.remove('active');
+document.getElementById('resultsPage').classList.remove('active');
+renderQuestionnaireList();
+}
+
+function loadQuestions() {
+const container = document.getElementById('questionsList');
+container.innerHTML = '';
+questionCounter = 0;
+}
+
+function toggleDeadline() {
+const checkbox = document.getElementById('setDeadline');
+const picker = document.getElementById('deadlinePicker');
+if (checkbox.checked) {
+picker.classList.add('show');
+} else {
+picker.classList.remove('show');
+document.getElementById('deadlineTime').value = '';
+}
+}
+
+function toggleWelcome() {
+const checkbox = document.getElementById('setWelcome');
+const wrapper = document.getElementById('welcomeInputWrapper');
+if (checkbox.checked) {
+wrapper.classList.add('show');
+} else {
+wrapper.classList.remove('show');
+document.getElementById('welcomeText').value = '';
+}
+}
+
+function addQuestion(type) {
+questionCounter++;
+const container = document.getElementById('questionsList');
+const questionCard = document.createElement('div');
+questionCard.className = 'question-card';
+questionCard.id = `question-${questionCounter}`;
+
+let optionsHtml = '';
+if (type === 'single' || type === 'multiple') {
+optionsHtml = `
+<div class="option-item">
+<span class="option-label">A</span>
+<input type="text" class="option-input" placeholder="选项内容">
+<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+</div>
+<div class="option-item">
+<span class="option-label">B</span>
+<input type="text" class="option-input" placeholder="选项内容">
+<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+</div>
+<button class="add-option-btn" onclick="addOption(this)">+ 添加选项</button>
+`;
+} else if (type === 'text') {
+optionsHtml = `
+<div class="form-group">
+<label class="form-label">答案类型</label>
+<select class="form-input">
+<option>文本</option>
+<option>数字</option>
+<option>邮箱</option>
+<option>手机号</option>
+</select>
+</div>
+<div class="form-group">
+<label class="form-label">最大字数限制</label>
+<input type="number" class="form-input" placeholder="请输入最大字数">
+</div>
+<div class="form-group">
+<label class="form-label">提示文字</label>
+<input type="text" class="form-input" placeholder="请输入提示文字">
+</div>
+`;
+}
+
+const typeMap = {
+'single': '单选题',
+'multiple': '多选题',
+'text': '填空题'
+};
+
+questionCard.innerHTML = `
+<div class="question-header">
+<span class="question-number">题目 ${questionCounter}</span>
+<div>
+<select class="question-type-select" onchange="changeQuestionType(this, ${questionCounter})">
+<option value="single" ${type === 'single' ? 'selected' : ''}>单选题</option>
+<option value="multiple" ${type === 'multiple' ? 'selected' : ''}>多选题</option>
+<option value="text" ${type === 'text' ? 'selected' : ''}>填空题</option>
+</select>
+<button class="delete-question-btn" onclick="deleteQuestion(${questionCounter})">🗑️</button>
+</div>
+</div>
+<input type="text" class="question-title-input" placeholder="请输入题目标题">
+<div class="question-options">
+${optionsHtml}
+</div>
+`;
+
+container.appendChild(questionCard);
+}
+
+function changeQuestionType(select, id) {
+showConfirmModal(
+'确认切换',
+'切换题型会清空当前选项配置，确定要切换吗？',
+() => {
+const newType = select.value;
+const card = document.getElementById(`question-${id}`);
+const title = card.querySelector('.question-title-input').value;
+card.remove();
+questionCounter--;
+addQuestion(newType);
+const newCard = document.getElementById(`question-${questionCounter}`);
+newCard.id = `question-${id}`;
+newCard.querySelector('.question-title-input').value = title;
+}
+);
+}
+
+function deleteQuestion(id) {
+showConfirmModal(
+'确认删除',
+'确定要删除这个题目吗？',
+() => {
+document.getElementById(`question-${id}`).remove();
+showToast('题目已删除');
+}
+);
+}
+
+function addOption(btn) {
+const optionsContainer = btn.parentElement;
+const options = optionsContainer.querySelectorAll('.option-item');
+const newLabel = String.fromCharCode(65 + options.length);
+
+const newOption = document.createElement('div');
+newOption.className = 'option-item';
+newOption.innerHTML = `
+<span class="option-label">${newLabel}</span>
+<input type="text" class="option-input" placeholder="选项内容">
+<button class="delete-option-btn" onclick="deleteOption(this)">×</button>
+`;
+
+btn.parentElement.insertBefore(newOption, btn);
+}
+
+function deleteOption(btn) {
+btn.parentElement.remove();
+}
+
+function saveQuestionnaire() {
+document.getElementById('saveStatus').textContent = '保存中...';
+setTimeout(() => {
+document.getElementById('saveStatus').textContent = '已保存';
+showToast('问卷保存成功！');
+}, 500);
+}
+
+function previewQuestionnaire() {
+showToast('预览功能开发中...');
+}
+
+function editDistribution(id) {
+currentQuestionnaire = questionnaires.find(q => q.id === id);
+document.getElementById('listPage').style.display = 'none';
+document.getElementById('distributionPage').classList.add('active');
+document.getElementById('distQuestionnaireTitle').textContent = currentQuestionnaire.name;
+
+// 重置状态
+importedData = [];
+document.getElementById('uploadResult').style.display = 'none';
+document.getElementById('fileInput').value = '';
+}
+
+function viewResults(id) {
+currentQuestionnaire = questionnaires.find(q => q.id === id);
+document.getElementById('listPage').style.display = 'none';
+document.getElementById('resultsPage').classList.add('active');
+document.getElementById('resultsQuestionnaireTitle').textContent = currentQuestionnaire.name;
+renderResultsTable();
+}
+
+function renderResultsTable() {
+if (!currentQuestionnaire || !currentQuestionnaire.questions) {
+showToast('该问卷暂无题目信息');
+return;
+}
+
+const headerRow = document.getElementById('resultsTableHeader');
+const tbody = document.getElementById('resultsTableBody');
+
+// 构建表头
+let headerHTML = '<th>客户姓名</th><th>资金账号</th><th>手机账号</th>';
+currentQuestionnaire.questions.forEach(q => {
+headerHTML += `<th>第${q.id}题题目</th><th>第${q.id}题答案</th>`;
+});
+headerRow.innerHTML = headerHTML;
+
+// 构建表格内容
+tbody.innerHTML = resultsData.map(data => {
+let rowHTML = `
+<td>${data.name}</td>
+<td>${data.account}</td>
+<td>${data.phone}</td>
+`;
+
+currentQuestionnaire.questions.forEach(q => {
+rowHTML += `<td>${q.title}</td><td>${data.answers[q.id] || '-'}</td>`;
+});
+
+return `<tr>${rowHTML}</tr>`;
+}).join('');
+}
+
+function searchResults() {
+const searchValue = document.getElementById('resultsSearchInput').value.trim().toLowerCase();
+if (!searchValue) {
+renderResultsTable();
+return;
+}
+
+const tbody = document.getElementById('resultsTableBody');
+const filteredData = resultsData.filter(data => 
+data.name.toLowerCase().includes(searchValue) ||
+data.account.includes(searchValue) ||
+data.phone.includes(searchValue)
+);
+
+tbody.innerHTML = filteredData.map(data => {
+let rowHTML = `
+<td>${data.name}</td>
+<td>${data.account}</td>
+<td>${data.phone}</td>
+`;
+
+currentQuestionnaire.questions.forEach(q => {
+rowHTML += `<td>${q.title}</td><td>${data.answers[q.id] || '-'}</td>`;
+});
+
+return `<tr>${rowHTML}</tr>`;
+}).join('');
+
+if (filteredData.length === 0) {
+tbody.innerHTML = '<tr><td colspan="100" style="text-align: center; color: #999;">未找到匹配的结果</td></tr>';
+}
+}
+
+function exportResults() {
+showToast('正在导出数据...');
+setTimeout(() => {
+// 模拟导出功能
+const csvContent = generateCSV();
+const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+const link = document.createElement('a');
+const url = URL.createObjectURL(blob);
+link.setAttribute('href', url);
+link.setAttribute('download', `${currentQuestionnaire.name}_回收结果_${new Date().toISOString().split('T')[0]}.csv`);
+link.style.visibility = 'hidden';
+document.body.appendChild(link);
+link.click();
+document.body.removeChild(link);
+showToast('导出成功！');
+}, 500);
+}
+
+function generateCSV() {
+let csv = '客户姓名,资金账号,手机账号';
+currentQuestionnaire.questions.forEach(q => {
+csv += `,第${q.id}题题目,第${q.id}题答案`;
+});
+csv += '\n';
+
+resultsData.forEach(data => {
+csv += `${data.name},${data.account},${data.phone}`;
+currentQuestionnaire.questions.forEach(q => {
+csv += `,"${q.title}","${data.answers[q.id] || '-'}"`;
+});
+csv += '\n';
+});
+
+return csv;
+}
+
+function switchTab(index) {
+document.querySelectorAll('.tab').forEach((tab, i) => {
+tab.classList.toggle('active', i === index);
+});
+document.querySelectorAll('.tab-panel').forEach((panel, i) => {
+panel.classList.toggle('active', i === index);
+});
+}
+
+function downloadTemplate() {
+showToast('模板下载中...');
+}
+
+function handleFileUpload(event) {
+const file = event.target.files[0];
+if (!file) return;
+
+if (file.size > 10 * 1024 * 1024) {
+showToast('文件大小超过限制，请压缩后重新上传');
+return;
+}
+
+showToast('正在解析文件...');
+
+setTimeout(() => {
+importedData = [
+{ name: '张三', account: '1234567890', phone: '13800138000', idCard: '110101199001011234', status: 'success' },
+{ name: '李四', account: '1234567891', phone: '13800138001', idCard: '110101199001011235', status: 'success' },
+{ name: '王五', account: '1234567892', phone: '13800138002', idCard: '110101199001011236', status: 'success' },
+{ name: '赵六', account: '1234567893', phone: '13800138003', idCard: '110101199001011237', status: 'success' }
+];
+
+document.getElementById('totalCount').textContent = importedData.length;
+document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+document.getElementById('uploadResult').style.display = 'block';
+
+renderDataTable();
+showToast('文件解析成功！');
+}, 1000);
+}
+
+function renderDataTable() {
+const tbody = document.getElementById('dataTableBody');
+tbody.innerHTML = importedData.map((data, index) => `
+<tr>
+<td>${data.name}</td>
+<td>${data.account}</td>
+<td>${data.phone}</td>
+<td>${data.idCard}</td>
+<td><span class="status-badge status-${data.status}">${data.status === 'success' ? '有效' : '无效'}</span></td>
+<td><button class="btn btn-secondary" style="padding: 5px 10px; font-size: 12px;" onclick="deleteRow(${index})">删除</button></td>
+</tr>
+`).join('');
+}
+
+function deleteRow(index) {
+importedData.splice(index, 1);
+renderDataTable();
+document.getElementById('totalCount').textContent = importedData.length;
+document.getElementById('validCount').textContent = importedData.filter(d => d.status === 'success').length;
+
+if (importedData.length === 0) {
+document.getElementById('uploadResult').style.display = 'none';
+}
+
+showToast('数据已删除');
+}
+
+function toggleScheduledTime() {
+const scheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+const wrapper = document.getElementById('scheduledTimeWrapper');
+if (scheduled) {
+wrapper.classList.add('show');
+} else {
+wrapper.classList.remove('show');
+}
+}
+
+function saveDistribution() {
+const activeTabIndex = Array.from(document.querySelectorAll('.tab')).findIndex(tab => tab.classList.contains('active'));
+
+// 验证导入名单
+if (activeTabIndex === 1 && importedData.length === 0) {
+showToast('请先导入用户名单');
+return;
+}
+
+// 验证通知方式
+const notifyApp = document.getElementById('notifyApp').checked;
+const notifySms = document.getElementById('notifySms').checked;
+
+if (!notifyApp && !notifySms) {
+showToast('请至少选择一种通知方式');
+return;
+}
+
+// 验证定时发送时间
+const isScheduled = document.querySelector('input[name="notifyTime"][value="scheduled"]').checked;
+if (isScheduled) {
+const scheduledTime = document.getElementById('scheduledTime').value;
+if (!scheduledTime) {
+showToast('请设置发送时间');
+return;
+}
+const selectedTime = new Date(scheduledTime);
+const now = new Date();
+if (selectedTime <= now) {
+showToast('发送时间必须晚于当前时间');
+return;
+}
+}
+
+// 立即发送逻辑
+const isImmediate = document.querySelector('input[name="notifyTime"][value="now"]').checked;
+if (isImmediate) {
+// 模拟立即发送
+showToast('正在推送通知...');
+setTimeout(() => {
+showToast('分发规则保存成功！通知已发送');
+setTimeout(() => {
+backToList();
+}, 1000);
+}, 500);
+} else {
+// 定时发送
+showToast('分发规则保存成功！将在设定时间发送');
+setTimeout(() => {
+backToList();
+}, 1000);
+}
+}
+
+function copyQuestionnaire(id) {
+const original = questionnaires.find(q => q.id === id);
+const copy = {
+...original,
+id: Date.now(),
+name: original.name + ' (副本)',
+createTime: new Date().toISOString().split('T')[0],
+updateTime: new Date().toISOString().split('T')[0]
+};
+questionnaires.push(copy);
+renderQuestionnaireList();
+showToast('问卷复制成功！');
+}
+
+function deleteQuestionnaire(id) {
+showConfirmModal(
+'确认删除',
+'确定要删除该问卷吗？删除后无法恢复。',
+() => {
+questionnaires = questionnaires.filter(q => q.id !== id);
+renderQuestionnaireList();
+showToast('问卷已删除');
+},
+true
+);
+}
+
+function toggleMoreMenu(event, id) {
+event.stopPropagation();
+document.querySelectorAll('.dropdown-menu').forEach(menu => {
+if (menu.id !== `menu-${id}`) {
+menu.classList.remove('show');
+}
+});
+document.getElementById(`menu-${id}`).classList.toggle('show');
+}
+
+document.addEventListener('click', () => {
+document.querySelectorAll('.dropdown-menu').forEach(menu => {
+menu.classList.remove('show');
+});
+});
+
+function showConfirmModal(title, body, callback, isDanger = false) {
+document.getElementById('modalTitle').textContent = title;
+document.getElementById('modalBody').textContent = body;
+const confirmBtn = document.getElementById('confirmBtn');
+confirmBtn.className = isDanger ? 'btn btn-danger' : 'btn btn-primary';
+currentAction = callback;
+document.getElementById('confirmModal').classList.add('show');
+}
+
+function closeModal() {
+document.getElementById('confirmModal').classList.remove('show');
+currentAction = null;
+}
+
+function confirmAction() {
+if (currentAction) {
+currentAction();
+}
+closeModal();
+}
+
+function showToast(message) {
+const toast = document.getElementById('toast');
+toast.textContent = message;
+toast.classList.add('show');
+setTimeout(() => {
+toast.classList.remove('show');
+}, 3000);
+}
+
+init();
+</script>
+</body>
+</html>
